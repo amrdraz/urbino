@@ -1,0 +1,28 @@
+.component {
+	position:relative;
+	padding:10px;
+	margin:10px;
+	height:auto;
+	border: #80CCFF solid 1px;
+	display:none;
+}
+.active{
+	display:block;
+}
+.canvas {
+	position:relative;
+	left:60px;
+	cursor:default;
+}
+.canvas svg,.canvas div{
+	border:#000 solid 1px;
+}
+.variation {
+	position:relative;
+	float:left;
+	height:auto;
+}
+.clear {
+	position:relative;
+	clear:both;
+}

@@ -1,0 +1,435 @@
+.time-panel {
+	position:relative;
+	
+	min-width:1020px;
+	max-width:1020px;
+	min-height:200px;
+	
+	background:#333;
+	
+	overflow: hidden;
+}
+
+.time-panel div, .time-panel svg{
+	position:absolute;
+}
+
+/*---------------------------- elements area ------------------------------*/
+.time-panel .elements-area{
+	top:0px;
+	left:0px;
+	
+	min-width: 235px;
+	max-width: 305px;
+	height: 200px;
+	
+}
+.time-panel .area-content div{
+	position:relative;
+	color:#eee;
+}
+.time-panel .element{
+	background:#444;
+	height: auto;
+}
+.time-panel .element .color{
+	z-index: 1;
+}
+
+.time-panel .element .header {
+	background:#666;
+	height:20px;
+	border-bottom:#444 solid 1px;
+}
+
+.time-panel .element.selected .header{
+	background:#777;
+}
+.time-panel .element-area .element.selected .prop{
+	background:#666;
+}
+
+
+.time-panel .elements-area  .element .header .arrow {
+	position:absolute;
+	width:8px;
+	left:15px;
+	top:-2px;
+	clip: rect(8px,8px,16px,0px);
+}
+.time-panel .elements-area  .element.expanded  .header .arrow{
+	top:6px;
+	clip: rect(0px,8px,8px,0px);
+}
+
+.time-panel .elements-area .element .header .eye {
+	position:absolute;
+	border:#555 solid 1px;
+	width:15px;
+	height:10px;
+	top:4px;
+	left:30px;
+}
+.time-panel .elements-area  .element .header .name {
+	position:absolute;
+	max-width:8px;	
+	top:1px;
+	left:60px;
+}
+.time-panel .elements-area .props {
+	margin-left:40%;
+	width:60%;
+}
+.time-panel .area-content .props div{
+	height:14px;
+}
+.time-panel  .props .prop{
+	background:#555;
+	border-bottom:#444 solid 1px;
+}
+.time-panel .element-area .props .prop.selected{
+	background:#666;
+}
+.time-panel .props:last-child {
+	border-bottom:none;
+}
+.time-panel .elements-area .props .prop *{
+	position:absolute;
+}
+.time-panel .elements-area .props .prop-label{
+	width:100px;
+	top:0px;
+	right:20px;
+	padding-bottom:1px;
+}
+.time-panel .elements-area .sliding-label{
+	top:0px;
+	right:40px;
+	line-height:1;
+}
+.time-panel .elements-area .sliding-input{
+	right:10px;
+	height:10px;
+	line-height: 1;
+	font-size: 9px;
+}
+.time-panel .elements-area  .key-frame{
+	position:absolute;
+	top:0px;
+	right:0;
+	width:19px;
+	border-left:#444 solid 1px;
+}
+/*the keyframe.gif real img width is 120px*/
+.time-panel .elements-area  .key-frame img{
+	position:absolute;
+	z-index:3;
+	top:3px;
+	width:24px;
+	
+	clip: rect(0px, 24px, 8px, 16px);
+	left:-10px;
+}
+.time-panel .elements-area  .key-frame img:hover{
+	clip: rect(0px, 16px, 8px, 8px);
+	left:-2px;
+}
+.time-panel .elements-area  .key-frame img:active{
+	clip: rect(0px, 8px, 8px, 0px);
+	left:7px;
+}
+
+.time-panel .element.expanded .props {
+	display:block;
+}
+.time-panel .element .props {
+	display:none;
+}
+
+#timelineOptons {
+	right:0px;
+	width:100px;
+	height:35px;
+}
+
+#playControl {
+	left:0px;
+	width:100px;
+	height:35px;
+}
+/*---------------------------- seperator ------------------------------*/
+.time-panel .seperator{
+	top:0px;
+	left:235px;
+	
+	background:#666;
+	width: 3px;
+	border-left:#000 solid 1px;
+	border-right:#000 solid 1px;
+	height: 200px;
+	
+}
+
+.time-panel .seperator:hover {
+	cursor:w-resize;
+}
+
+.time-panel .timeline-area{
+	top:0px;
+	left:240px;
+	
+	width: 760px;
+	height: 200px;
+	
+}
+.time-panel .timeline-area .scroll-area {
+	overflow:hidden;
+	width:759px;
+	height:180px;
+}
+.time-panel .scroll-bar {
+	top:0px;
+	right:0px;
+	
+	width:20px;
+	height:200px;
+	
+	background: #666;
+	border-left:#000 solid 1px;
+}
+
+.time-panel .slide-arrow, #timeLineFit {
+	width:18px;
+	height:18px;
+	
+	border:#444 solid 1px;
+}
+
+.time-panel .handel {
+	background:#333;
+}
+.time-panel .container:hover .handel{
+	background:#777;
+}
+
+#timeLineYSlider {
+	top:20px;
+	
+	width:20px;
+	height:160px;
+	
+	background:#555;
+}
+#timeLineYSlider .container{
+	top:20px;
+	width:20px;
+	height:120px;
+}
+#timeLineYSlider .handel {
+	width:20px;
+}
+
+#timeLineYSlider > div:first-child {
+	top:0;
+}
+
+#timeLineYSlider > div:last-child {
+	bottom:0;
+}
+
+
+/*---------The header section of the timeline and element-are -----*/
+
+.time-panel .area-header{
+	width:100%;
+	height:40px;
+	background: #666;
+	
+}
+
+.time-panel .timeline-area .area-header{
+	width:760px;
+}
+
+#timeLane {
+	background: #555;
+	width:100%;
+	height: 10px;
+	
+	left:0px;
+	top:9px;
+	border-top:#222 solid 1px;
+	border-bottom:#222 solid 1px;
+}
+
+#tracker {
+	left:0px;
+	top:9.5px;
+	
+	background:#111;
+	
+	min-width:23px;
+	padding-right:2px;
+	height:11px;
+	z-index:4;
+	white-space:nowrap;
+	
+	-webkit-border-radius:2px;
+	-moz-border-radius:2px;
+	border-radius: 2px;
+}
+#timelineSlider {
+	left:-5px;
+	
+	width:10px;
+	height:10px;
+}
+
+#trackerLine {
+	top:10px;
+	left:-0.5px;
+	border-left:#411 solid 1px;
+	width:1px;
+	height:162px;
+}
+
+#trackerTime {
+	position:relative !important;
+	
+	margin-left:7px;
+	
+	color:#eee;
+	font-size:8px;
+	
+	white-space:nowrap;
+	
+	height:10px;
+}
+/*for making sure the Raphael cnavas starts from 0*/
+.time-panel .area-header  svg, .time-panel .area-header DIV,.time-panel .area-footer DIV,.time-panel .area-footer svg {
+	position:absolute !important;
+}
+
+.time-panel .area-header .header-footer {
+	top: 30px;
+	left:0px;
+	
+	width:100%;
+	height: 10px;
+	
+	background: #444;
+	border-top:#222 solid 1px;
+}
+
+/*---------The content section of the timeline and element-are -----*/
+
+.time-panel .area-content{
+	top:40px;
+	overflow:hidden;
+	width:100%;
+	height:140px;
+}
+.time-panel .timeline-area .area-content{
+	width:760px;
+}
+.time-panel .timeline-area  .anim {
+	position:absolute;
+}
+.time-panel .timeline-area  .anim .body{
+	opacity:0.6;
+	width:100%;
+	-webkit-border-radius:1px;
+	-moz-border-radius:1px;
+	border-radius: 1px;
+}
+.time-panel .timeline-area  .anim .body.selected{
+	top:-1px;
+	border-top: #59f solid 1px;
+	border-bottom:#59f solid 1px;
+}
+.time-panel .timeline-area  .anim img{
+	position:absolute;
+	z-index:3;
+	top:3px;
+	width:24px;
+}
+.time-panel .timeline-area  .anim .left{
+	clip: rect(0px, 16px, 8px, 12px);
+	left:-12px;
+}
+.time-panel .timeline-area  .anim .left.selected{
+	clip:rect(0px, 8px, 8px, 4px);
+    left:-4px;
+}
+.time-panel .timeline-area  .anim .right{
+	 clip: rect(0px, 12px, 8px, 8px);
+	right:-12px;
+}
+.time-panel .timeline-area  .anim .right.selected{
+	 clip:rect(0px, 4px, 8px, 0px);
+     right:-20px;
+}
+/*---------The footer section of the timeline and element-are -----*/
+
+.time-panel .area-footer {
+	bottom:0px;
+	
+	width:100%;
+	height:19px;
+	background: #666;
+	border-top:#000 solid 1px;
+}
+
+#timeLineXSlider {
+	right:0px;
+
+	width:590px;
+	height:19px;
+	
+	background:#555;
+}
+#timeLineXSlider .container{
+	left:20px;
+	width:550px;
+	height:20px;
+}
+#timeLineXSlider .handel {
+	height:20px;
+}
+
+#timeLineXSlider > div:first-child {
+	left:0;
+}
+#timeLineXSlider > div:last-child {
+	right:0;
+}
+
+#timeLineFit {
+	left:152px;
+}
+
+#timeZoomSlider {
+	left:0px;
+	
+	width:151px;
+	height:20px;
+	
+	background:#555;
+}
+
+#timeZoomSlider div:first-child{
+	left:0px;
+}
+#timeZoomSlider .container{
+	left:20px;
+	width:110px;
+	height:20px;
+}
+#timeZoomSlider .handel{
+	width:10px;
+	height:20px;
+}
+
+#timeZoomSlider div:last-child{
+	right:0px;
+}

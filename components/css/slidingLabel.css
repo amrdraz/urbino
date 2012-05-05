@@ -1,0 +1,26 @@
+/*used w3schools for refrence and color picker*/
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.is-sliding {
+cursor:url(slider-cursor.svg),url(slider-cursor.gif),w-resize;
+-webkit-touch-callout: none;
+-webkit-user-select: none;
+-khtml-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+-o-user-select: none;
+user-select: none;
+}
+.sliding-label {
+	color:#BA7A19;
+	border-bottom:#BA7A19 dashed 1px;
+	padding-bottom: 1px;
+	margin-right:5px;
+	text-align:right;
+}
+.sliding-input {
+	width:20px;
+}

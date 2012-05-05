@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+  <title>Urbino</title>
+  <!-- blueprint CSS framework -->
+  <link rel="stylesheet" type="text/css" href="css/screen.css" media="screen, projection" />
+  <link rel="stylesheet" type="text/css" href="css/print.css" media="print" />
+  <!--[if lt IE 8]>
+  <link rel="stylesheet" type="text/css" href="css/ie.css" media="screen, projection" />
+  <![endif]-->
+  
+  <link rel='stylesheet' type='text/css' href="components/css/components.css" />
+  <link rel='stylesheet' type='text/css' href="components/css/slidingLabel.css" />
+  <link rel='stylesheet' type='text/css' href="components/css/propretiesPanel.css" />
+  <link rel='stylesheet' type='text/css' href="components/css/editorCanvas.css"  />
+  <link rel='stylesheet' type='text/css' href="components/css/layerPanel.css"  />
+  <link rel='stylesheet' type='text/css' href="components/css/TimePanel.css"  />
+  <link rel='stylesheet' type='text/css' href="core/mooRainbow.css"  />
+
+  <script type="text/javascript" src="core/mootools-core-full-compat.js"></script>
+  <script type="text/javascript" src="core/mootools-more-1.4.0.1.js"></script>
+  <script type="text/javascript" src="core/mooRainbow.js"></script>  
+  <script type="text/javascript" src="core/raphael-min.js"></script>
+  <script type="text/javascript" src="external/raphael.free_transform.js"></script>
+  <script type="text/javascript" src="components/js/raphael.pathManager.js"></script>
+  <script type="text/javascript" src="components/js/slidingLabel.js"></script>
+  <script type="text/javascript" src="components/js/PropretiesPanel.js"></script>
+  <script type="text/javascript" src="components/js/ToolPanel.js"></script>
+  <script type="text/javascript" src="components/js/LayerPanel.js"></script>
+  <script type="text/javascript" src="components/js/TimePanel.js"></script>
+  
+  <script type="text/javascript" src="core/main.js"></script>
+ 
+</head>
+ 
+<body>
+
+<div id="props" class="prop-panel"></div>
+<div id="tools" class="tools"></div>
+<div id="draw" class="canvas"></div>
+<div id="layers" ></div>
+<div id="timePanel" class="time-panel"></div>
+​
+<script>
+	var R = Raphael("draw", 640, 480),
+	selected,
+	
+	tp = new ToolPanel("tools", R),
+	lp = new LayerPanel("layers",R),
+	pp = new PropretiesPanel("props", ["fill", "stroke", "stroke-width"]),
+	timePanel = new TimePanel("timePanel", R,"img"),
+	fill = new MooRainbow('input[name=fill]', {
+		id: 'fill',
+		imgPath: 'img/',
+		'onChange': function(color) {
+			$$('input[name=fill]')[0].set("value", color.hex);
+			if(pp.selected){
+				window.fireEvent("element.update", [{"fill":color.hex}]);
+			}else {
+				tp.setAttr({"fill":color.hex});
+				pp.attrs = tp.getAttr();
+			}
+		}
+	}),
+	stroke = new MooRainbow('input[name=stroke]', {
+		id: 'stroke',
+		imgPath: 'img/',
+		startcolor:[],
+		'onChange': function(color) {
+			$$('input[name=stroke]')[0].set("value", color.hex);
+			if(pp.selected){
+				window.fireEvent("element.update", [{"stroke":color.hex}]);
+			} else {
+				tp.setAttr({"stroke":color.hex});
+				pp.attrs = tp.getAttr();
+			}
+				
+		}
+	});
+	pp.slidingLabel.setOnChange(function(val, label){
+		var attr = {};
+            attr[label.get("for")] = val;
+            if(pp.selected){
+                window.fireEvent("element.update", [attr]);
+            } else {
+                tp.setAttr(attr);
+            }
+	});
+</script>
+</body>
+</html>

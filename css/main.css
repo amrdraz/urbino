@@ -1,0 +1,161 @@
+#canvas svg, #canvas DIV {
+ border:1px solid #000;
+}
+
+.propreties.panel {
+    width:280px;
+    height:500px;
+    position:absolute;
+    right:20px;
+    top:100px;
+    padding:10px;
+    border:1px solid #000;
+	background:#222;
+}
+
+.propreties.panel input[type=text], .propreties.panel input[type=number] {
+    width:60px;
+}
+
+.propreties.panel label{
+	text-align:right;
+	color:#BA7A19;
+	width:60px;
+    margin-right:5px;
+}
+
+.propreties.panel .proprety {
+	display:none;
+	position:relative;
+	min-width:60px;
+	float:left;
+    margin:10px;
+    
+}
+.propreties .proprety.active{
+    display:block
+}
+
+#tools {
+	width:40px;
+	padding:5px;
+	height:auto;
+	background: #222;
+	position:absolute;
+	top:60px;
+	left:5px;
+	-moz-border-radius:5px;
+    -webkit-border-radius:5px;
+    border-radius:5px;
+}
+.tool {
+	background: #444;
+	color:#CCC;
+	text-align:center;
+	vertical-align:middle;
+	cursor:pointer;
+	
+	width:40px;
+	height:40px;
+	margin-bottom:3px;
+	
+	-moz-border-radius:5px;
+    -webkit-border-radius:5px;
+    border-radius:5px;
+}
+.tool:hover {
+	background: #666;
+}
+.tool.selected {
+	background: #111;
+	cursor:default;
+}
+.canvas {
+	position:relative;
+	left:60px;
+	cursor:default;
+}
+.canvas svg,.canvas div{
+	border:#000 solid 1px;
+}
+
+#layers{
+	position:absolute;
+	right:30px;
+	top:80px;
+	
+	width:220px;
+	height:auto;
+	min-height:310px;
+	max-height:710px;
+	overflow:hidden;
+	
+	background:#222;
+	
+	color: #eee;
+	overflow-y: scroll;
+}
+
+#layers .row{
+	background:#444;
+	border-bottom:#555 solid 1px;
+	position:relative;
+	height: 29px;
+}
+#layers .row:hover{
+	background:#333;
+}
+#layers .row.selected{
+	background:#666;
+}
+
+#layers .row .eye {
+	border:#555 solid 1px;
+	
+	width:15px;
+	height:10px;
+	
+	position:absolute;
+	top:9px;
+	left:5px;
+}
+
+#layers .row .node {
+	position:absolute;
+	left:20px;
+}
+
+#layers .node .arrow {
+	width:8px;
+	
+	position:relative;
+	top:5px;
+	left:8px;
+}
+#layers .node .name {
+	max-width:8px;
+	
+	position:relative;
+	top:5px;
+	left:12px;
+}
+
+#layers .hide {
+	display:none;
+}
+
+#layers .controls {
+	position:absolute;
+	bottom: 0px;
+	background:#333;
+	height: 20px;
+	width:100%;
+	min-width:220px;
+}
+
+#layers .controls svg, #layers .controls DIV{
+	position:absolute;
+	
+	top:0px;
+	right:2px;
+}

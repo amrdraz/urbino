@@ -1,0 +1,86 @@
+#layers{
+	position:absolute;
+	right:30px;
+	top:80px;
+	
+	width:220px;
+	height:auto;
+	min-height:310px;
+	max-height:710px;
+	overflow:hidden;
+	
+	background:#222;
+	
+	color: #eee;
+	overflow-y: scroll;
+}
+
+#layers .row{
+	background:#444;
+	border-bottom:#555 solid 1px;
+	position:relative;
+	height: 29px;
+}
+#layers .row:hover{
+	background:#333;
+}
+#layers .row.selected{
+	background:#666;
+}
+
+#layers .row .eye {
+	border:#555 solid 1px;
+	
+	width:15px;
+	height:10px;
+	
+	position:absolute;
+	top:9px;
+	left:5px;
+}
+
+#layers .row .node {
+	position:absolute;
+	left:20px;
+}
+
+#layers .node .arrow {
+	width:8px;
+	
+	position:absolute;
+	top:2px;
+	left:10px;
+	clip: rect(8px,8px,16px,0px);
+}
+
+#layers .node .arrow.expanded{
+	top:10px;
+	clip: rect(0px,8px,8px,0px);
+}
+#layers .node .name {
+	max-width:8px;
+	
+	position:absolute;
+	top:8px;
+	left:20px;
+}
+
+#layers .hide {
+	display:none;
+}
+
+#layers .controls {
+	position:absolute;
+	bottom: 0px;
+	background:#333;
+	height: 20px;
+	width:100%;
+	min-width:220px;
+}
+
+#layers .controls svg, #layers .controls DIV{
+	position:absolute;
+	
+	top:0px;
+	right:2px;
+}

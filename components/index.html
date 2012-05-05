@@ -1,0 +1,343 @@
+<!DOCTYPE HTML>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+  <title>Urbino</title>
+  <!-- blueprint CSS framework -->
+	<link rel="stylesheet" type="text/css" href="css/screen.css" media="screen, projection" />
+	<link rel="stylesheet" type="text/css" href="css/print.css" media="print" />
+	<!--[if lt IE 8]>
+	<link rel="stylesheet" type="text/css" href="css/ie.css" media="screen, projection" />
+	<![endif]-->
+  <link rel='stylesheet' type='text/css' href="css/components.css" />
+  <link rel='stylesheet' type='text/css' href="css/slidingLabel.css" />
+  <link rel='stylesheet' type='text/css' href="css/propretiesPanel.css" />
+  <link rel='stylesheet' type='text/css' href="css/editorCanvas.css"  />
+  <link rel='stylesheet' type='text/css' href="css/layerPanel.css"  />
+  <link rel='stylesheet' type='text/css' href="css/TimePanel.css"  />
+   
+  <script type="text/javascript" src="../core/mootools-core-full-compat.js"></script>
+  <script type="text/javascript" src="../core/mootools-more-1.4.0.1.js"></script>
+  <script type="text/javascript" src="../core/raphael.js"></script>
+  <script type="text/javascript" src="../external/raphael.free_transform.js"></script>
+  <script type="text/javascript" src="js/raphael.pathManager.js"></script>
+  <script type="text/javascript" src="js/SlidingLabel.js"></script>
+  <script type="text/javascript" src="js/Panel.js"></script>
+  <script type="text/javascript" src="js/ToolPanel.js"></script>
+  <script type="text/javascript" src="js/LayerPanel.js"></script>
+  <script type="text/javascript" src="js/TimePanel.js"></script>
+  
+  <script type="text/javascript" src="js/EditorCanvas.js"></script>
+  
+</head>
+ 
+<body>
+	
+<div class="component">
+	<h3>SlidingLabel</h3>
+	<form id="slideForm">
+		<div id="label"></div>
+		<label class="sliding-label" for="y">y:</label><input class="sliding-input" step="0.1", min="0" type="number" name="y"/>
+		<label class="sliding-label" for="height">height:</label><input class="sliding-input" max="30" type="number" name="height"/>
+	</form>
+	<script>
+//		window.addEvent("domready", function () {
+	/*global SlidingLabel,console*/
+		var sl =	new SlidingLabel({
+							container:"slideForm",
+							onChange:function(val){
+								console.log(val);
+							},
+							labels:[{label:"opacity", min:0, max:1, step:0.1},
+				                    "name"]
+	                });
+	              
+//		});
+	</script>
+</div>
+
+<div class="component">
+	<h3>DropDown</h3>
+	<form id="slideForm">
+		<div class="styled-select">
+			<select>
+			<option>first option</option>
+			<option>second option</option>
+			</select>
+		</div>
+	</form>
+	<script>
+//		window.addEvent("domready", function () {
+			
+//		});
+	</script>
+</div>
+
+<div class="component">
+	<h3>Propreties Panel</h3>
+	<div class="variation" >
+		<h4>Rect</h4>
+			
+		<form id="rect" class="panel">
+				
+		</form><!--End of propreties-->
+	</div><!--End of Variation-->
+	<div class="variation" >
+		<h4>image</h4>
+		<form id="image" class="panel">
+			
+		</form><!--End of propreties-->
+	</div><!--End of Variation-->
+	<div class="variation" >
+		<h4>text</h4>
+		<form id="text">
+			
+		</form><!--End of propreties-->
+	</div><!--End of Variation-->
+	<div class="variation" >
+		<h4>ellipse</h4>
+		<form id="ellipse" class="panel">
+			
+		</form><!--End of propreties-->
+	</div><!--End of Variation-->
+	<div class="variation" >
+		<h4>circle</h4>
+		<form id="circle" class="panel">
+		
+		</form><!--End of propreties-->
+	</div><!--End of Variation-->
+	<script>
+//		window.addEvent("domready", function () {
+	
+//		});
+	</script>
+	<script src="js/propretiesPanel.js"></script>
+	
+	<div class="clear"></div>
+</div>
+​
+<div class="component ">
+	<h3>Raphael Draw</h3>
+	<div id="tools" class="tools"></div>
+	<div id="draw" class="canvas"></div>
+	<div id="layers" ></div>
+	
+	<script>
+//		window.addEvent("domready", function () {
+/*global $,$$,console,Class,Element,typeOf,window,R, Raphael, ToolPanel, LayerPanel*/
+var D = Raphael("draw", 640, 480)
+//,tp = new ToolPanel("tools", D)
+//,lp = new LayerPanel("layers",D)
+;
+//		});
+	</script>
+</div>
+
+<div class="component">
+	<h3>Raphael Path</h3>
+	<div id="holder" class="canvas"></div>
+	<script>
+//		window.addEvent("domready", function () {
+	/*global $,$$,console,Class,Element,typeOf,window,R, Raphael*/
+	var r = Raphael("holder", 620, 420);
+	/*
+	pm.insertSegment(["M", 10, 10]);
+	pm.insertSegment(["L", 20,10]);
+	pm.insertSegment(["L", 60,10]);
+	pm.insertSegment(["L", 60,50]);
+	pm.insertSegment(["Z"]); */
+	
+	var pm = r.pathManager("M 100 100 100 200 200 200 200 100z M 125 125 125 175 175 175 175 125z");
+	
+// }
+	</script>
+</div>
+
+<div class="component ">
+	<h3>Time Panel</h3>
+	<div id="timeholder"class="canvas"></div>
+	<div id="time-panel" class="time-panel"></div>
+	<script>
+	/*global Raphael, TimePanel,console */
+	
+	var r = Raphael("timeholder", 800,200);
+		
+	/*var 
+		anim = function(prop,val,from,to,r){
+			var attr = {};
+			r = r || 1;
+			attr[prop] = val;
+			return Raphael.animation(attr, to).delay(from).repeat(r);
+		},
+		insertKeyFrame = function(el,prop,val,ms,i){
+			el.anims = el.anims||{};
+			var ii,del,a,b,temp,p =el.anims[prop] = el.anims[prop] || [];
+			//first time insert
+			if(p.length===0){
+				el.anims[prop][0] = anim(prop,val,0,ms);
+				return el.anims[prop][0];
+			}
+			//index not specified
+			if(!i){
+				i=0;
+				ii=p.length;
+				do{
+					i++;
+				}while(i<ii && p[i-1].ms<ms);
+			}
+			a = p[i-1];
+			if(a.ms===ms){
+				a.anim["100"][prop] = val;
+				return a;
+			}
+			if(a.ms<ms){
+				b = anim(prop,val,a.ms,ms);
+			} else {
+				b = anim(prop,val,a.del,ms);
+				a.del = ms;
+				i--;
+			}
+			p.splice(i,0,b);
+			return b;
+		},
+		asyncSeekTo = function(el,ms){
+			el.anims = el.anims||{};
+			Object.each(el.anims,function(p,k){
+				(function(){
+					p.some(function(a){
+						if(a.del<ms && a.ms>ms){
+							el.setTime(a,ms);
+							return true;
+						}
+						return (a.ms<ms);
+					});
+				}).delay(0);
+			});
+		},
+		seekTo =function (el, ms){
+			el.anims = el.anims||{};
+			Object.each(el.anims,function(p,k){
+				p.some(function(a){
+					if(a.del<ms && a.ms>ms){
+						el.setTime(a,ms);
+						return true;
+					}
+					return (a.ms<ms);
+				});
+			});
+		},
+		massanimate = function(els,ms){
+			els.each(function(el){
+				el.anims = el.anims||{};
+				Object.each(el.anims,function(p,k){
+					p.each(function(a){
+						el.animate(a);
+					});
+				});
+				(function(){
+					//el.stop();
+				}).delay(ms);
+			});
+		},
+		play = function(els,i,ii){
+			
+			var j=0,jj=els.length,
+			timer = (function(){
+                els.each(function(el){
+					//(function(){
+						seekTo(el,i);
+					//}).delay(0);
+				});
+                if(i>=ii) {
+                    clearTimeout(timer);
+                }
+                i+=10;
+            }).periodical(10);
+		},
+		test = function(name,func,n){
+			var r=0,res={name:name,total:0,avreg:0,max:0,min:0},s,e,i=0;
+			n=n||1;
+			
+			do {
+				s  = new Date();
+				func();
+				e = new Date();
+				r=(e-s);
+				res["t_"+i]=(e-s);
+				res.max = (res.max).max(r);
+				res.min = (res.max).min(r);
+				res.total+=r;
+				i++;
+			} while(i < n);
+			res.avreg = (res.total/n).round();
+			return res;
+		};
+		var rect,i,j,jj,x,att,elc = 2,ntimes=1,els=[],step=1000,attr=["x","y","cx","cy","r","width","height"];
+		for(var k=0;k<elc;k++){
+			rect = r.rect(20,20,100,50);
+			rect.id = "rect"+k;
+			els.push(rect);
+			for(j=0,jj = attr.length;j<jj;j++){
+				att=attr[j];
+				for(i=0;i<=2;i++){
+					x = i*step;
+					insertKeyFrame(rect,att,(20+i*130),x);
+				}
+			}
+		}
+		
+		var ms = 500;
+		console.log(
+			test("aSeekTo",function(){
+				els.each(function(el){
+					(function(){
+						seekTo(el,ms);
+					}).delay(0);
+				});
+			},ntimes),
+			test("aAsyncSeekTo",function(){
+				els.each(function(el){
+					asyncSeekTo(el,ms);
+				});
+			},ntimes),
+			test("aAsyncSeekTo",function(){
+				els.each(function(el){
+					(function(){
+						asyncSeekTo(el,ms);
+					}).delay(0);
+				});
+			},ntimes),
+			test("seekTo",function(){
+				els.each(function(el){
+					seekTo(el,ms);
+				});
+			},ntimes),
+			test("play",function(){
+				//play(els[3],0,1000);
+			}),
+			test("massaniamte",function(){
+				//massanimate(els[0],1000);
+			})
+		);
+		
+	*/
+	var timeline = new TimePanel("time-panel", r, {imgSrc:"../img"});
+	
+	</script>
+</div>
+
+<div class="component active">
+	<h3>Panel</h3>
+	<div id="container" class=""></div>
+	<script>
+//		window.addEvent("domready", function () {
+	/*global $,$$,console,Class,Element,typeOf,window,R, Raphael*/
+	//var r = Raphael("holder", 620, 420);
+
+	var panel = new Panel("container", {});
+	
+// }
+	</script>
+</div>
+
+</body>
+</html>

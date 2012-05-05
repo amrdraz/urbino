@@ -1,0 +1,18 @@
+3000=FINA Point Scoring 2004
+3001=FINA Point Scoring 2008
+3002=FINA Point Scoring 2009
+3003=FINA Point Scoring 2010
+3004=FINA Point Scoring 2011
+1011=CAN: Canadian SWAD Points Table 2008
+1014=CAN: Canadian SWAD Points Table 2010
+1001=GER: DSV Performance Table 2001
+1007=GER: DSV Performance Table 2005
+1013=GER: DSV Performance Table 2009
+1008=GER: DSV Master Performance Table 2004
+1106=GER: German Rudolph Table 2008
+1107=GER: German Rudolph Table 2009
+1108=GER: German Rudolph Table 2010
+1009=SLO: Slovenian Point Scoring 2006
+1101=SUI: Swiss Kids Points 2005
+1102=SUI: Swiss Kids Points 2007
+

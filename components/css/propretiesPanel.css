@@ -1,0 +1,36 @@
+.prop-panel {
+	position:relative;
+    width:1020px;
+    height:40px;
+    padding:10px;
+    background:#444;
+}
+
+.prop-panel input[type=text], .prop-panel input[type=number] {
+    width:60px;
+}
+
+.prop-panel label{
+	text-align:right;
+	width:60px;
+    margin-right:5px;
+    color:#BA7A19;
+}
+
+.prop-panel .proprety {
+	
+	position:relative;
+	min-width:60px;
+	float:left;
+    margin:10px;
+    
+}
+
+.prop-panel .proprety.active{
+    display:block
+}
+
+.prop-panel .proprety[name=x], .prop-panel .proprety[name=y], .prop-panel .proprety[name=cx], .prop-panel .proprety[name=cy] {
+   top:20px;
+   left:10px;
+}
