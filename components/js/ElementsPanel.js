@@ -1,15 +1,15 @@
 /**
- * this class is respnsible for the Editors Layer panel
+ * this class is respnsible for the Editors Elements view
  * @author Amr Draz
  * @requirments Raphael, Mootools
  */
 /*global $,$$,console,Class,Element,typeOf,window,R*/
 
-var LayerPanel = new Class({
+var ElementsPanel = new Class({
     
-    initialize: function (panel, canvas){
+    initialize: function (canvas){
         
-        var selected, panel = $(panel), els = {};
+        var selected, panel = this.panel = new Element("div", {"class":"elements-panel"}), els = {};
        
        
         
@@ -270,5 +270,7 @@ var LayerPanel = new Class({
                 window.fireEvent("element.delete", selected.el);
             }
         });
+        
     }
+    
 });

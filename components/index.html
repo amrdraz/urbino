@@ -12,7 +12,8 @@
   <link rel='stylesheet' type='text/css' href="css/slidingLabel.css" />
   <link rel='stylesheet' type='text/css' href="css/propretiesPanel.css" />
   <link rel='stylesheet' type='text/css' href="css/editorCanvas.css"  />
-  <link rel='stylesheet' type='text/css' href="css/layerPanel.css"  />
+  <link rel='stylesheet' type='text/css' href="css/TabPanel.css"  />
+  <link rel='stylesheet' type='text/css' href="css/ElementsPanel.css"  />
   <link rel='stylesheet' type='text/css' href="css/TimePanel.css"  />
    
   <script type="text/javascript" src="../core/mootools-core-full-compat.js"></script>
@@ -21,9 +22,9 @@
   <script type="text/javascript" src="../external/raphael.free_transform.js"></script>
   <script type="text/javascript" src="js/raphael.pathManager.js"></script>
   <script type="text/javascript" src="js/SlidingLabel.js"></script>
-  <script type="text/javascript" src="js/Panel.js"></script>
+  <script type="text/javascript" src="js/TabPanel.js"></script>
   <script type="text/javascript" src="js/ToolPanel.js"></script>
-  <script type="text/javascript" src="js/LayerPanel.js"></script>
+  <script type="text/javascript" src="js/ElementsPanel.js"></script>
   <script type="text/javascript" src="js/TimePanel.js"></script>
   
   <script type="text/javascript" src="js/EditorCanvas.js"></script>
@@ -326,15 +327,31 @@ var D = Raphael("draw", 640, 480)
 </div>
 
 <div class="component active">
-	<h3>Panel</h3>
+	<h3>Tab Panel</h3>
+	<div id="canvas" ></div>
 	<div id="container" class=""></div>
 	<script>
 //		window.addEvent("domready", function () {
-	/*global $,$$,console,Class,Element,typeOf,window,R, Raphael*/
-	//var r = Raphael("holder", 620, 420);
-
-	var panel = new Panel("container", {});
-	
+	/*global $,$$,console,Class,Element,typeOf,window,R, Raphael,TabPanel, PropretiesPanel,ElementsPanel*/
+	var 
+	r = Raphael("canvas","100%","100%"),
+	rect = r.rect(20,20,200,100).attr("fill","#48e"),
+	canvas = new TabPanel("canvas", {
+		width:640,
+		height:500,
+		tabs:{
+			canvas:{R:r ,panel:r.canvas}
+			}
+	});
+	side = new TabPanel("container", {
+		x:840,
+		width:300,
+		height:700,
+		tabs:{
+			"Propreties": (new PropretiesPanel()),
+			"Elements":(new ElementsPanel(r))
+		}
+	});
 // }
 	</script>
 </div>

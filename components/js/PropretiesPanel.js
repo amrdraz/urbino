@@ -6,8 +6,76 @@
  * @author Amr Draz
  *  
  */
-/*global Rapahel,$,$$,Class,Events,Options,Element,SlidingLabel,window*/
-var PropretiesPanel = new Class({
+/*global Rapahel,$,$$,Class,Events,Options,Element,typeOf,SlidingLabel,window*/
+var PropretiesPanel = (function(){
+    
+    var
+    /**
+     * list of web safe fonts mapped to their font-family
+     */
+    fonts={
+        "Times New Roman":'"Times New Roman", Times, serif',
+        "Trebuchet MS":'"Trebuchet MS", Helvetica, sans-serif',
+        Georgia:'Georgia, serif',
+        "Palatino Linotype":'"Palatino Linotype","Book Antiqua", Palatino, serif',
+        Arial:'Arial, Helvetica, sans-serif',
+        "Arial Black":'Arial Black, Gadget, sans-serif',
+        "Comic Sans MS":'"Comic Sans MS", cursive, sans-serif',
+        Impact:'Impact, Charcoal, sans-serif',
+        "Lucida Sans Unicode":'"Lucida Sans Unicode", "Lucida Grande", sans-serif',
+        Tahoma:'Tahoma, Geneva, sans-serif',
+        Verdana:'Verdana, Geneva, sans-serif',
+        "Courier New":'"Courier New", Courier, monospace',
+        "Lucida Console":'"Lucida Console", Monaco, monospace'},
+    /**
+     * object containing the discription of all Raphael element attributes
+     * following the proprotiess syntax
+     * nameOfProp:{name:"nameOfProp" type:"typeOfProp" [options:[], min,max,step]}
+     *      -name corresponds to the element's proprety name
+     *      -type (string) can be ["number", "precent", "text", "textarea", "select"]
+     *      -options (array) options for select element in case type is select
+     *      -min, max, setp (number) in case type is percent or number
+     * 
+     */
+    propreties = {    /* documentation taken from Rapahel-src.html */
+        x: {name:"x", type:"number"},                // (number)
+        y: {name:"y", type:"number"},                   // (number)
+        cx: {name:"cx", type:"number"},            // (number)
+        cy: {name:"cy", type:"number"},           // (number)
+        width: {name:"width", type:"number"},                // (number)
+        height: {name:"height", type:"number"},                // (number)
+        r: {name:"r", type:"number"},               // (number)
+        rx: {name:"rx", type:"number"},                // (number)
+        ry: {name:"ry", type:"number"},                // (number)
+        text: {name:"text", type:"textarea"},               // (string) contents of the text element. Use '\n' for multiline text
+        "text-anchor":{name:"text-anchor", type:"select", options:["start","middle","end"]},        // (string) ["start", "middle", "end"], default is "middle"
+        "opacity":{name:"opacity", type:"percent"},            // (number)
+        "fill":{name:"fill", type:"text"},                // (string) colour, gradient or image
+        "fill-opacity":{name:"fill-opacity", type:"percent"},        // (number)
+        "stroke":{name:"stroke", type:"text"},            // (string) stroke colour
+        "stroke-dasharray":{name:"stroke-dasharray", type:"select", options:["", "-", ".", "-.", "-..", ". ", "- ", "--", "- .", "--.", "--.."]},    // (string) [“”, "-", ".", "-.", "-..", ". ", "- ", "--", "- .", "--.", "--.."]
+        "stroke-linecap":{name:"stroke-linecap", type:"select", options:["butt", "square", "round"]},    // (string) ["butt", "square", "round"]
+        "stroke-linejoin":{name:"stroke-linejoin", type:"select", options:["bevel", "round", "miter"]},  // (string) ["bevel", "round", "miter"]
+        //TODO "stroke-miterlimit",// (number)
+        "stroke-opacity":{name:"stroke-opacity", type:"percent"},    // (number)
+        "stroke-width":{name:"stroke-width", type:"number", min:"1"},       // (number) stroke width in pixels, default is '1'
+        path:{name:"path", type:"text"},                // (string) SVG path string format
+        src:{name:"src", type:"text"},                // (string) image URL, only works for @Element.image element
+        font:{name:"font", type:"text"},                // (string)
+        "font-family":{label:"font",name:"font-family", type:"select", options:fonts},        // (string)
+        "font-size":{name:"font-size", type:"number", min:0},        // (number) font size in pixels
+        "font-weight":{name:"font-weight", type:"number"},        // (string)
+        "href":{name:"href", type:"text"},              // (string) URL, if specified element behaves as hyperlink
+        "target":{name:"target", type:"text"},            // (string) used with href
+        "title":{name:"title", type:"text"},            // (string) will create tooltip with a given text
+        //TODO "transform" (string) see @Element.transform
+        "arrow-end":{name:"arrow-end",  type:"select", options:['classic', 'block', 'open', 'oval', 'diamond', 'none'] },     // (string) arrowhead on the end of the path. The format for string is '<type>[-<width>[-<length>]]'. Possible types: 'classic', 'block', 'open', 'oval', 'diamond', 'none', width: 'wide', 'narrow', 'midium', length: 'long', 'short', 'midium'.
+        //TODO "clip-rect",        // (string) comma or space separated values: x, y, width and height
+        "cursor":{name:"cursor", type:"text"}           // (string) CSS type of the cursor
+        }
+    ;
+    
+    return new Class({
     
     Implements: [Events, Options],
     options:{
@@ -19,52 +87,6 @@ var PropretiesPanel = new Class({
      */
     attrs:{},
     /**
-     * object containing the discription of all Raphael element attributes
-     * following the proprotiess syntax
-     * nameOfProp:{name:"nameOfProp" type:"typeOfProp" [options:[], min,max,step]}
-     *      -name corresponds to the element's proprety name
-     *      -type (string) can be ["number", "precent", "text", "textarea", "select"]
-     *      -options (array) options for select element in case type is select
-     *      -min, max, setp (number) in case type is percent or number
-     * 
-     */
-    propreties : {    /* documentation taken from Rapahel-src.html */
-        x: {name:"x", type:"number"},                // (number)
-        y: {name:"y", type:"number"},                   // (number)
-        cx: {name:"cx", type:"number"},            // (number)
-        cy: {name:"cy", type:"number"},           // (number)
-        width: {name:"width", type:"number"},                // (number)
-        height: {name:"height", type:"number"},                // (number)
-        r: {name:"r", type:"number"},               // (number)
-        rx: {name:"rx", type:"number"},                // (number)
-        ry: {name:"ry", type:"number"},                // (number)
-        text: {name:"text", type:"textarea"},               // (string) contents of the text element. Use `\n` for multiline text
-        "text-anchor":{name:"text-anchor", type:"select", options:["start","middle","end"]},        // (string) ["start", "middle", "end"], default is "middle"
-        "opacity":{name:"opacity", type:"percent"},            // (number)
-        "fill":{name:"fill", type:"text"},                // (string) colour, gradient or image
-        "fill-opacity":{name:"fill-opacity", type:"percent"},        // (number)
-        "stroke":{name:"stroke", type:"text"},            // (string) stroke colour
-        "stroke-dasharray":{name:"stroke-dasharray", type:"select", options:["", "-", ".", "-.", "-..", ". ", "- ", "--", "- .", "--.", "--.."]},    // (string) [“”, "-", ".", "-.", "-..", ". ", "- ", "--", "- .", "--.", "--.."]
-        "stroke-linecap":{name:"stroke-linecap", type:"select", options:["butt", "square", "round"]},    // (string) ["butt", "square", "round"]
-        "stroke-linejoin":{name:"stroke-linejoin", type:"select", options:["bevel", "round", "miter"]},  // (string) ["bevel", "round", "miter"]
-        //TODO "stroke-miterlimit",// (number)
-        "strock-opacity":{name:"strock-opacity", type:"percent"},    // (number)
-        "stroke-width":{name:"stroke-width", type:"number", min:"1"}        // (number) stroke width in pixels, default is '1'
-        //{name:"path", type:"text"},                // (string) SVG path string format
-        //{name:"src", type:"text"},                // (string) image URL, only works for @Element.image element
-        //{name:"font", type:"text"},                // (string)
-        //{name:"font-family", type:"text"},        // (string)
-        //{name:"font-size", type:"number"},        // (number) font size in pixels
-        //{name:"font-weight", type:"number"},        // (string)
-        //{name:"href", type:"text"},              // (string) URL, if specified element behaves as hyperlink
-        //{name:"target", type:"text"},            // (string) used with href
-        //{name:"title", type:"text"},            // (string) will create tooltip with a given text
-        //TODO "transform" (string) see @Element.transform
-        //TODO "arrow-end",        // (string) arrowhead on the end of the path. The format for string is `<type>[-<width>[-<length>]]`. Possible types: `classic`, `block`, `open`, `oval`, `diamond`, `none`, width: `wide`, `narrow`, `midium`, length: `long`, `short`, `midium`.
-        //TODO "clip-rect",        // (string) comma or space separated values: x, y, width and height
-        //{name:"cursor", type:"text"}           // (string) CSS type of the cursor
-        },
-    /**
      * predefine list of props for SVG elements
      */
     elementProps: {
@@ -74,9 +96,11 @@ var PropretiesPanel = new Class({
         ellipse:["cx","cy","rx","ry"],
         text:["x","y","text","text-anchor","font","font-family","font-size","font-weight"],
         image:["x","y","width","height","src"],
-        path:["path"/*,"arrow-end","clip-rect"*/],
-        canvas:["width","height"]
+        path:["path","arrow-end"],
+        canvas:["width","height"],
+        all:["x","y","cx","cy","width","height","rx","ry","r","src","text","text-anchor","font-family","font-size","font-weight","title","opacity","cursor","fill","fill-opacity","stroke","stroke-dasharray","stroke-linecap","stroke-linejoin",/*"stroke-miterlimit",*/"stroke-opacity","stroke-width"]
     },
+    
     /**
      * creates a select element for a proprety of type text
      * @param p (obj) a proprety object that follows the propreties object syntax
@@ -84,7 +108,7 @@ var PropretiesPanel = new Class({
      */
     textInput: function (p) {
         var div = new Element("div", {"class":p.name+" proprety "+p.type}),
-            label = new Element("label", {"for":p.name, "text":p.name+":"}),
+            label = new Element("label", {"for":p.name, "text":(p.label||p.name)+":"}),
             input = new Element("input", {
                 type:"text",
                 name:p.name
@@ -98,7 +122,7 @@ var PropretiesPanel = new Class({
      */
     textarea: function (p) {
         var div = new Element("div", {"class":p.name+" proprety "+p.type}),
-            label = new Element("label", {"for":p.name, "text":p.name+":"})
+            label = new Element("label", {"for":p.name, "text":(p.label||p.name)+":"})
                 .setStyles({'position':'relative', 'clear':'right'}),
             textarea = new Element("textarea", {
                 name:p.name
@@ -112,12 +136,17 @@ var PropretiesPanel = new Class({
      */
     selectInput: function (p) {
         var div = new Element("div", {"class":p.name+" proprety "+p.type}),
-            label = new Element("label", {"for":p.name, "text":p.name+":"}),
+            label = new Element("label", {"for":p.name, "text":(p.label||p.name)+":"}),
             select = new Element("select", {"name":p.name }),
             option;
-            for (var i=0,ii=p.options.length;i<ii;i+=1){
-                option = new Element("option", {value:p.options[i], text:p.options[i]});
-                option.inject(select);
+            if(typeOf(p.options)==="array"){
+                p.options.each(function(option,i){
+                    (new Element("option", {value:option, text:option})).inject(select);
+                });
+            } else {
+                Object.each(p.options,function(val,text){
+                    (new Element("option", {value:val, text:text})).inject(select);
+                });
             }
        return div.adopt(label, select);
     },
@@ -169,21 +198,21 @@ var PropretiesPanel = new Class({
      *                                    the option needs to follow the same synatax a proprety is defined in the propreties panels
      *                                     i.e nameOfProp:{name:"nameOfProp" type:"typeOfProp" [options:[], min,max,step]}
      */
-    initialize: function (panel, props, options) {
+    initialize: function (options) {
         options = options ||{};
         if(options.extraProps) {
-            this.propreties.combine(options.extraProps);
+            propreties.combine(options.extraProps);
         }
-        this.panel = $(panel);
-       // var form = this.form = new Element("form", {"class":"prop-panel "});
+        var panel = this.panel = new Element("form", {"class":"prop-panel"}),
+        props = options.props || this.elementProps.all;
         this.slidingLabel = new SlidingLabel({
                                     container:panel
                                 });
         
         var obj = {};//loop generating propreties
         for (var i = 0, ii = props.length; i <ii;i+=1) {
-            var p = this.propreties[props[i]],
-            div = this.createInput(p);
+            var p = propreties[props[i]];
+            var div = this.createInput(p);
             obj[p.name] = div.getLast();
             props[i] = div;
         }
@@ -198,6 +227,7 @@ var PropretiesPanel = new Class({
         window.addEvent("element.select", this.elementSelect.bind(this));
         window.addEvent("element.deselect", this.elementDeselect.bind(this));
         window.addEvent("element.update", this.elementUpdate.bind(this));
+        
    },
    /**
     * function that fires element.update event with the input'scurrent value on keyup or change
@@ -213,7 +243,7 @@ var PropretiesPanel = new Class({
         if(this.selected){
             window.fireEvent("element.update", [attr]);
         } else {
-            tp.setAttr(attr);
+            toolpanel.setAttr(attr);
         }
     },
     /**
@@ -291,11 +321,14 @@ var PropretiesPanel = new Class({
     showByType: function(type) {
         var props = this.propreties,
             elP = this.elementProps;
-        Object.each(props, function(item, index){
-            if(elP.common.indexOf(index)!=-1 || elP[type].indexOf(index)!=-1){
+        Object.each(props, function(item, key){
+            if(~elP.common.indexOf(key) || ~elP[type].indexOf(key)){
+                console.log(type,key);
                 item.getParent().addClass("active");
             }
         }, this);
     }
     
 });
+
+})();

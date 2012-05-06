@@ -15,8 +15,8 @@ cursor:url(slider-cursor.svg),url(slider-cursor.gif),w-resize;
 user-select: none;
 }
 .sliding-label {
-	color:#BA7A19;
-	border-bottom:#BA7A19 dashed 1px;
+	color:#48e;
+	border-bottom:#48e dashed 1px;
 	padding-bottom: 1px;
 	margin-right:5px;
 	text-align:right;

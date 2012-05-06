@@ -8,8 +8,9 @@ var TimePanel = new Class({
     
     Implements: [Events, Options],
     
-    initialize: function (panel, paper, options){
-        panel = this.panel = $(panel);
+    initialize: function (paper, options){
+        var panel = this.panel = new Element("div",{"class":"time-panel"});
+
         options = options || {};
         var
         timePanel = this,
@@ -138,42 +139,37 @@ var TimePanel = new Class({
         
         timelineArea = div("timeline-area"),
             scrollArea = div("scroll-area").inject(timelineArea),
-            timelineHeader = div("area-header",{
-                html:   "<div id='timeLane'></div>"+
-                        "<div id='labelLane'></div>"+
-                        "<div id='triggerLane' class='header-footer'></div>"+
-                        "<div id='tracker'>"+
-                            "<div id='timelineSlider'></div>"+
-                            "<div id='trackerLine'></div>"+
-                            "<div id='trackerTime'></div>"+
-                        "</div>"+
-                        "<div id='pin'></div>"
-            }).inject(scrollArea),
-            timelanes = div("area-content",{
-                events:{
-                    
-                }
-            }).inject(scrollArea),
-            timelineFooter = div("area-footer",{
-                html:   "<div id='timeZoomSlider'>"+
-                            "<div class='slide-arrow'></div>"+
-                            "<div class='container'><div class='handel'></div></div>"+
-                            "<div class='slide-arrow'></div>"+
-                        "</div>"+
-                        "<div id='timeLineFit'></div>"+
-                        "<div id='timeLineXSlider'>"+
-                            "<div class='slide-arrow'></div>"+
-                            "<div class='container'><div class='handel'></div></div>"+
-                            "<div class='slide-arrow'></div>"+
-                        "</div>"
-            }).inject(timelineArea),
-        scrollBar = div("scroll-bar",{
-            html:   "<div id='timeLineYSlider'>"+
-                        "<div class='slide-arrow'></div>"+
-                        "<div class='container'><div class='handel'></div></div>"+
-                        "<div class='slide-arrow'></div>"+
-                    "</div>"
-        }),
+            timelineHeader = div("area-header").adopt(
+                div("",{id:"timeLane"}),
+                div("",{id:"labelLane"}),
+                div("header-footer",{id:"triggerLane"}),
+                div("",{id:"tracker"}).adopt(
+                    div("",{id:"timelineSlider"}),
+                    div("",{id:"trackerLine"}),
+                    div("",{id:"trackerTime"})
+                ),
+                div("",{id:"pin"})
+            ).inject(scrollArea),
+            timelanes = div("area-content").inject(scrollArea),
+            timelineFooter = div("area-footer").adopt(
+                div("",{id:"timeZoomSlider"}).adopt(
+                    div("slide-arrow"),
+                    div("container").adopt(div("handel")),
+                    div("slide-arrow")
+                ),
+                div("",{id:"timeLineFit"}),
+                div("",{id:"timeLineXSlider"}).adopt(
+                    div("slide-arrow"),
+                    div("container").adopt(div("handel")),
+                    div("slide-arrow")
+                )
+            ).inject(timelineArea),
+        scrollBar = div("scroll-bar").adopt(
+            div("",{id:"timeLineYSlider"}).adopt(
+                div("slide-arrow"),
+                div("container").adopt(div("handel")),
+                div("slide-arrow")
+            )),
         slidingLabel = new SlidingLabel({
             container:elements,
             onStart:function(val,label){
@@ -421,15 +417,14 @@ var TimePanel = new Class({
             }
         };
         
-        
         var
-        playControl = Raphael($("playControl"),"100%","100%"),
-        timelineOptions = Raphael($("timelineOptons"),"100%","100%"),
-        timeLane = Raphael($("timeLane"),"100%",10),
-        labelLane = Raphael($("labelLane"),"100%",10),
-        triggerLane = Raphael($("triggerLane"),"100%",10),
-        timelineXSlider = makeScrollbar([scrollArea], $$('#timeLineXSlider .container')[0], $$("#timeLineXSlider .handel")[0], true ,true),
-        timelineYSlider = makeScrollbar([elements,timelanes], $$('#timeLineYSlider .container')[0], $$("#timeLineYSlider .handel")[0], false,true ),
+        playControl = Raphael(elementsAreaHeader.getElement("#playControl"),"100%","100%"),
+        timelineOptions = Raphael(elementsAreaHeader.getElement("#timelineOptons"),"100%","100%"),
+        timeLane = Raphael(timelineArea.getElement("#timeLane"),"100%",10),
+        labelLane = Raphael(timelineArea.getElement("#labelLane"),"100%",10),
+        triggerLane = Raphael(timelineArea.getElement("#triggerLane"),"100%",10),
+        timelineXSlider = makeScrollbar([scrollArea], timelineArea.getElement('#timeLineXSlider .container'), timelineArea.getElement("#timeLineXSlider .handel"), true ,true),
+        timelineYSlider = makeScrollbar([elements,timelanes], scrollBar.getElement('.container'), scrollBar.getElement(".handel"), false,true ),
         
         buttonAttr = {"fill":"#ddd", "stroke":"#444", "cursor":"pointer"},
         controlHoverIn = function (){
@@ -627,7 +622,7 @@ var TimePanel = new Class({
          * @param pos (number) position of the tracker in pixels
          */
         setTracker = function(pos){
-            var tracker = $("tracker");
+            var tracker = timelineHeader.getElement("#tracker");
             
             tracker.setStyle("left", pos);
             trackerMs = ((pos)*msPerpx).round();
@@ -706,7 +701,7 @@ var TimePanel = new Class({
             });
             slideTo(pos);
         },
-        zoomSlider = new Slider($$("#timeZoomSlider .container")[0], $$("#timeZoomSlider .handel")[0],{
+        zoomSlider = new Slider(timelineArea.getElement("#timeZoomSlider .container"), timelineArea.getElement("#timeZoomSlider .handel"),{
             steps:100,
             wheel:true,
             onChange:function(val){
@@ -1141,37 +1136,37 @@ var TimePanel = new Class({
                         setTrackerMs(lastMs);
                         slideTo(lastMs/msPerpx);
                     });
-        Raphael($("timeLineYSlider").getFirst(),"100%","100%")
+        Raphael(scrollBar.getElement("#timeLineYSlider").getFirst(),"100%","100%")
                     .path(icon.arrowup).attr(buttonAttr).attr({title:"step up"})
                     .hover(controlHoverIn, controlHoverOut)
                     .transform("T -7 -7 S 0.8");
-        Raphael($("timeLineYSlider").getLast(),"100%","100%")
+        Raphael(scrollBar.getElement("#timeLineYSlider").getLast(),"100%","100%")
                     .path(icon.arrowdown).attr(buttonAttr).attr({title:"step down"})
                     .hover(controlHoverIn, controlHoverOut)
                     .transform("T -7 -7 S 0.8");
-        Raphael($("timeLineXSlider").getFirst(),"100%","100%")
+        Raphael(timelineArea.getElement("#timeLineXSlider").getFirst(),"100%","100%")
                     .path(icon.arrowleft).attr(buttonAttr).attr({title:"step left"})
                     .hover(controlHoverIn, controlHoverOut)
                     .transform("T -7 -7 S 0.8");
-        Raphael($("timeLineXSlider").getLast(),"100%","100%")
+        Raphael(timelineArea.getElement("#timeLineXSlider").getLast(),"100%","100%")
                     .path(icon.arrowright).attr(buttonAttr).attr({title:"step right"})
                     .hover(controlHoverIn, controlHoverOut)
                     .transform("T -7 -7 S 0.8");
         
-        Raphael($("timeZoomSlider").getFirst(),"100%","100%")
+        Raphael(timelineArea.getElement("#timeZoomSlider").getFirst(),"100%","100%")
                     .path(icon.minus).attr(buttonAttr).attr({title:"zoom out"})
                     .hover(controlHoverIn, controlHoverOut)
                     .transform("T -4 0 S 0.8");
-        Raphael($("timeZoomSlider").getLast(),"100%","100%")
+        Raphael(timelineArea.getElement("#timeZoomSlider").getLast(),"100%","100%")
                     .path(icon.plus).attr(buttonAttr).attr({title:"zoom in"})
                     .hover(controlHoverIn, controlHoverOut)
                     .transform("T -4 0 S 0.8");
-        Raphael($("timeLineFit"),"100%","100%")
+        Raphael(timelineArea.getElement("#timeLineFit"),"100%","100%")
                     .path(icon.fit).attr(buttonAttr).attr({title:"fit to timeline"})
                     .hover(controlHoverIn, controlHoverOut)
                     .transform("T -7 -7 S 0.6");
         
-        Raphael($("timelineSlider"),"100%","100%")
+        Raphael(timelineArea.getElement("#timelineSlider"),"100%","100%")
                     .path(icon.tracker).attr(buttonAttr).attr({title:""})
                     .hover(controlHoverIn, controlHoverOut)
                     .transform("T 2 0 S 1.5")
@@ -1221,10 +1216,10 @@ var TimePanel = new Class({
                 },
             "blur": hideTextField
         });
-        $("timeLane").addEvent("mousedown", trackerSeek);
-        $("timeZoomSlider").getFirst().addEvent("mousedown", function(e){e.stop();timePanel.fireEvent("timeline.zoomout");});
-        $("timeZoomSlider").getLast().addEvent("mousedown", function(e){e.stop();timePanel.fireEvent("timeline.zoomin");});
-        $("timeLineFit").addEvent("mousedown", function(e){e.stop();fitTo(lastMs);});
+        timelineArea.getElement("#timeLane").addEvent("mousedown", trackerSeek);
+        timelineArea.getElement("#timeZoomSlider").getFirst().addEvent("mousedown", function(e){e.stop();timePanel.fireEvent("timeline.zoomout");});
+        timelineArea.getElement("#timeZoomSlider").getLast().addEvent("mousedown", function(e){e.stop();timePanel.fireEvent("timeline.zoomin");});
+        timelineArea.getElement("#timeLineFit").addEvent("mousedown", function(e){e.stop();fitTo(lastMs);});
         
         window.addEvents({
             "element.create": elementCreate,

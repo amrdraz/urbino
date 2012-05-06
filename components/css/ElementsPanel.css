@@ -1,34 +1,30 @@
-#layers{
-	position:absolute;
-	right:30px;
-	top:80px;
+.elements-panel{
+	position:relative;
 	
-	width:220px;
-	height:auto;
-	min-height:310px;
-	max-height:710px;
+	width:100%;
+	height:100%;
+	
 	overflow:hidden;
 	
 	background:#222;
 	
 	color: #eee;
-	overflow-y: scroll;
 }
 
-#layers .row{
-	background:#444;
+.elements-panel .row{
+	background:#333;
 	border-bottom:#555 solid 1px;
 	position:relative;
 	height: 29px;
 }
-#layers .row:hover{
+.elements-panel .row:hover{
 	background:#333;
 }
-#layers .row.selected{
+.elements-panel .row.selected{
 	background:#666;
 }
 
-#layers .row .eye {
+.elements-panel .row .eye {
 	border:#555 solid 1px;
 	
 	width:15px;
@@ -39,12 +35,12 @@
 	left:5px;
 }
 
-#layers .row .node {
+.elements-panel .row .node {
 	position:absolute;
 	left:20px;
 }
 
-#layers .node .arrow {
+.elements-panel .node .arrow {
 	width:8px;
 	
 	position:absolute;
@@ -53,11 +49,11 @@
 	clip: rect(8px,8px,16px,0px);
 }
 
-#layers .node .arrow.expanded{
+.elements-panel .node .arrow.expanded{
 	top:10px;
 	clip: rect(0px,8px,8px,0px);
 }
-#layers .node .name {
+.elements-panel .node .name {
 	max-width:8px;
 	
 	position:absolute;
@@ -65,11 +61,11 @@
 	left:20px;
 }
 
-#layers .hide {
+.elements-panel .hide {
 	display:none;
 }
 
-#layers .controls {
+.elements-panel .controls {
 	position:absolute;
 	bottom: 0px;
 	background:#333;
@@ -78,7 +74,7 @@
 	min-width:220px;
 }
 
-#layers .controls svg, #layers .controls DIV{
+.elements-panel .controls svg, .elements-panel .controls DIV{
 	position:absolute;
 	
 	top:0px;

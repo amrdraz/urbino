@@ -127,6 +127,7 @@ var SlidingLabel = (function (){
             "for":name
             }).set(o.label)
             .addClass("sliding-label is-sliding");
+
         return div.adopt(label,input);
     },
     /**

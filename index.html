@@ -12,8 +12,9 @@
   <link rel='stylesheet' type='text/css' href="components/css/components.css" />
   <link rel='stylesheet' type='text/css' href="components/css/slidingLabel.css" />
   <link rel='stylesheet' type='text/css' href="components/css/propretiesPanel.css" />
+  <link rel='stylesheet' type='text/css' href="components/css/TabPanel.css" />
   <link rel='stylesheet' type='text/css' href="components/css/editorCanvas.css"  />
-  <link rel='stylesheet' type='text/css' href="components/css/layerPanel.css"  />
+  <link rel='stylesheet' type='text/css' href="components/css/ElementsPanel.css"  />
   <link rel='stylesheet' type='text/css' href="components/css/TimePanel.css"  />
   <link rel='stylesheet' type='text/css' href="core/mooRainbow.css"  />
 
@@ -23,10 +24,11 @@
   <script type="text/javascript" src="core/raphael-min.js"></script>
   <script type="text/javascript" src="external/raphael.free_transform.js"></script>
   <script type="text/javascript" src="components/js/raphael.pathManager.js"></script>
+  <script type="text/javascript" src="components/js/TabPanel.js"></script>
   <script type="text/javascript" src="components/js/slidingLabel.js"></script>
   <script type="text/javascript" src="components/js/PropretiesPanel.js"></script>
   <script type="text/javascript" src="components/js/ToolPanel.js"></script>
-  <script type="text/javascript" src="components/js/LayerPanel.js"></script>
+  <script type="text/javascript" src="components/js/ElementsPanel.js"></script>
   <script type="text/javascript" src="components/js/TimePanel.js"></script>
   
   <script type="text/javascript" src="core/main.js"></script>
@@ -35,20 +37,48 @@
  
 <body>
 
-<div id="props" class="prop-panel"></div>
+<div id="menu" ></div>
 <div id="tools" class="tools"></div>
-<div id="draw" class="canvas"></div>
-<div id="layers" ></div>
-<div id="timePanel" class="time-panel"></div>
+<div id="canvas" ></div>
+<div id="side" ></div>
+<div id="timeline"></div>
 ​
 <script>
-	var R = Raphael("draw", 640, 480),
+	/*global $,$$,console,Class,Element,typeOf,window,R, Raphael,MooRainbow,TabPanel,TimePanel, PropretiesPanel,ElementsPanel,ToolPanel*/
+	var r = Raphael("canvas", "100%", "100%"),
 	selected,
-	
-	tp = new ToolPanel("tools", R),
-	lp = new LayerPanel("layers",R),
-	pp = new PropretiesPanel("props", ["fill", "stroke", "stroke-width"]),
-	timePanel = new TimePanel("timePanel", R,"img"),
+	toolpanel = new ToolPanel("tools", r),
+	ep = new ElementsPanel(r,{imgSrc:"img"}),
+	pp = new PropretiesPanel(),
+	tp = new TimePanel(r,{imgSrc:"img"}),
+	canvas = new TabPanel("canvas", {
+		x:60,
+		y:50,
+		width:840,
+		height:500,
+		tabs:{
+			canvas:{R:r ,panel:r.canvas}
+			}
+	}),
+	side = new TabPanel("side", {
+		x:1000,
+		y:50,
+		width:300,
+		height:500,
+		tabs:{
+			"Propreties":pp,
+			"Elements":ep
+		}
+	}),
+	timeline = new TabPanel("timeline", {
+		x:0,
+		y:560,
+		width:1020,
+		height:220,
+		tabs:{
+			"Timeline":tp
+		}
+	}),
 	fill = new MooRainbow('input[name=fill]', {
 		id: 'fill',
 		imgPath: 'img/',
@@ -57,8 +87,8 @@
 			if(pp.selected){
 				window.fireEvent("element.update", [{"fill":color.hex}]);
 			}else {
-				tp.setAttr({"fill":color.hex});
-				pp.attrs = tp.getAttr();
+				toolpanel.setAttr({"fill":color.hex});
+				pp.attrs = toolpanel.getAttr();
 			}
 		}
 	}),
@@ -71,8 +101,8 @@
 			if(pp.selected){
 				window.fireEvent("element.update", [{"stroke":color.hex}]);
 			} else {
-				tp.setAttr({"stroke":color.hex});
-				pp.attrs = tp.getAttr();
+				toolpanel.setAttr({"stroke":color.hex});
+				pp.attrs = toolpanel.getAttr();
 			}
 				
 		}
@@ -83,7 +113,7 @@
             if(pp.selected){
                 window.fireEvent("element.update", [attr]);
             } else {
-                tp.setAttr(attr);
+                toolpanel.setAttr(attr);
             }
 	});
 </script>
