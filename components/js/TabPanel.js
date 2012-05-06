@@ -1,7 +1,7 @@
 /**
  * This Class definesthe a panel
  * @author Amr Draz
- * @dependency Raphael, MooTools, SlidingLabel, ColorPicker
+ * @dependency MooTools Core, Slider
  */
 /*global Class,Raphael,Events,Options,$,$$,Element,console,window,typeOf,Slider,SlidingLabel */
 

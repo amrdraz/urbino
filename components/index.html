@@ -159,9 +159,8 @@ var D = Raphael("draw", 640, 480)
 	<script>
 	/*global Raphael, TimePanel,console */
 	
-	var r = Raphael("timeholder", 800,200);
-		
-	/*var 
+	var r = Raphael("timeholder", 800,200),
+	
 		anim = function(prop,val,from,to,r){
 			var attr = {};
 			r = r || 1;
@@ -199,60 +198,6 @@ var D = Raphael("draw", 640, 480)
 			p.splice(i,0,b);
 			return b;
 		},
-		asyncSeekTo = function(el,ms){
-			el.anims = el.anims||{};
-			Object.each(el.anims,function(p,k){
-				(function(){
-					p.some(function(a){
-						if(a.del<ms && a.ms>ms){
-							el.setTime(a,ms);
-							return true;
-						}
-						return (a.ms<ms);
-					});
-				}).delay(0);
-			});
-		},
-		seekTo =function (el, ms){
-			el.anims = el.anims||{};
-			Object.each(el.anims,function(p,k){
-				p.some(function(a){
-					if(a.del<ms && a.ms>ms){
-						el.setTime(a,ms);
-						return true;
-					}
-					return (a.ms<ms);
-				});
-			});
-		},
-		massanimate = function(els,ms){
-			els.each(function(el){
-				el.anims = el.anims||{};
-				Object.each(el.anims,function(p,k){
-					p.each(function(a){
-						el.animate(a);
-					});
-				});
-				(function(){
-					//el.stop();
-				}).delay(ms);
-			});
-		},
-		play = function(els,i,ii){
-			
-			var j=0,jj=els.length,
-			timer = (function(){
-                els.each(function(el){
-					//(function(){
-						seekTo(el,i);
-					//}).delay(0);
-				});
-                if(i>=ii) {
-                    clearTimeout(timer);
-                }
-                i+=10;
-            }).periodical(10);
-		},
 		test = function(name,func,n){
 			var r=0,res={name:name,total:0,avreg:0,max:0,min:0},s,e,i=0;
 			n=n||1;
@@ -284,75 +229,10 @@ var D = Raphael("draw", 640, 480)
 				}
 			}
 		}
-		
-		var ms = 500;
-		console.log(
-			test("aSeekTo",function(){
-				els.each(function(el){
-					(function(){
-						seekTo(el,ms);
-					}).delay(0);
-				});
-			},ntimes),
-			test("aAsyncSeekTo",function(){
-				els.each(function(el){
-					asyncSeekTo(el,ms);
-				});
-			},ntimes),
-			test("aAsyncSeekTo",function(){
-				els.each(function(el){
-					(function(){
-						asyncSeekTo(el,ms);
-					}).delay(0);
-				});
-			},ntimes),
-			test("seekTo",function(){
-				els.each(function(el){
-					seekTo(el,ms);
-				});
-			},ntimes),
-			test("play",function(){
-				//play(els[3],0,1000);
-			}),
-			test("massaniamte",function(){
-				//massanimate(els[0],1000);
-			})
-		);
-		
-	*/
+
 	var timeline = new TimePanel(r, {imgSrc:"../img"});
 	timeline.panel.inject($("timeholder"),"after");
 	
-	</script>
-</div>
-
-<div class="component active">
-	<h3>Tab Panel</h3>
-	<div id="canvas" ></div>
-	<div id="container" class=""></div>
-	<script>
-//		window.addEvent("domready", function () {
-	/*global $,$$,console,Class,Element,typeOf,window,R, Raphael,TabPanel, PropretiesPanel,ElementsPanel*/
-	var 
-	r = Raphael("canvas","100%","100%"),
-	rect = r.rect(20,20,200,100).attr("fill","#48e"),
-	canvas = new TabPanel("canvas", {
-		width:640,
-		height:500,
-		tabs:{
-			canvas:{R:r ,panel:r.canvas}
-			}
-	});
-	side = new TabPanel("container", {
-		x:840,
-		width:300,
-		height:700,
-		tabs:{
-			"Propreties": (new PropretiesPanel()),
-			"Elements":(new ElementsPanel(r))
-		}
-	});
-// }
 	</script>
 </div>
 

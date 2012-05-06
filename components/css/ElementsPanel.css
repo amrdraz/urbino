@@ -10,73 +10,84 @@
 	
 	color: #eee;
 }
-
-.elements-panel .row{
-	background:#333;
-	border-bottom:#555 solid 1px;
+.elements-panel div{
 	position:relative;
-	height: 29px;
 }
-.elements-panel .row:hover{
-	background:#333;
-}
-.elements-panel .row.selected{
-	background:#666;
-}
-
-.elements-panel .row .eye {
-	border:#555 solid 1px;
-	
-	width:15px;
-	height:10px;
-	
-	position:absolute;
-	top:9px;
-	left:5px;
-}
-
-.elements-panel .row .node {
-	position:absolute;
-	left:20px;
-}
-
-.elements-panel .node .arrow {
-	width:8px;
-	
-	position:absolute;
-	top:2px;
-	left:10px;
-	clip: rect(8px,8px,16px,0px);
-}
-
-.elements-panel .node .arrow.expanded{
-	top:10px;
-	clip: rect(0px,8px,8px,0px);
-}
-.elements-panel .node .name {
-	max-width:8px;
-	
-	position:absolute;
-	top:8px;
-	left:20px;
-}
-
-.elements-panel .hide {
-	display:none;
-}
-
-.elements-panel .controls {
-	position:absolute;
-	bottom: 0px;
+.elements-panel .area-header {
 	background:#333;
 	height: 20px;
 	width:100%;
-	min-width:220px;
 }
 
-.elements-panel .controls svg, .elements-panel .controls DIV{
+.elements-panel .area-header  svg, .elements-panel .area-header DIV{
 	position:absolute;
+}
+
+.elements-panel .area-header .vect{
+	width:20px;
+	height:20px;
+}
+.elements-panel .vect.moveup{
+	right:5px
+}
+.elements-panel .vect.movedown{
+	right:30px
+}
+.elements-panel .vect.delete{
+	right:55px
+}
+
+.elements-panel .area-content div{
+	position:relative;
+	color:#eee;
+}
+.elements-panel .element{
+	background:#444;
+	height: auto;
+}
+.elements-panel .element .color{
+	z-index: 1;
+}
+
+.elements-panel .element .header {
+	height:20px;
+	border-top:#333 solid 1px;
+}
+
+.elements-panel .element.selected .header{
+	background:#555;
+}
+
+.elements-panel .element .header .arrow {
+	position:absolute;
+	width:8px;	
+	top:-1px;
+	left:17px;
+	clip: rect(8px,8px,16px,0px);
+}
+
+.elements-panel   .element.expanded  .header .arrow{
+	top:7px;
+	clip: rect(0px,8px,8px,0px);
+}
+
+.elements-panel  .element .header .eye {
+	position:absolute;
+	border:#555 solid 1px;
+	width:18px;
+	height:20px;
+	top:4px;
+	left:33px;
 	
-	top:0px;
-	right:2px;
+	clip: rect(0px,18px,10px,0px);
+}
+.elements-panel .element.hidden .header .eye {
+	top:-7px;
+	clip: rect(12px,18px,22px,0px);
+}
+.elements-panel .element .header .name {
+	position:absolute;
+	max-width:8px;	
+	top:1px;
+	left:60px;
 }

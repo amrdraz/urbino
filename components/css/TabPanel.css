@@ -4,6 +4,7 @@
 	min-height:20px;
 	height:auto;
 	background-color:#333;
+	overflow: hidden;
 }
 .tab-panel  .container {
 	width:auto;

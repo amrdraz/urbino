@@ -24,7 +24,7 @@
 	min-width:60px;
 	float:left;
     margin:10px;
-    display:none;
+    /*display:none;*/
 }
 
 .prop-panel .proprety.active{

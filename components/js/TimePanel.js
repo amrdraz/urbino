@@ -304,16 +304,12 @@ var TimePanel = new Class({
             return {color:color,el:el, element:element,timeline:timeLane, anims:anims, maxMs:a.ms};
         },
         /**
-         * inserts a new row into the layer panel
+         * inserts a new element into the elements panel
          * @param el (Raphael Obj) the element for this row
          */
-        rowInsert = function(el){
-            var obj = {};
-                obj.el = el;
-                obj.row = elementCreate(el);
-            els[el.id] = (obj);
-            
-            obj.row.inject(panel,"top");
+        elementInsert = function(el){
+            var obj = els[el.id] = elementCreate(el);
+            obj.element.inject(panel,"top");
         },
         /**
          * selects the elemnets obj by it's id
@@ -321,8 +317,6 @@ var TimePanel = new Class({
          */
         rowDeselect = function (id){
             if(id) {
-                
-
                 if(typeOf(id)=="string" && selected[id]) {
                     selected[id].row.removeClass("selected");
                     delete selected[id];
@@ -357,14 +351,14 @@ var TimePanel = new Class({
             }
         },
         /**
-         * selects the elemnets obj by it's element
-         * @param el (Raphael Obj) the element ithis row represents
+         * deselect the elemnets obj by it's element
+         * @param el (Raphael Obj) the element this div represents
          */
-        elementDeselect = function (el){
+        elDeselect = function (el){
             if(el && typeOf(el)!=="null"){
-                rowDeselect(el.id);
+                elementDeselect(el.id);
             } else {
-                rowDeselect();
+                elementDeselect();
             }
         },
         rowClick = function (e) {
@@ -381,7 +375,6 @@ var TimePanel = new Class({
                 window.fireEvent("element.deselect");
                 window.fireEvent("element.select", [el]);
             }
-            
         },
         elementUpdate = function(el) {
             var inputs, id = el.id;
