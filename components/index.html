@@ -156,7 +156,6 @@ var D = Raphael("draw", 640, 480)
 <div class="component ">
 	<h3>Time Panel</h3>
 	<div id="timeholder"class="canvas"></div>
-	<div id="time-panel" class="time-panel"></div>
 	<script>
 	/*global Raphael, TimePanel,console */
 	
@@ -321,7 +320,8 @@ var D = Raphael("draw", 640, 480)
 		);
 		
 	*/
-	var timeline = new TimePanel("time-panel", r, {imgSrc:"../img"});
+	var timeline = new TimePanel(r, {imgSrc:"../img"});
+	timeline.panel.inject($("timeholder"),"after");
 	
 	</script>
 </div>

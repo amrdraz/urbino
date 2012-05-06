@@ -47,10 +47,6 @@
 	/*global $,$$,console,Class,Element,typeOf,window,R, Raphael,MooRainbow,TabPanel,TimePanel, PropretiesPanel,ElementsPanel,ToolPanel*/
 	var r = Raphael("canvas", "100%", "100%"),
 	selected,
-	toolpanel = new ToolPanel("tools", r),
-	ep = new ElementsPanel(r,{imgSrc:"img"}),
-	pp = new PropretiesPanel(),
-	tp = new TimePanel(r,{imgSrc:"img"}),
 	canvas = new TabPanel("canvas", {
 		x:60,
 		y:50,
@@ -60,6 +56,10 @@
 			canvas:{R:r ,panel:r.canvas}
 			}
 	}),
+	toolpanel = new ToolPanel("tools", r),
+	ep = new ElementsPanel(r,{imgSrc:"img"}),
+	pp = new PropretiesPanel(),
+	tp = new TimePanel(r,{imgSrc:"img"}),
 	side = new TabPanel("side", {
 		x:1000,
 		y:50,

@@ -323,7 +323,6 @@ var PropretiesPanel = (function(){
             elP = this.elementProps;
         Object.each(props, function(item, key){
             if(~elP.common.indexOf(key) || ~elP[type].indexOf(key)){
-                console.log(type,key);
                 item.getParent().addClass("active");
             }
         }, this);

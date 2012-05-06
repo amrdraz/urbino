@@ -20,7 +20,7 @@
 
 .tab-panel .header-area h3{
 	position:relative;
-	height:15px;
+	height:14px;
 	margin-bottom:0;
 	padding: 4px 10px 1px 4px;
 	
@@ -37,7 +37,7 @@
 }
 .tab-panel .header-area h3:hover{
 	background-color: #666;
-	z-index: 2;
+	z-index: 6;
 }
 .tab-panel .header-area h3.selected{
 	top:1px;
@@ -60,7 +60,7 @@
 
 .tab-panel .content-area .tab-content.selected{
 	position:relative;
-	border: #48e solid 1px;
+	border-top: #48e solid 1px;
 	width:100%;
 	z-index: 3;
 

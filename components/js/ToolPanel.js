@@ -39,7 +39,7 @@ attrs : {"fill":"#48e", "stroke":"none"},
  * @param options (obj) extra options when initializing the Panel
  */
 initialize : function(panel, R, options){
-    
+    this.panel = $(panel);
     var 
     /**
      * the scurrently selected element
@@ -72,7 +72,7 @@ initialize : function(panel, R, options){
     /**
      * sets c to the DIV/SVG R is applied too
      */
-    c = R.canvas,
+    c = $(R.canvas),
     /**
      * text area for writing text
      */
@@ -474,8 +474,6 @@ initialize : function(panel, R, options){
                 break;
         }
         //console.log(o);
-        
-        
        
     },
     /**
@@ -507,21 +505,23 @@ initialize : function(panel, R, options){
     });
     
     panelInit(panel);
-    textToolArea.inject(c.getParent());
+    textToolArea.inject(c.parentNode);
     
-    window.addEvent("keyup", keyCommand);
+    console.log(R);
+    $(c).addEvents({
+        "mousedown": mousedown.bind(this),
+        "dblclick":dblclick
+    });
     
-    c.addEvent("mousedown", mousedown.bind(this));
-    c.addEvent("dblclick", dblclick);
-    
-    window.addEvent("draw.start", drawStart);
-    window.addEvent("draw.drag", drawDrag);
-    window.addEvent("draw.stop", drawStop);
-    
-    
-    window.addEvent("element.delete", elementDelete);
-    window.addEvent("element.select", elementSelect);
-    window.addEvent("element.deselect", elementDeselect);
+    window.addEvents({
+        "keyup": keyCommand,
+        "draw.start": drawStart,
+        "draw.drag": drawDrag,
+        "draw.stop": drawStop,
+        "element.delete":elementDelete,
+        "element.select":elementSelect,
+        "element.deselect": elementDeselect
+    });
 }
 
 

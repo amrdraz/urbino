@@ -269,7 +269,7 @@ var force = function(name, object, methods){
 			if (!methodsEnumerable) for (var i = 0, l = methods.length; i < l; i++){
 				fn.call(prototype, prototype[methods[i]], methods[i]);
 			}
-			for (var key in prototype) fn.call(prototype, prototype[key], key)
+			for (var key in prototype) {fn.call(prototype, prototype[key], key);}
 		};
 	}
 
@@ -4486,12 +4486,12 @@ if (!window.addEventListener){
 	Element.Events.change = {
 		base: function(){
 			var type = this.type;
-			return (this.get('tag') == 'input' && (type == 'radio' || type == 'checkbox')) ? 'propertychange' : 'change'
+			return (this.get('tag') == 'input' && (type == 'radio' || type == 'checkbox')) ? 'propertychange' : 'change';
 		},
 		condition: function(event){
 			return this.type != 'radio' || (event.event.propertyName == 'checked' && this.checked);
 		}
-	}
+	};
 }
 /*</ltIE9>*/
 
