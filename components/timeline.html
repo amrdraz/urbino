@@ -24,55 +24,93 @@
   <script type="text/javascript" src="js/SlidingLabel.js"></script>
   <script type="text/javascript" src="js/TabPanel.js"></script>
   <script type="text/javascript" src="js/ToolPanel.js"></script>
-  <script type="text/javascript" src="js/PropretiesPanel.js"></script>
   <script type="text/javascript" src="js/ElementsPanel.js"></script>
   <script type="text/javascript" src="js/TimePanel.js"></script>
-  <style>
-  	
-  	body > h2 {
-  		
-  		margin:10px 20px ;
-  	}
-  </style>
+  
 </head>
  
 <body>
 
-	<h2>Tab Panel</h2>
 <div class="component active">
-	<div id="canvas" ></div>
-	<div id="container" class=""></div>
+	<h3>Time Panel</h3>
+	<div id="timeholder"class="canvas"></div>
 	<script>
-//		window.addEvent("domready", function () {
-	/*global $,$$,console,Class,Element,typeOf,window,R, Raphael,TabPanel, PropretiesPanel,ElementsPanel*/
-	var 
-	r = Raphael("canvas","100%","100%"),
-	rect = r.rect(10,20,200,100).attr("fill","#8e4");
-	r.rect(210,20,200,100).attr("fill","#e84");
-	r.rect(410,20,200,100).attr("fill","#e48");
-	r.rect(10,120,200,100).attr("fill","#84e");
-	r.rect(210,120,200,100).attr("fill","#48e");
-	r.rect(410,120,200,100).attr("fill","#4e8");
+	/*global $,Raphael, TimePanel,console */
 	
-	r.circle(50,250,30).attr("fill","#e48");
-	var
-	canvas = new TabPanel("canvas", {
-		width:640,
-		height:500,
-		tabs:{
-			canvas:{R:r ,panel:r.canvas}
+	var r = Raphael("timeholder", 800,200),
+	
+		anim = function(prop,val,from,to,r){
+			var attr = {};
+			r = r || 1;
+			attr[prop] = val;
+			return Raphael.animation(attr, to).delay(from).repeat(r);
+		},
+		insertKeyFrame = function(el,prop,val,ms,i){
+			el.anims = el.anims||{};
+			var ii,del,a,b,temp,p =el.anims[prop] = el.anims[prop] || [];
+			//first time insert
+			if(p.length===0){
+				el.anims[prop][0] = anim(prop,val,0,ms);
+				return el.anims[prop][0];
 			}
-	}),
-	side = new TabPanel("container", {
-		x:840,
-		width:300,
-		height:500,
-		tabs:{
-			"Propreties": (new PropretiesPanel()),
-			"Elements":(new ElementsPanel(r, {imgSrc:"../img"}))
+			//index not specified
+			if(!i){
+				i=0;
+				ii=p.length;
+				do{
+					i++;
+				}while(i<ii && p[i-1].ms<ms);
+			}
+			a = p[i-1];
+			if(a.ms===ms){
+				a.anim["100"][prop] = val;
+				return a;
+			}
+			if(a.ms<ms){
+				b = anim(prop,val,a.ms,ms);
+			} else {
+				b = anim(prop,val,a.del,ms);
+				a.del = ms;
+				i--;
+			}
+			p.splice(i,0,b);
+			return b;
+		},
+		test = function(name,func,n){
+			var r=0,res={name:name,total:0,avreg:0,max:0,min:0},s,e,i=0;
+			n=n||1;
+			
+			do {
+				s  = new Date();
+				func();
+				e = new Date();
+				r=(e-s);
+				res["t_"+i]=(e-s);
+				res.max = (res.max).max(r);
+				res.min = (res.max).min(r);
+				res.total+=r;
+				i++;
+			} while(i < n);
+			res.avreg = (res.total/n).round();
+			return res;
+		};
+		var rect,i,j,jj,x,att,elc = 3,ntimes=1,els=[],step=1000,attr=["x",/*"y","cx","cy","r",*/"width","height"];
+		for(var k=0;k<elc;k++){
+			rect = r.rect(20,20,100,50);
+			rect.id = "rect"+k;
+			els.push(rect);
+			for(j=0,jj = attr.length;j<jj;j++){
+				att=attr[j];
+				for(i=0;i<=2;i++){
+					x = i*step;
+					insertKeyFrame(rect,att,(20+i*130),x);
+				}
+			}
 		}
-	});
-// }
+
+	var timeline = new TimePanel(r, {imgSrc:"../img"});
+	timeline.panel.inject($("timeholder"),"after");
+	
 	</script>
 </div>
 

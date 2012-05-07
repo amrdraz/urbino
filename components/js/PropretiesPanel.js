@@ -206,8 +206,8 @@ var PropretiesPanel = (function(){
         var panel = this.panel = new Element("form", {"class":"prop-panel"}),
         props = options.props || this.elementProps.all;
         this.slidingLabel = new SlidingLabel({
-                                    container:panel
-                                });
+                                container:panel
+                            });
         
         var obj = {};//loop generating propreties
         for (var i = 0, ii = props.length; i <ii;i+=1) {
@@ -217,16 +217,26 @@ var PropretiesPanel = (function(){
             props[i] = div;
         }
         
-        $(panel).adopt(props);
+        panel.adopt(props);
         this.propreties = obj;
-        $(panel).addEvents({
-            "keyup:relay(input,textarea)": this.updateEvent.bind(this),
-            "change:relay(input, select)": this.updateEvent.bind(this)
+        
+        this.bound = {
+            updateEvent: this.updateEvent.bind(this),
+            elementSelect : this.elementSelect.bind(this),
+            elementDeselect : this.elementDeselect.bind(this),
+            elementUpdate : this.elementUpdate.bind(this)
+        };
+        
+        panel.addEvents({
+            "keyup:relay(input,textarea)": this.bound.updateEvent,
+            "change:relay(input, select)": this.bound.updateEvent
         });
         
-        window.addEvent("element.select", this.elementSelect.bind(this));
-        window.addEvent("element.deselect", this.elementDeselect.bind(this));
-        window.addEvent("element.update", this.elementUpdate.bind(this));
+        window.addEvents({
+            "element.select":this.boud.elementSelect,
+            "element.deselect": this.bound.elementDeselect,
+            "element.update": this.bound.elementUpdate
+        });
         
    },
    /**

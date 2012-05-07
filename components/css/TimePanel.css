@@ -62,13 +62,19 @@
 	clip: rect(0px,8px,8px,0px);
 }
 
-.time-panel .elements-area .element .header .eye {
+.time-panel  .elements-area .element .header .eye {
 	position:absolute;
 	border:#555 solid 1px;
-	width:15px;
-	height:10px;
+	width:18px;
+	height:20px;
 	top:4px;
-	left:30px;
+	left:33px;
+	
+	clip: rect(0px,18px,10px,0px);
+}
+.time-panel .elements-area .element.hidden .header .eye {
+	top:-7px;
+	clip: rect(12px,18px,22px,0px);
 }
 .time-panel .elements-area  .element .header .name {
 	position:absolute;
@@ -146,16 +152,19 @@
 	display:none;
 }
 
-#timelineOptons {
-	right:0px;
-	width:100px;
-	height:35px;
+.time-panel .elements-area .area-header .vect{
+	top:8px;
+	width:20px;
+	height:20px;
 }
-
-#playControl {
-	left:0px;
-	width:100px;
-	height:35px;
+.time-panel .start-button {
+	left:15px;
+}
+.time-panel .play-button {
+	left:45px;
+}
+.time-panel .end-button {
+	left:70px;
 }
 /*---------------------------- seperator ------------------------------*/
 .time-panel .seperator{
@@ -198,7 +207,7 @@
 	border-left:#000 solid 1px;
 }
 
-.time-panel .slide-arrow, #timeLineFit {
+.time-panel .slide-arrow,.time-panel .fit-button {
 	width:18px;
 	height:18px;
 	
@@ -278,7 +287,8 @@
 	-moz-border-radius:2px;
 	border-radius: 2px;
 }
-#timelineSlider {
+.time-panel .timeline-slider{
+	top:0;
 	left:-5px;
 	
 	width:10px;
@@ -404,7 +414,7 @@
 	right:0;
 }
 
-#timeLineFit {
+.time-panel .fit-button{
 	left:152px;
 }
 
