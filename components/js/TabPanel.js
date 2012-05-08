@@ -54,7 +54,7 @@ var TabPanel = (function(){
             ;
             
             panel.adopt(contain);
-            
+            var lastInsert;
             Object.each(tabs,function(panel,title){
                 this.tabs[title]= {};
                 this.tabs[title].header = (new Element("h3", {"for":title, text:title, styles:{
@@ -62,8 +62,10 @@ var TabPanel = (function(){
                 }})).inject(headerArea);
                 this.tabs[title].panel = panel;
                 this.tabs[title].content = div("tab-content",{"name":title}).inject(contentArea).adopt(panel.panel);
-                this.select(title);
+                lastInsert = title;
             }, this);
+            
+            if(lastInsert){this.select(options.initSelect|| lastInsert);}
             
             this.bound = {
                 tabSelect:this.tabSelect.bind(this)
@@ -72,6 +74,8 @@ var TabPanel = (function(){
             panel.addEvents({
                 "mousedown:relay(.header-area h3)":this.bound.tabSelect
             });
+            
+            
         },
         select:function(tab){
             var sel = this.selected = this.get(tab);
@@ -86,6 +90,12 @@ var TabPanel = (function(){
         },
         get : function(tab){
             return this.tabs[tab];
+        },
+        insert: function(panel){
+            //TODO insert a panel last
+        },
+        remove:function(tab){
+            //TODO remove a tab
         }
     });
 })();

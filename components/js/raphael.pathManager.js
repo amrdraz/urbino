@@ -597,11 +597,11 @@ path.plug = function(){
     
     path.drawing = true;
     
-    parse(pa);
+    path.transform("");
     
-    path.guide.transform(trans);
-    path.segments.transform(trans);
-};
+    pa = Raphael.transformPath(pa,trans);
+    parse(pa);
+    };
 path.hide = function(oldFunc){
     return function (){
             path.unplug();

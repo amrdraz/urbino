@@ -1,16 +1,13 @@
-.tools{
-	width:40px;
+.tool-panel{
+	width:100%;
+	height:100%;
 	padding:5px;
-	height:auto;
 	background: #222;
-	position:absolute;
-	top:60px;
-	left:5px;
 	-moz-border-radius:5px;
     -webkit-border-radius:5px;
     border-radius:5px;
 }
-.tool {
+.tool-panel .tool {
 	background: #444;
 	color:#CCC;
 	text-align:center;
@@ -25,10 +22,10 @@
     -webkit-border-radius:5px;
     border-radius:5px;
 }
-.tool:hover {
+.tool-panel .tool:hover {
 	background: #666;
 }
-.tool.selected {
+.tool-panel .tool.selected {
 	background: #111;
 	cursor:default;
 }

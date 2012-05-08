@@ -107,15 +107,6 @@
 				
 		}
 	});
-	pp.slidingLabel.setOnChange(function(val, label){
-		var attr = {};
-            attr[label.get("for")] = val;
-            if(pp.selected){
-                window.fireEvent("element.update", [attr]);
-            } else {
-                toolpanel.setAttr(attr);
-            }
-	});
 </script>
 </body>
 </html>

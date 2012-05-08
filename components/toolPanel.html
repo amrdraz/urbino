@@ -1,0 +1,87 @@
+<!DOCTYPE HTML>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+  <title>Urbino</title>
+  <!-- blueprint CSS framework -->
+	<link rel="stylesheet" type="text/css" href="css/screen.css" media="screen, projection" />
+	<link rel="stylesheet" type="text/css" href="css/print.css" media="print" />
+	<!--[if lt IE 8]>
+	<link rel="stylesheet" type="text/css" href="css/ie.css" media="screen, projection" />
+	<![endif]-->
+  <link rel='stylesheet' type='text/css' href="css/components.css" />
+  <link rel='stylesheet' type='text/css' href="css/slidingLabel.css" />
+  <link rel='stylesheet' type='text/css' href="css/propretiesPanel.css" />
+  <link rel='stylesheet' type='text/css' href="css/editorCanvas.css"  />
+  <link rel='stylesheet' type='text/css' href="css/TabPanel.css"  />
+  <link rel='stylesheet' type='text/css' href="css/ElementsPanel.css"  />
+  <link rel='stylesheet' type='text/css' href="css/TimePanel.css"  />
+   
+  <script type="text/javascript" src="../core/mootools-core-full-compat.js"></script>
+  <script type="text/javascript" src="../core/mootools-more-1.4.0.1.js"></script>
+  <script type="text/javascript" src="../core/raphael.js"></script>
+  <script type="text/javascript" src="../external/raphael.free_transform.js"></script>
+  <script type="text/javascript" src="js/raphael.pathManager.js"></script>
+  <script type="text/javascript" src="js/SlidingLabel.js"></script>
+  <script type="text/javascript" src="js/TabPanel.js"></script>
+  <script type="text/javascript" src="js/ToolPanel.js"></script>
+  <script type="text/javascript" src="js/PropretiesPanel.js"></script>
+  <script type="text/javascript" src="js/ElementsPanel.js"></script>
+  <script type="text/javascript" src="js/TimePanel.js"></script>
+  <style>
+  	
+  	body > h2 {
+  		
+  		margin:10px 20px ;
+  	}
+  </style>
+</head>
+ 
+<body>
+
+	<h2>Tool Panel</h2>
+<div class="component active">
+	<div id="tools" class="tools"></div>
+	<div id="draw" class="canvas"></div>
+	<div id="side" ></div>
+	
+	<script>
+//		window.addEvent("domready", function () {
+/*global $,$$,console,Class,Element,typeOf,window,R, Raphael, TabPanel,PropretiesPanel,ToolPanel, ElementsPanel*/
+var r = Raphael("draw", "100%", "100%");
+
+var
+	canvas = new TabPanel("draw", {
+		position:"relative",
+		x:60,
+		
+		width:640,
+		height:500,
+		tabs:{
+			canvas:{R:r ,panel:r.canvas}
+			}
+	}),
+	side = new TabPanel("side", {
+		x:840,
+		width:300,
+		height:500,
+		initSelect:"Propreties",
+		tabs:{
+			"Propreties": (new PropretiesPanel()),
+			"Elements":(new ElementsPanel(r, {imgSrc:"../img"}))
+		}
+	}),
+	toolPanel = new TabPanel("tools", {
+		x:5,
+		y:60,
+		width:50,
+		height:"auto",
+		tabs:{
+			"Tools": new ToolPanel(r)
+		}
+	});
+//		});
+	</script>
+</div>
+
+</body>
+</html>

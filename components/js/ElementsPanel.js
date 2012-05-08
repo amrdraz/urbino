@@ -163,8 +163,9 @@ var ElementsPanel = new Class({
          * @param el (Raphael Obj) the element for this row
          */
         elementInsert = function(el){
-            var obj = els[el.id] = elementCreate(el);
-            obj.element.inject(panel,"top");
+            var obj = elementCreate(el);
+            els[el.id] = obj;
+            obj.element.inject(elements,"top");
         },
         /**
          * selects the elemnets obj by it's id

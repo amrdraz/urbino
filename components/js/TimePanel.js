@@ -15,6 +15,7 @@ var TimePanel = new Class({
         var
         timePanel = this,
         imgSrc= (options.imgSrc || "img")+"/",
+        buttonAttr = {"fill":"#ddd", "stroke":"none", "cursor":"pointer"},
         icon = {
             stop: "M5.5,5.5h20v20h-20z",
             end: "M21.167,5.5,21.167,13.681,6.684,5.318,6.684,25.682,21.167,17.318,21.167,25.5,25.5,25.5,25.5,5.5z",
@@ -33,7 +34,7 @@ var TimePanel = new Class({
             fit: "M1.999,2.332v26.499H28.5V2.332H1.999zM26.499,26.832H4V12.5h8.167V4.332h14.332V26.832zM15.631,17.649l5.468,5.469l-1.208,1.206l5.482,1.469l-1.47-5.481l-1.195,1.195l-5.467-5.466l1.209-1.208l-5.482-1.469l1.468,5.48L15.631,17.649z"
         },
         selected={}, els={}, selectedAnim = [], context= "global", zoomLevel=1,
-        tColor = "#eee",step = 250,base = 250,msPerpx = 1,trackerMs=0,lastMs=0,
+        tColor = "#eee",step = 250,base = 250,msPerpx = 1,trackerMs=0,lastMs=2000,
         play=false,timer,timelineWidth,timelineHeight,
         baseArr = [250,500,1000,5000,15000,30000,60000,120000,300000,600000,1200000],
         divsArr = [  2,  5,   4,   3,    4,    4,    4,     4,     5,     4,     4],
@@ -56,6 +57,12 @@ var TimePanel = new Class({
             }
             console.log(ids);
         },
+        controlHoverIn = function (){
+            this.attr("stroke","#48e");
+        },
+        controlHoverOut = function (){
+            this.attr("stroke","none");
+        },
         div = function(c,s){
             s = s || {};
             return new Element("div",{"class":c}).set(s);
@@ -63,6 +70,17 @@ var TimePanel = new Class({
         img = function(src,c,s){
             s = s || {};
             return new Element("img",{src:src,"class":c}).set(s);
+        },
+        vect = function(c,icon,trans,evens,title){
+            
+             var d = div("vect "+c), r = Raphael(d,"100%","100%"),
+                vec = r.path(icon)
+                        .attr(buttonAttr).attr({"title":title||""})
+                        .transform(trans||"")
+                        .hover(controlHoverIn, controlHoverOut);
+                d.addEvents(evens||{});
+                d.store("vec",vec);
+            return d;
         },
         has = "hasOwnProperty",
         getLarger = function(arr,horizontal){
@@ -105,25 +123,64 @@ var TimePanel = new Class({
             };
             
             if( !(ignoreMouse) ){
-                // Scroll the content element when the mousewheel is used within the 
-                // content or the scrollbar element.
                 for (i = 0, ii = contents.length; i < ii; i++) {
                     contents[i].addEvent('mousewheel', scrollFunc);
                 }
             }
-            // Stops the handle dragging process when the mouse leaves the document body.
             $(document.body).addEvent('mouseleave',function(){slider.drag.stop();});
             
             return slider;
         },
+        playEvent = function(){timePanel.fireEvent("timeline.play.toggle");},
+        setToStart = function(){
+                        setTrackerMs(0);
+                        slideTo(0);
+                },
+        moveToEnd = function(){ setTrackerMs(lastMs); slideTo(lastMs/msPerpx);},
+        makeZoomSlider = function(){
+            var 
+            cont = div("container"),
+            handel = div("handel"),
+            d = div("",{id:"timeZoomSlider"}).adopt(
+                vect("slide-arrow",icon.minus,"T -4 0 S 0.8",{"mousedown": function(e){timePanel.fireEvent("timeline.zoomout");}},"zoom out"),
+                cont.adopt(handel),
+                vect("slide-arrow",icon.plus,"T -4 0 S 0.8",{"mousedown": function(e){timePanel.fireEvent("timeline.zoomin");}},"zoom in")
+            ),
+            slider = new Slider(cont, handel,{
+                steps:100,
+                wheel:true,
+                onChange:function(val){
+                    console.log(this,val);
+                    timePanel.fireEvent("timeline.zoom", [val]);
+                }
+            });
+            console.log(cont,handel);
+            d.store("slider",slider);
+            return d;
+        },
+        makeScroller = function(id,content, horizontal){
+            var 
+            cont = div("container"),
+            handel = div("handel"),
+            d = div("",{id:id}).adopt(
+                vect("slide-arrow",icon[horizontal?"arrowleft":"arrowup"],"T -7 -7 S 0.8",{},horizontal?"step left":"step up"),
+                cont.adopt(handel),
+                vect("slide-arrow",icon[horizontal?"arrowright":"arrowdown"],"T -7 -7 S 0.8",{},horizontal?"step right":"step down")
+            ),
+            slider = makeScrollbar(content, cont, handel, horizontal ,true);
+            
+            return d.store("slider",slider);
+        },
+        
         /*----------------------- create panel ----------------------*/
         
         elementsArea = div("elements-area"),
-            elementsAreaHeader = div("area-header",{
-                html:   "<div id='playControl' style='float:left;'></div>"+
-                        "<div id='timelineOptons' style='float:right;'></div>"+
-                        "<div class='header-footer'></div>"
-            }).inject(elementsArea),
+            elementsAreaHeader = div("area-header").adopt(
+                vect("start-button",icon.start,"T -7 -7 S 0.8 0.6",{click:setToStart},"to start"),
+                vect("play-button",icon.play,"T -7 -7 S 0.8",{click:playEvent},"Play animation"),
+                vect("end-button",icon.end,"T -7 -7 S 0.8 0.6",{click:moveToEnd},"to end"),
+                div("header-footer")
+            ).inject(elementsArea),
             elements = div("area-content").inject(elementsArea),
             elementsAreaFooter = div("area-footer").inject(elementsArea),
             textField = new Element("input",{"type":"text", "id":"editText",
@@ -139,77 +196,79 @@ var TimePanel = new Class({
         
         timelineArea = div("timeline-area"),
             scrollArea = div("scroll-area").inject(timelineArea),
+            slideTracker = vect("timeline-slider",icon.tracker,"T 2 0 S 1.5",{}),
             timelineHeader = div("area-header").adopt(
                 div("",{id:"timeLane"}),
                 div("",{id:"labelLane"}),
                 div("header-footer",{id:"triggerLane"}),
                 div("",{id:"tracker"}).adopt(
-                    div("",{id:"timelineSlider"}),
+                    slideTracker,
                     div("",{id:"trackerLine"}),
                     div("",{id:"trackerTime"})
                 ),
                 div("",{id:"pin"})
             ).inject(scrollArea),
             timelanes = div("area-content").inject(scrollArea),
+            xScroller = makeScroller("timeLineXSlider",[scrollArea],true),
             timelineFooter = div("area-footer").adopt(
-                div("",{id:"timeZoomSlider"}).adopt(
-                    div("slide-arrow"),
-                    div("container").adopt(div("handel")),
-                    div("slide-arrow")
-                ),
-                div("",{id:"timeLineFit"}),
-                div("",{id:"timeLineXSlider"}).adopt(
-                    div("slide-arrow"),
-                    div("container").adopt(div("handel")),
-                    div("slide-arrow")
-                )
+                makeZoomSlider(),
+                vect("fit-button",icon.fit,"T -7 -7 S 0.6",{},"fit to timeline"),
+                xScroller
             ).inject(timelineArea),
+        yScroller= makeScroller("timeLineYSlider",[elements,timelanes],false),
         scrollBar = div("scroll-bar").adopt(
-            div("",{id:"timeLineYSlider"}).adopt(
-                div("slide-arrow"),
-                div("container").adopt(div("handel")),
-                div("slide-arrow")
-            )),
+            yScroller
+        ),
+        xSlider = xScroller.retrieve("slider"),
+        ySlider = yScroller.retrieve("slider"),
         slidingLabel = new SlidingLabel({
             container:elements,
             onStart:function(val,label){
                 //TODO is auto-keyfram is set then add a new keyframe
             },
             onChange:function(val,label){
-                var attr = {};
-                attr[label.get("for")] = val;
+                var attr = {},prop = label.get("for");
+                attr[prop] = val;
                 if(selected){
-                    window.fireEvent("element.update", [attr]);
                     //TODO add keyfram or edit keyframe
                     //for now I'm editing the element
                     els[label.getParent().get("for")].el.attr(attr);
+                    window.fireEvent("element.update", [attr]);
+                    //els[label.getParent().get("for")].el.attr(attr);
                 }
             },
             onEnd:function(val,label){
                 //TODO if there's a keyframe update it
             }
         });
+        
         panel.adopt(timelineArea, elementsArea, seperator, scrollBar);
         
        
         /*-----------------------handeling general events ----------------------*/
         var
+        
         hideToggle = function (e){
-            e.stopPropagation();
-            var eye = e.target,
-            el = els[e.target.getParent(".element").get("for")];
-            
-            if(el){
-                if(eye.hasClass("hidden")){
-                    eye.set("src",imgSrc+"eye.gif");
-                    eye.removeClass("hidden");
-                    el.el.show();
-                } else {
-                    eye.set("src",imgSrc+"hidden-eye.gif");
-                    eye.addClass("hidden");
-                    el.el.hide();
-                }
+            e.stop();
+
+            var el = els[e.target.getParent(".element").get("for")];
+            delete selected[el.el.id];
+            if(el.element.hasClass("hidden")){
+                el.element.removeClass("hidden");
+                el.el.show();
+                Object.each(selected, function(elm,key){
+                    elm.element.removeClass("hidden");
+                    elm.el.show();
+                });
+            } else {
+                el.element.addClass("hidden");
+                el.el.hide();
+                Object.each(selected, function(elm,key){
+                    elm.element.addClass("hidden");
+                    elm.el.hide();
+                });
             }
+            selected[el.id] = el;
         },
        expandToggle = function (e){
             e.stopPropagation();
@@ -313,46 +372,42 @@ var TimePanel = new Class({
         },
         /**
          * selects the elemnets obj by it's id
-         * @param id (string) the row id in the layers panel
+         * @param id (string) the row id in the elements panel
          */
-        rowDeselect = function (id){
+        elementDeselect = function (id){
             if(id) {
                 if(typeOf(id)=="string" && selected[id]) {
-                    selected[id].row.removeClass("selected");
+                    selected[id].element.removeClass("selected");
                     delete selected[id];
-                    
                 }
             } else {
-                Object.each(selected, function(el,key){
-                    el.row.removeClass("selected");
-                    delete selected[key];
+                Object.each(selected, function(elm,key){
+                    elementDeselect(key);
                 });
             }
-
         },
         /**
          * selects the elemnets obj by it's id
-         * @param id (string) the row id in the layers panel
+         * @param id (string) the element id in the elements panel
          */
-        rowSelect = function (id){
+        elementSelect = function (id){
             if(id && els[id] && !selected[id]){
                 selected[id] = els[id];
-                selected[id].row.addClass("selected");
-                
+                selected[id].element.addClass("selected");
             }
         },
         /**
          * selects the elemnets obj by it's element
-         * @param el (Raphael Obj) the element ithis row represents
+         * @param el (Raphael Obj) the element to select
          */
-        elementSelect = function (el){
+        elSelect = function (el){
             if(el && typeOf(el)!=="null"){
-                rowSelect(el.id);
+                elementSelect(el.id);
             }
         },
         /**
          * deselect the elemnets obj by it's element
-         * @param el (Raphael Obj) the element this div represents
+         * @param el (Raphael Obj) the element to deselect
          */
         elDeselect = function (el){
             if(el && typeOf(el)!=="null"){
@@ -361,10 +416,14 @@ var TimePanel = new Class({
                 elementDeselect();
             }
         },
-        rowClick = function (e) {
+        /**
+         * event handler for element selection allows for multiple selection if ctrl is pressed
+         * @param e (event)
+         */
+        elementClick = function (e) {
             e.stopPropagation();
             
-            var el = els[((e.target.hasClass("row"))?e.target:e.target.getParent(".row")).get("id")].el;
+            var el = els[((e.target.hasClass("element"))?e.target:e.target.getParent(".element")).get("for")].el;
             if(e.control){
                 if(selected[el.id]){
                     window.fireEvent("element.deselect", [el]);
@@ -374,6 +433,34 @@ var TimePanel = new Class({
             } else {
                 window.fireEvent("element.deselect");
                 window.fireEvent("element.select", [el]);
+            }
+        },
+        /**
+         * event handler deletes the element from the elements panel
+         * @param el (Raphael Obj) the element to delete
+         */
+        elementDelete = function (el){
+            
+            if(el){
+                if(typeOf(el)==="array"){
+                    el.each(function(id){
+                        elementDelete(els[id].el);
+                    });
+                } else {
+                    var id = el && el.id;
+                    if(selected[el.id]){
+                       window.fireEvent("element.deselect", el);
+                    }
+                    els[id].element.destroy();
+                    delete els[id];
+                    //TODO move this part elsewhere
+                    if(el.ft) { el.ft.unplug();}
+                    el.remove();
+                }
+            } else {
+                Object.each(selected, function(elm,key){
+                    elementDelete(elm.el);
+                });
             }
         },
         elementUpdate = function(el) {
@@ -387,19 +474,6 @@ var TimePanel = new Class({
                 });
             }
         },
-        elementDelete = function (el){
-                var id = el.id;
-                if(els[id]){
-                    els[id].row.destroy();
-                    if(selected[el.id]){
-                       window.fireEvent("element.deselect", el);
-                    }
-                    delete els[id];
-                    //TODO move this part elsewhere
-                    if(el.ft) { el.ft.unplug();}
-                    el.remove();
-                }
-        },
         /**
          * checks if user clicked on an element
          */
@@ -411,33 +485,17 @@ var TimePanel = new Class({
         };
         
         var
-        playControl = Raphael(elementsAreaHeader.getElement("#playControl"),"100%","100%"),
-        timelineOptions = Raphael(elementsAreaHeader.getElement("#timelineOptons"),"100%","100%"),
         timeLane = Raphael(timelineArea.getElement("#timeLane"),"100%",10),
         labelLane = Raphael(timelineArea.getElement("#labelLane"),"100%",10),
-        triggerLane = Raphael(timelineArea.getElement("#triggerLane"),"100%",10),
-        timelineXSlider = makeScrollbar([scrollArea], timelineArea.getElement('#timeLineXSlider .container'), timelineArea.getElement("#timeLineXSlider .handel"), true ,true),
-        timelineYSlider = makeScrollbar([elements,timelanes], scrollBar.getElement('.container'), scrollBar.getElement(".handel"), false,true ),
+        triggerLane = Raphael(timelineArea.getElement("#triggerLane"),"100%",10),        
         
-        buttonAttr = {"fill":"#ddd", "stroke":"#444", "cursor":"pointer"},
-        controlHoverIn = function (){
-            this.attr("stroke","#48e");
-        },
-        controlHoverOut = function (){
-            this.attr("stroke","#444");
-        },
-        playButton = playControl.path(icon.play).attr(buttonAttr).attr({title:"play"})
-                    .hover(controlHoverIn, controlHoverOut)
-                    .transform("T 35 0 S 0.8")
-                    .click(function(){timePanel.fireEvent("timeline.play.toggle");}),
         seperatorMousedown = function(e){
             var
             x = e.page.x.toInt(),
-            slideX = $("timeLineXSlider"),
             mousemove = function(e){
                 var
                 dx = e.page.x - x,
-                slider = $$('#timeLineXSlider .container')[0],
+                slider = xSlider.element,
                 width = elementsArea.getStyle("width").toInt() + dx;
                 x = e.page.x;
                 
@@ -451,7 +509,7 @@ var TimePanel = new Class({
                     scrollArea.setStyle("width", scrollArea.getSize().x - dx);
                     timelanes.setStyle("width", timelanes.getSize().x - dx);
                     slider.setStyle("width", slider.getSize().x - dx);
-                    slideX.setStyle("width", slideX.getSize().x - dx);
+                    xScroller.setStyle("width", xScroller.getSize().x - dx);
                     
                     setTimeLanesWidth(scrollArea.getScrollSize().x);
                 }
@@ -471,7 +529,20 @@ var TimePanel = new Class({
 
             window.addEvent("mousemove",mousemove);
             window.addEvent("mouseup",mouseup);
-    },
+     },
+        parse = function(paper){
+            var a = [];
+            paper.forEach(function(el) {
+                var obj;
+                el.noparse = el.noparse || false;
+                if(!el.noparse){
+                    obj = elementCreate(el);
+                    els[el.id] = obj;
+                    a.push(obj.element);
+                }
+            });
+          return a;  
+        },
     /*-----------------------handeling what text filed should do ----------------------*/
         clearSelection = function () {
             if(document.selection && document.selection.empty) {
@@ -486,7 +557,7 @@ var TimePanel = new Class({
             
             var sel = e.target,
             size = sel.getSize(),
-            pos = sel.getPosition(elementsArea);
+            pos = sel.getPosition(panel);
             
             clearSelection();
             
@@ -503,15 +574,15 @@ var TimePanel = new Class({
             this.noShortcut = true;
         },
         hideTextField = function (){
-            var id = textField.id, val = textField.get("value");
+           var id = textField.id, val = textField.get("value");
             if(val!=="" && !els[val]) {
-                els[id].row.getElement(".name").set("text", val);
-                els[id].row.set("id", val);
+                els[id].element.getElement(".name").set("text", val);
+                els[id].element.set("for", val);
                 els[id].el.id = val;
                 els[val] = els[id];
                 delete els[id];
                 //rowDeselect(id);
-                rowSelect(val);
+                elementSelect(val);
             }
             textField.set({"value":"", styles:{"display":"none"}});
             this.noShortcut=false;
@@ -581,10 +652,10 @@ var TimePanel = new Class({
         setTimeLanesWidth = function(width){
             width = width.max(scrollArea.getSize().x);
             scrollArea.getChildren().setStyle("width",width);
-            resizeSlider(width, scrollArea, timelineXSlider, true);
+            resizeSlider(width, scrollArea, xSlider, true);
         },
         resizeHorizontal = function(){
-            resizeSlider(elements.getScrollSize().y, elements, timelineYSlider, false);
+            resizeSlider(elements.getScrollSize().y, elements, ySlider, false);
         },
         seekTo =function (el, ms){
             el.anims = el.anims||{};
@@ -665,8 +736,10 @@ var TimePanel = new Class({
             msPerpx = base/step;
         },
         slideTo = function(pos){
-            timelineXSlider.set(timelineXSlider.max*(pos/scrollArea.getScrollSize().x).round());
+            xSlider.set(xSlider.max*(pos/scrollArea.getScrollSize().x).round());
         },
+        
+        zoomSlider = timelineFooter.getElement("#timeZoomSlider").retrieve("slider"),
         /**
          * This function set the zoom level of the timeline then calculates the ms/px ratio
          * it then sets the tracker resizes the xSlider and redraws the TimeLane numbers
@@ -693,14 +766,8 @@ var TimePanel = new Class({
                 el.setStyles({left:del/msPerpx,width:dur/msPerpx});
             });
             slideTo(pos);
+            console.log(zoomLevel, zoomSlider);
         },
-        zoomSlider = new Slider(timelineArea.getElement("#timeZoomSlider .container"), timelineArea.getElement("#timeZoomSlider .handel"),{
-            steps:100,
-            wheel:true,
-            onChange:function(val){
-                setZoomLevel(val);
-            }
-        }),
         zoomIn = function(){
             zoomSlider.set((zoomLevel+0.1)*100);
         },
@@ -709,9 +776,9 @@ var TimePanel = new Class({
         },
         fitTo = function (ms) {
             var 
-            width = timelineArea.getStyle("width").toInt(),
+            width = timelineArea.getSize().x,
             px = (ms/msPerpx).round();
-            
+            console.log(lastMs, trackerMs);
             while ((px+100)<=width && zoomLevel<1) {
               zoomLevel+=0.01;
               setMsPerpx(zoomLevel);
@@ -730,7 +797,7 @@ var TimePanel = new Class({
             timePanel.fireEvent("timeline.redraw");
             
         },
-        
+        playButton = elementsAreaHeader.getElement(".play-button").retrieve("vec"),
         timelineStop = function(){
             console.log("stop");
             
@@ -1112,65 +1179,7 @@ var TimePanel = new Class({
     }
     ;
         
-         /*----------------------- adding more elements ----------------------*/
-        
-        
-        playControl.path(icon.start).attr(buttonAttr).attr({title:"to start"})
-                    .hover(controlHoverIn, controlHoverOut)
-                    .transform("T 5 0 S 0.8 0.6")
-                    .click(function(){
-                        setTrackerMs(0);
-                        slideTo(0);
-                    });
-        playControl.path(icon.end).attr(buttonAttr).attr({title:"to end"})
-                    .hover(controlHoverIn, controlHoverOut)
-                    .transform("T 65 0 S 0.8 0.6")
-                    .click(function(){
-                        setTrackerMs(lastMs);
-                        slideTo(lastMs/msPerpx);
-                    });
-        Raphael(scrollBar.getElement("#timeLineYSlider").getFirst(),"100%","100%")
-                    .path(icon.arrowup).attr(buttonAttr).attr({title:"step up"})
-                    .hover(controlHoverIn, controlHoverOut)
-                    .transform("T -7 -7 S 0.8");
-        Raphael(scrollBar.getElement("#timeLineYSlider").getLast(),"100%","100%")
-                    .path(icon.arrowdown).attr(buttonAttr).attr({title:"step down"})
-                    .hover(controlHoverIn, controlHoverOut)
-                    .transform("T -7 -7 S 0.8");
-        Raphael(timelineArea.getElement("#timeLineXSlider").getFirst(),"100%","100%")
-                    .path(icon.arrowleft).attr(buttonAttr).attr({title:"step left"})
-                    .hover(controlHoverIn, controlHoverOut)
-                    .transform("T -7 -7 S 0.8");
-        Raphael(timelineArea.getElement("#timeLineXSlider").getLast(),"100%","100%")
-                    .path(icon.arrowright).attr(buttonAttr).attr({title:"step right"})
-                    .hover(controlHoverIn, controlHoverOut)
-                    .transform("T -7 -7 S 0.8");
-        
-        Raphael(timelineArea.getElement("#timeZoomSlider").getFirst(),"100%","100%")
-                    .path(icon.minus).attr(buttonAttr).attr({title:"zoom out"})
-                    .hover(controlHoverIn, controlHoverOut)
-                    .transform("T -4 0 S 0.8");
-        Raphael(timelineArea.getElement("#timeZoomSlider").getLast(),"100%","100%")
-                    .path(icon.plus).attr(buttonAttr).attr({title:"zoom in"})
-                    .hover(controlHoverIn, controlHoverOut)
-                    .transform("T -4 0 S 0.8");
-        Raphael(timelineArea.getElement("#timeLineFit"),"100%","100%")
-                    .path(icon.fit).attr(buttonAttr).attr({title:"fit to timeline"})
-                    .hover(controlHoverIn, controlHoverOut)
-                    .transform("T -7 -7 S 0.6");
-        
-        Raphael(timelineArea.getElement("#timelineSlider"),"100%","100%")
-                    .path(icon.tracker).attr(buttonAttr).attr({title:""})
-                    .hover(controlHoverIn, controlHoverOut)
-                    .transform("T 2 0 S 1.5")
-                    .drag(trackermove,function(){
-                        if(play){timelineStop();}
-                        this.x=timelineHeader.getPosition().x;
-                        this.offset = scrollArea.getScroll().x;
-                        
-                    });
-        
-        
+                    
         /*----------------------- public stuff ----------------------*/
                     
         this.tracker = $("tracker");
@@ -1183,6 +1192,7 @@ var TimePanel = new Class({
         timePanel.addEvents({
             "timeline.zoomin": zoomIn,
             "timeline.zoomout": zoomOut,
+            "timeline.zoom": setZoomLevel,
             "timeline.redraw": drawTimeLane,
             "timeline.play.toggle": togglePlay,
             "timeline.resize.horizontal":resizeHorizontal,
@@ -1190,9 +1200,9 @@ var TimePanel = new Class({
         });
         elements.addEvents({
             "click":notElement,
-            "click:relay(.row)":rowClick,
-            "click:relay(.eye)": hideToggle,
-            "click:relay(.arrow)": expandToggle,
+            "click:relay(.row)":elementClick,
+            "mousedown:relay(.eye)": hideToggle,
+            "mousedown:relay(.arrow)": expandToggle,
             "dblclick:relay(.name)": changName,
             "mousedown:relay(.key-frame img)":keyframeInsert
         });
@@ -1210,15 +1220,18 @@ var TimePanel = new Class({
             "blur": hideTextField
         });
         timelineArea.getElement("#timeLane").addEvent("mousedown", trackerSeek);
-        timelineArea.getElement("#timeZoomSlider").getFirst().addEvent("mousedown", function(e){e.stop();timePanel.fireEvent("timeline.zoomout");});
-        timelineArea.getElement("#timeZoomSlider").getLast().addEvent("mousedown", function(e){e.stop();timePanel.fireEvent("timeline.zoomin");});
-        timelineArea.getElement("#timeLineFit").addEvent("mousedown", function(e){e.stop();fitTo(lastMs);});
-        
+        timelineArea.getElement(".fit-button").addEvent("mousedown", function(e){e.stop();fitTo(lastMs);});
+        slideTracker.retrieve("vec").drag(trackermove,function(){
+                        if(play){timelineStop();}
+                        this.x=timelineHeader.getPosition().x;
+                        this.offset = scrollArea.getScroll().x;
+                    });
+                    
         window.addEvents({
             "element.create": elementCreate,
             "element.delete": elementDelete,
             "element.deselect": elementDeselect,
-            "element.select": elementSelect,
+            "element.select": elSelect,
             "panel.element.update":elementUpdate,
             "keydown":animDelete
         });

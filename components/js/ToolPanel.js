@@ -38,8 +38,8 @@ attrs : {"fill":"#48e", "stroke":"none"},
  * @param R (obj) Rapahel paper element
  * @param options (obj) extra options when initializing the Panel
  */
-initialize : function(panel, R, options){
-    this.panel = $(panel);
+initialize : function(R, options){
+    var panel = this.panel = new Element("div",{"class":"tool-panel"});
     var 
     /**
      * the scurrently selected element
@@ -231,10 +231,8 @@ initialize : function(panel, R, options){
      * @param at (obj) attributes of bounding box while drawing
      */
     elementCreate = function(el, at){
-        
         if(el.type!=="path") {
             var ft = R.freeTransform(el);
-        
             el.ft = ft;
             ft.hideHandles();
         }
@@ -278,7 +276,6 @@ initialize : function(panel, R, options){
               //  if(toolMode=="path" && drawPath){
                 els = R.getElementsByPoint(x,y);
                 el = (els.length>0)?els[els.length-1]:null;
-                console.log(el);
                 if(el && el.noparse){
                     if(el.control && /anchor|next|prev/.test(el.control)){
                         window.fireEvent("segment.mousedown",[e, el]);
@@ -288,7 +285,6 @@ initialize : function(panel, R, options){
               //      }
            // timer = (function(){
                window.fireEvent("element.deselect", [selected]);
-                console.log("mousedown");
                 window.fireEvent("draw.start", {"x":x,"y":y, "attrs":this.attrs});
            // }).delay(500);
                 
@@ -505,9 +501,8 @@ initialize : function(panel, R, options){
     });
     
     panelInit(panel);
-    textToolArea.inject(c.parentNode);
+    textToolArea.inject(c.getParent());
     
-    console.log(R);
     $(c).addEvents({
         "mousedown": mousedown.bind(this),
         "dblclick":dblclick

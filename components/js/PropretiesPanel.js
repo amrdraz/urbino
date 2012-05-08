@@ -206,8 +206,18 @@ var PropretiesPanel = (function(){
         var panel = this.panel = new Element("form", {"class":"prop-panel"}),
         props = options.props || this.elementProps.all;
         this.slidingLabel = new SlidingLabel({
-                                container:panel
-                            });
+                                container:panel,
+                                onChange:function(val, label){
+                                    var attr = {};
+                                        attr[label.get("for")] = val;
+                                        if(this.selected){
+                                            window.fireEvent("element.update", [attr]);
+                                            //TODO fire update event for other panels
+                                        } else {
+                                            //toolpanel.setAttr(attr);
+                                        }
+                                    }.bind(this)
+                                });
         
         var obj = {};//loop generating propreties
         for (var i = 0, ii = props.length; i <ii;i+=1) {
@@ -233,7 +243,7 @@ var PropretiesPanel = (function(){
         });
         
         window.addEvents({
-            "element.select":this.boud.elementSelect,
+            "element.select":this.bound.elementSelect,
             "element.deselect": this.bound.elementDeselect,
             "element.update": this.bound.elementUpdate
         });
@@ -263,6 +273,7 @@ var PropretiesPanel = (function(){
      */
     elementUpdate: function(attr){
         var el = this.selected;
+        //console.log(el,attr);
         if(this.selected){el.attr(attr);}
     },
     /**
@@ -282,8 +293,8 @@ var PropretiesPanel = (function(){
      */
     elementDeselect: function (el) {
         
-        this.selected = null;
-        this.setPropreties(this.attrs);
+        //this.selected = null;
+       // this.setPropreties(this.attrs);
     },
     /**
      * sets the propreties panel's inputs to the passed attrs
@@ -294,6 +305,7 @@ var PropretiesPanel = (function(){
         //this.clearPropreties();
         var props = this.propreties;
         
+        console.log(attrs,props);
        //console.log(attrs);
        Object.map(props, function(prop, index){
            return prop.set("value", attrs[index]);
