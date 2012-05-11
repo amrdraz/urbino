@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Color Picker</title>
+
+  <link rel='stylesheet' type='text/css' href="css/components.css" />
+  <script type="text/javascript" src="../core/mootools-core-full-compat.js"></script>
+  <script type="text/javascript" src="../core/mootools-more-1.4.0.1.js"></script>
+  <script type="text/javascript" src="../core/raphael.js"></script>
+  <script src="js/ColorPicker.js"></script>
+        
+    </head>
+<body>
+    	<div class="component active">
+	<h3>Color Picker</h3>
+
+	<script>
+//		window.addEvent("domready", function () {
+	/*global $,$$,console,Class,Element,typeOf,window,R, Raphael,TabPanel, ColorPicker,ElementsPanel*/
+	var cp = new ColorPicker({
+		container:"body",
+		imgSrc:"../img",
+		onChange:function(color,o,v){
+			v && v.attr({"fill":color==="none"?"135-#fff-#fff:45-#f00:45-#f00:55-#fff:45-#fff":color,"fill-opacity":o});
+		}
+	});
+	
+	cp.initFill("fill",{x:20,y:20}).inject($$("h3")[0],"after");
+	//cp.initFill("fill",{x:40,y:20,stroke:true}).inject($$("h3")[0],"after");
+// }
+	</script>
+</body>
+</html>
