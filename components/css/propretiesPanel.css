@@ -1,37 +1,98 @@
 .prop-panel {
 	position:relative;
-    padding:10px;
+    padding:0px;
     width:100%;
     height:100%;
 	background:#222;
 
 }
-
-.prop-panel input[type=text], .prop-panel input[type=number] {
-    width:60px;
+.prop-panel .group {
+	
+	position:relative;
+	height:35px;
+	padding: 10px;
+	border-bottom:#666 solid 1px;
+    /*display:none;*/
+}
+.prop-panel .group:last-child{
+	border: none;
+}
+.prop-panel .group h4{
+	position:absolute;
+	top:3px;
+	right:20px;
+	text-align:right;
+	color:#666666;
+}
+.prop-panel .group.dimension, .prop-panel .group.clip {
+	height:60px;
 }
 
-.prop-panel label{
+.prop-panel .group.fillstroke, .prop-panel .group.text{
+	height:200px;
+}
+.prop-panel .group.transform, .prop-panel .group.arrow-end, .prop-panel .group.anchor{
+	height:100px
+}
+
+.prop-panel input[type=number] {
+    width:35px;
+	white-space:nowrap;
+}
+.prop-panel  label{
 	text-align:right;
-	width:60px;
-    margin-right:5px;
-    color:#48e;
+    color:#ddd;
+}
+
+.prop-panel div.sliding-label label{
+	position:absolute;
+	right:50%;
+	text-align:right;
+    color:#ddd;
 }
 
 .prop-panel .proprety {
-	
-	position:relative;
-	min-width:60px;
-	float:left;
-    margin:10px;
-    /*display:none;*/
+	position:absolute;
+	height:15px;
+	width:110px;
+	white-space: nowrap;
+	overflow: normal;
 }
 
-.prop-panel .proprety.active{
-    display:block
+
+div.clear{
+	float:none;
+	clear:both;
 }
 
-.prop-panel .proprety[name=x], .prop-panel .proprety[name=y], .prop-panel .proprety[name=cx], .prop-panel .proprety[name=cy] {
-   top:20px;
-   left:10px;
+
+.prop-panel .proprety.left{
+	left:10px;
+}
+.prop-panel .proprety.right{
+	right:40px;
+}
+
+.prop-panel .proprety.row-1{
+	top:20px;
+}
+.prop-panel .proprety.row-2{
+	top:45px;
+}
+.prop-panel .proprety.row-3{
+	top:70px;
+}
+.prop-panel .proprety.row-4{
+	top:110px;
+}
+.prop-panel .proprety.row-5{
+	top:140px;
+}
+.prop-panel .proprety.row-6{
+	top:170px;
+}
+
+.prop-panel .proprety.select, .prop-panel  .proprety.text {
+	width:90%;
+	left:20px;
 }

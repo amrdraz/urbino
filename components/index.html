@@ -32,29 +32,6 @@
 </head>
  
 <body>
-	
-<div class="component">
-	<h3>SlidingLabel</h3>
-	<form id="slideForm">
-		<div id="label"></div>
-		<label class="sliding-label" for="y">y:</label><input class="sliding-input" step="0.1", min="0" type="number" name="y"/>
-		<label class="sliding-label" for="height">height:</label><input class="sliding-input" max="30" type="number" name="height"/>
-	</form>
-	<script>
-//		window.addEvent("domready", function () {
-	/*global SlidingLabel,console*/
-		var sl =	new SlidingLabel({
-							container:"slideForm",
-							onChange:function(val){
-								console.log(val);
-							},
-							labels:[{label:"opacity", min:0, max:1, step:0.1},
-				                    "name"]
-	                });
-	              
-//		});
-	</script>
-</div>
 
 <div class="component">
 	<h3>DropDown</h3>

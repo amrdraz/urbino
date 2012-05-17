@@ -1,8 +1,9 @@
-/*used w3schools for refrence and color picker*/
+
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
+    outline: none;
 }
 .is-sliding {
 cursor:url(slider-cursor.svg),url(slider-cursor.gif),w-resize;
@@ -14,13 +15,33 @@ cursor:url(slider-cursor.svg),url(slider-cursor.gif),w-resize;
 -o-user-select: none;
 user-select: none;
 }
-.sliding-label {
+label.sliding-label{
 	color:#48e;
 	border-bottom:#48e dashed 1px;
 	padding-bottom: 1px;
-	margin-right:5px;
 	text-align:right;
 }
-.sliding-input {
-	width:20px;
+input.sliding-label {
+	color:#48e;
+	background-color:transparent;
+    border:none;
+}
+input.sliding-input {
+	position:absolute;
+	right:15px;
+	text-align:right;
+	top:2px;
+    line-height: 1px;
+    font-size: 11px;
+	height:11px;
+	width:10px;
+	
+}
+span.sufix {
+	position:absolute;
+	width:15px;
+	right:0px;
+	top:1px;
+	color:#eee;
+	font-size: 11px;
 }

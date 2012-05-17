@@ -6,7 +6,7 @@
  * @author Amr Draz
  *  
  */
-/*global Rapahel,$,$$,Class,Events,Options,Element,typeOf,SlidingLabel,window*/
+/*global Rapahel,$,$$,Class,Events,Options,Element,typeOf,SlidingLabel,ColorPicker,window*/
 var PropretiesPanel = (function(){
     
     var
@@ -37,42 +37,73 @@ var PropretiesPanel = (function(){
      *      -min, max, setp (number) in case type is percent or number
      * 
      */
-    propreties = {    /* documentation taken from Rapahel-src.html */
-        x: {name:"x", type:"number"},                // (number)
-        y: {name:"y", type:"number"},                   // (number)
-        cx: {name:"cx", type:"number"},            // (number)
-        cy: {name:"cy", type:"number"},           // (number)
-        width: {name:"width", type:"number"},                // (number)
-        height: {name:"height", type:"number"},                // (number)
-        r: {name:"r", type:"number"},               // (number)
-        rx: {name:"rx", type:"number"},                // (number)
-        ry: {name:"ry", type:"number"},                // (number)
-        text: {name:"text", type:"textarea"},               // (string) contents of the text element. Use '\n' for multiline text
-        "text-anchor":{name:"text-anchor", type:"select", options:["start","middle","end"]},        // (string) ["start", "middle", "end"], default is "middle"
-        "opacity":{name:"opacity", type:"percent"},            // (number)
-        "fill":{name:"fill", type:"text"},                // (string) colour, gradient or image
-        "fill-opacity":{name:"fill-opacity", type:"percent"},        // (number)
-        "stroke":{name:"stroke", type:"text"},            // (string) stroke colour
-        "stroke-dasharray":{name:"stroke-dasharray", type:"select", options:["", "-", ".", "-.", "-..", ". ", "- ", "--", "- .", "--.", "--.."]},    // (string) [“”, "-", ".", "-.", "-..", ". ", "- ", "--", "- .", "--.", "--.."]
-        "stroke-linecap":{name:"stroke-linecap", type:"select", options:["butt", "square", "round"]},    // (string) ["butt", "square", "round"]
-        "stroke-linejoin":{name:"stroke-linejoin", type:"select", options:["bevel", "round", "miter"]},  // (string) ["bevel", "round", "miter"]
+    properties = {    /* documentation taken from Rapahel-src.html */
+        x: {name:"x", "class":"left row-1",label:"x",type:"number"},                // (number)
+        y: {name:"y", "class":"left row-2",label:"y",type:"number"},                   // (number)
+        cx: {name:"cx","class":"left row-1", type:"number"},            // (number)
+        cy: {name:"cy", "class":"left row-2",type:"number"},           // (number)
+        width: {name:"width", "class":"right row-1", label:"width",type:"number"},                // (number)
+        height: {name:"height", "class":"right row-2",label:"height",type:"number"},              // (number)
+                      // r (number)
+                cr: {name:"r", "class":"right row-1",label:"radius",type:"number"},               // (number) fpr circle radius
+                r: {name:"r", "class":"left row-1",label:"radius",type:"number"},               // (number) for rect corner
+
+        rx: {name:"rx", "class":"right row-1",type:"number"},                // (number)
+        ry: {name:"ry", "class":"right row-2",type:"number"},                // (number)
+        text: {name:"text", "class":"left row-4",type:"textarea"},               // (string) contents of the text element. Use '\n' for multiline text
+        "text-anchor":{name:"text-anchor", "class":"left row-2",type:"select", options:["start","middle","end"]},        // (string) ["start", "middle", "end"], default is "middle"
+        "opacity":{name:"opacity", "class":"right row-2",type:"percent", max:100},            // (number)
+        "fill":{name:"fill", "class":"left row-1",type:"color"},                // (string) colour, gradient or image
+        //"fill-opacity":{name:"fill-opacity", type:"percent"},        // (number)
+        "stroke":{name:"stroke", "class":"left row-2",type:"color"},            // (string) stroke colour
+        "stroke-dasharray":{name:"stroke-dasharray", label:"dasharray","class":"left row-4 all",type:"select", options:["", "-", ".", "-.", "-..", ". ", "- ", "--", "- .", "--.", "--.."]},    // (string) [“”, "-", ".", "-.", "-..", ". ", "- ", "--", "- .", "--.", "--.."]
+        "stroke-linecap":{name:"stroke-linecap", label:"linecap","class":"left row-5 all",type:"select", options:["butt", "square", "round"]},    // (string) ["butt", "square", "round"]
+        "stroke-linejoin":{name:"stroke-linejoin", label:"linejoin","class":"left row-6 all",type:"select", options:["bevel", "round", "miter"]},  // (string) ["bevel", "round", "miter"]
         //TODO "stroke-miterlimit",// (number)
-        "stroke-opacity":{name:"stroke-opacity", type:"percent"},    // (number)
-        "stroke-width":{name:"stroke-width", type:"number", min:"1"},       // (number) stroke width in pixels, default is '1'
-        path:{name:"path", type:"text"},                // (string) SVG path string format
-        src:{name:"src", type:"text"},                // (string) image URL, only works for @Element.image element
-        font:{name:"font", type:"text"},                // (string)
-        "font-family":{label:"font",name:"font-family", type:"select", options:fonts},        // (string)
-        "font-size":{name:"font-size", type:"number", min:0},        // (number) font size in pixels
-        "font-weight":{name:"font-weight", type:"number"},        // (string)
-        "href":{name:"href", type:"text"},              // (string) URL, if specified element behaves as hyperlink
-        "target":{name:"target", type:"text"},            // (string) used with href
-        "title":{name:"title", type:"text"},            // (string) will create tooltip with a given text
-        //TODO "transform" (string) see @Element.transform
-        "arrow-end":{name:"arrow-end",  type:"select", options:['classic', 'block', 'open', 'oval', 'diamond', 'none'] },     // (string) arrowhead on the end of the path. The format for string is '<type>[-<width>[-<length>]]'. Possible types: 'classic', 'block', 'open', 'oval', 'diamond', 'none', width: 'wide', 'narrow', 'midium', length: 'long', 'short', 'midium'.
-        //TODO "clip-rect",        // (string) comma or space separated values: x, y, width and height
-        "cursor":{name:"cursor", type:"text"}           // (string) CSS type of the cursor
-        }
+        //"stroke-opacity":{name:"stroke-opacity", type:"percent"},    // (number)
+        "stroke-width":{name:"stroke-width", "class":"right row-3",type:"number", min:1},       // (number) stroke width in pixels, default is '1'
+        path:{name:"path", "class":"left row-1",type:"text"},                // (string) SVG path string format
+        src:{name:"src", "class":"left row-1",type:"text"},                // (string) image URL, only works for @Element.image element
+        font:{name:"font", "class":"left row-1",type:"text"},                // (string)
+        "font-family":{label:"font",name:"font-family", "class":"left row-1",type:"select", options:fonts},        // (string)
+        "font-size":{name:"font-size", "class":"left row-3",type:"number", min:0},        // (number) font size in pixels
+        "font-weight":{name:"font-weight", "class":"right row-3", type:"number", min:100, max:900, step:100, sufix:""},        // (string)
+        "href":{name:"href", "class":"left row-2", type:"text"},              // (string) URL, if specified element behaves as hyperlink
+        "target":{name:"target", "class":"left row-1", type:"select",options:["_self","_blank","_top","_parent"]},            // (string) used with href
+        "title":{name:"title", "class":"left row-3", type:"text"},            // (string) will create tooltip with a given text
+        // "transform" (string) see @Element.transform
+            "translate-x":{name:"translate-x", "class":"transfrom left row-1", label:"x",type:"number"},
+            "translate-y":{name:"translate-y", "class":"transfrom right row-1", label:"y",type:"number"},
+            "origin-x":{name:"origin-x", "class":"transfrom left row-1", label:"origin-x",type:"number"},
+            "origin-y":{name:"origin-y", "class":"transfrom right row-1", label:"origin-y",type:"number"},
+            "rotate":{name:"rotate", "class":"transfrom left row-2", label:"Rotate",type:"number", sufix:"°"},
+            "scale-x":{name:"scale-x", "class":"transfrom right row-2", label:"Scale-x",type:"percent"},
+            "scale-y":{name:"scale-y", "class":"transfrom right row-3", label:"Scale-y",type:"percent"},
+       // "arrow-end":{name:"arrow-end"},     // (string) arrowhead on the end of the path. The format for string is '<type>[-<width>[-<length>]]'. Possible types: 'classic', 'block', 'open', 'oval', 'diamond', 'none', width: 'wide', 'narrow', 'midium', length: 'long', 'short', 'midium'.
+            "arrow-type":{name:"arrow-type", "class":"left row-1", label:"type",type:"select", options:['none','classic', 'block', 'open', 'oval', 'diamond'] },
+            "arrow-width":{name:"arrow-width", "class":"left row-2", label:"width",type:"select", options:['midium','wide', 'narrow'] },
+            "arrow-length":{name:"arrow-length", "class":"left row-3", label:"length",type:"select", options:['midium','short', 'long'] },
+        // "clip-rect",        // (string) comma or space separated values: x, y, width and height
+            "clip-x":{name:"clip-x", "class":"left row-1", label:"Clip-x",type:"number"},
+            "clip-y":{name:"clip-y", "class":"left row-2", label:"Clip-y",type:"number"},
+            "clip-width":{name:"clip-width", "class":"right row-1", label:"Clip-w",type:"number"},
+            "clip-height":{name:"clip-height", "class":"right row-2", label:"Clip-h",type:"number"},
+        "cursor":{name:"cursor", "class":"left row-1", type:"text"}           // (string) CSS type of the cursor
+    },
+    groups={
+        dimension:["x","y","translate-x","translate-y","cx","cy","height","width","cr","rx","ry"],
+        corner:["r"],
+        path:["path"],
+        image:["src"],
+        paper:[],
+        "arrow-end":["arrow-type","arrow-width","arrow-length"],
+        fillstroke:["opacity","fill","stroke","stroke-width","stroke-dasharray","stroke-linecap","stroke-linejoin",/*"stroke-miterlimit",*/],
+        text:["text-anchor","font-family","font-size","font-weight","text"],
+        transform:["origin-x","origin-y","rotate","scale-x","scale-y"],
+        clip:["clip-x","clip-y","clip-width","clip-height"],
+        anchor:["title","href","target"],
+        cursor:["cursor"]
+    }
     ;
     
     return new Class({
@@ -85,29 +116,52 @@ var PropretiesPanel = (function(){
      * temp value for global state of attribute
      * the global state is the state of the propreties pabnel's attributes when no element is selected
      */
-    attrs:{},
+    attrs:{
+        "translate":"T0 0R0S1 1",
+        "x":0,"y":0,"cx":0,"cy":0,"width":0,"height":0,"rx":0,"ry":0,"cr":0,"r":0,
+        "opacity":1,
+        "src":"","fill":"none",
+        "stroke":"#000",
+        "stroke-width":1,
+        "stroke-dasharray":"",
+        "stroke-linecap":"butt",
+        "stroke-linejoin":"bevel",
+        "stroke-miterlimit":1,
+        "text-anchor":"start",
+        "font-family":'Arial, Helvetica, sans-serif',
+        "font-size":18,"font-weight":400,"text":"",
+        "href":"", "target":"", "title":"","cursor":"default",
+        "arrow-end":"none-midium-midium"},
     /**
      * predefine list of props for SVG elements
      */
     elementProps: {
-        common:["title","opacity","cursor","fill","fill-opacity","stroke","stroke-dasharray","stroke-linecap","stroke-linejoin",/*"stroke-miterlimit",*/"stroke-opacity","stroke-width"],
-        circle:["cx","cy","r"],
-        rect:["x","y","height","width","r","rx","ry"],
-        ellipse:["cx","cy","rx","ry"],
-        text:["x","y","text","text-anchor","font","font-family","font-size","font-weight"],
-        image:["x","y","width","height","src"],
-        path:["path","arrow-end"],
-        canvas:["width","height"],
-        all:["x","y","cx","cy","width","height","rx","ry","r","src","text","text-anchor","font-family","font-size","font-weight","title","opacity","cursor","fill","fill-opacity","stroke","stroke-dasharray","stroke-linecap","stroke-linejoin",/*"stroke-miterlimit",*/"stroke-opacity","stroke-width"]
+        common:["clip-x","clip-y","clip-width","clip-height","origin-x","origin-y","rotate","scale-x","scale-y","title","opacity","cursor","fill","fill-opacity","stroke","stroke-dasharray","stroke-linecap","stroke-linejoin",/*"stroke-miterlimit",*/"stroke-opacity","stroke-width"],
+        circle:["cx","cy","cr","origin-x","origin-y","rotate","scale-x","scale-y","clip-x","clip-y","clip-width","clip-height", "href", "target", "title"],
+        rect:["x","y","height","width","r","origin-x","origin-y","rotate","scale-x","scale-y","clip-x","clip-y","clip-width","clip-height", "href", "target", "title"],
+        ellipse:["cx","cy","rx","ry","origin-x","origin-y","rotate","scale-x","scale-y","clip-x","clip-y","clip-width","clip-height", "href", "target", "title"],
+        text:["x","y","text","text-anchor","font","font-family","font-size","font-weight","origin-x","origin-y","rotate","scale-x","scale-y","clip-x","clip-y","clip-width","clip-height", "href", "target", "title"],
+        image:["x","y","width","height","src","origin-x","origin-y","rotate","scale-x","scale-y","clip-x","clip-y","clip-width","clip-height", "href", "target", "title"],
+        path:["translate-x","translate-y","path","arrow-type","arrow-width","arrow-length","origin-x","origin-y","rotate","scale-x","scale-y","clip-x","clip-y","clip-width","clip-height", "href", "target", "title"],
+        canvas:["x","y","width","height",],
+        all:["clip-x","clip-y","clip-width","clip-height","translate-x","translate-y","origin-x","origin-y","rotate","scale-x","scale-y","x","y","cx","cy","width","height","rx","ry","cr","r","opacity","src","fill","stroke","stroke-width","stroke-dasharray","stroke-linecap","stroke-linejoin",/*"stroke-miterlimit",*/"text-anchor","font-family","font-size","font-weight","text", "href", "target", "title","cursor"]
     },
-    
+    states:{
+        canvas:["dimension","paper"],
+        circle:["dimension","fillstroke","transform","clip","anchor","cursor"],
+        rect:["dimension","corner","fillstroke","transform","clip","anchor","cursor"],
+        ellipse:["dimension","fillstroke","transform","clip","anchor","cursor"],
+        text:["dimension","fillstroke","text","transform","clip","anchor","cursor"],
+        image:["dimension","fillstroke","image","transform","clip","anchor","cursor"],
+        path:["dimension","path","arrow-end","fillstroke","transform","clip","anchor","cursor"]
+    },
     /**
      * creates a select element for a proprety of type text
      * @param p (obj) a proprety object that follows the propreties object syntax
      * @return (DIV) containing select element with its options
      */
     textInput: function (p) {
-        var div = new Element("div", {"class":p.name+" proprety "+p.type}),
+        var div = new Element("div"),
             label = new Element("label", {"for":p.name, "text":(p.label||p.name)+":"}),
             input = new Element("input", {
                 type:"text",
@@ -121,12 +175,12 @@ var PropretiesPanel = (function(){
      * @return (DIV) containing textarea element
      */
     textarea: function (p) {
-        var div = new Element("div", {"class":p.name+" proprety "+p.type}),
+        var div = new Element("div"),
             label = new Element("label", {"for":p.name, "text":(p.label||p.name)+":"})
                 .setStyles({'position':'relative', 'clear':'right'}),
             textarea = new Element("textarea", {
                 name:p.name
-                }).setStyles({'float':'right',"max-width":"200px"});
+                }).setStyles({'float':'right',"max-width":"200px","max-height":"95px"});
        return div.adopt(label, textarea);
     },
     /**
@@ -164,30 +218,32 @@ var PropretiesPanel = (function(){
         var div;
         switch(p.type){
             case "number":
-                div = this.slidingLabel.initLabel(p.name,{
-                        min:p.min, step:p.step, max:p.max,
-                        container:{
-                            "class":p.name+" proprety "+p.type
-                        }
+                div = this.slidingLabel.initLabel(p.name,{label:p.label,
+                        min:p.min, step:p.step, max:p.max,sufix:p.sufix||"px"
                     });
                 break;
             case "percent":
-                div = this.slidingLabel.initLabel(p.name,{
-                    min:0, step:0.01, max:1,
-                    container:{
-                        "class":p.name+" proprety "+p.type
-                        }
+                div = this.slidingLabel.initLabel(p.name,{label:p.label,
+                    value:100,factor:100,sufix:"%", min:0, step:1, max:p.max||""
                     });
                 break;
             case "select":
                 div = this.selectInput(p);
+                break;
+            case "color":
+                
+                div = this.colorPicker.initFill(p.name,{
+                        stroke:(p.name==="stroke"),
+                        label:(p.label||p.name),
+                        x:0,y:0,width:50
+                    } );
                 break;
             case "textarea":
                 div = this.textarea(p);
                 break;
             default:  div = this.textInput(p); break;
         }
-        return div;
+        return div.addClass(p["class"]+" "+p.name+" proprety "+p.type);
     },
     /**
      * intitialize Propreties Panel that contains given propreties
@@ -203,13 +259,27 @@ var PropretiesPanel = (function(){
         if(options.extraProps) {
             propreties.combine(options.extraProps);
         }
-        var panel = this.panel = new Element("form", {"class":"prop-panel"}),
-        props = options.props || this.elementProps.all;
+        var panel = this.panel = new Element("div", {"class":"prop-panel"});
+        
         this.slidingLabel = new SlidingLabel({
                                 container:panel,
-                                onChange:function(val, label){
-                                    var attr = {};
-                                        attr[label.get("for")] = val;
+                                onChange:function(val, input){
+                                    var attr = {}, name = input.get("name"),fact = input.retrieve("factor"), sel = this.selected;
+                                    if(input.getParent().hasClass("transform")){
+                                        if(sel){
+                                            if(sel._.transform.length===0){
+                                                sel.transform("T0 0R0 "+sel.oX+" "+sel.oY+"S0 0 "+sel.oX+" "+sel.oY);
+                                             }
+                                            if(/^origin\-x/.test())
+                                            this.selected._.deg;
+                                        } 
+                                    }
+                                    if(input.getParent().hasClass("clip")){
+                                        
+                                    }
+                                    
+                                        attr[input.get("name")] = val;
+                                        console.log(val);
                                         if(this.selected){
                                             window.fireEvent("element.update", [attr]);
                                             //TODO fire update event for other panels
@@ -218,17 +288,45 @@ var PropretiesPanel = (function(){
                                         }
                                     }.bind(this)
                                 });
+       this.colorPicker = new ColorPicker({
+            imgSrc:"../img",
+            onChange:function(color,o,v){
+                if(v){
+                    var attr = {},
+                        att = v.node.getParent("div").get("for");
+                        attr[att]=color;
+                        attr[att+"-opacity"]=o;
+                    v.attr({"fill":color==="none"?"135-#fff-#fff:45-#f00:45-#f00:55-#fff:45-#fff":color,"fill-opacity":o});
+                    if(this.selected){
+                        window.fireEvent("element.update", [attr]);
+                        //TODO fire update event for other panels
+                    } else {
+                        //toolpanel.setAttr(attr);
+                    }
+                }
+            }.bind(this)
+        });
         
-        var obj = {};//loop generating propreties
-        for (var i = 0, ii = props.length; i <ii;i+=1) {
-            var p = propreties[props[i]];
-            var div = this.createInput(p);
-            obj[p.name] = div.getLast();
-            props[i] = div;
-        }
+        var ps = this.properties={}, gs=this.groups={};//loop generating propreties by groups
+        Object.each(groups, function(props, group){
+            gs[group] = {};
+            var g = new Element("div", {"class":group+" group"});
+            new Element("h4", {text:group}).inject(g);
+            props.each(function(p){
+                var prop = properties[p],
+                    div = this.createInput(properties[p]).inject(g);
+                ps[p]={};
+                ps[p].name = prop.name;
+                ps[p].type = prop.type;
+                ps[p].prop = div;
+            }, this);
+            new Element("div",{"class":"clear"}).inject(g);
+            gs[group].group = g;
+            g.inject(panel);
+            //console.log();
+        }, this);
         
-        panel.adopt(props);
-        this.propreties = obj;
+        this.setState("canvas");
         
         this.bound = {
             updateEvent: this.updateEvent.bind(this),
@@ -243,11 +341,35 @@ var PropretiesPanel = (function(){
         });
         
         window.addEvents({
-            "element.select":this.bound.elementSelect,
             "element.deselect": this.bound.elementDeselect,
+            "element.select":this.bound.elementSelect,
             "element.update": this.bound.elementUpdate
         });
         
+   },
+   setState:function(s){
+        var props = this.properties,
+            elP = this.elementProps,
+            states = this.states,
+            gs = this.groups;
+      // console.log(s,states[s],gs);
+       Object.each(gs, function(g){
+           g.group.addClass("hide");
+       });
+       Object.each(states[s], function(g){
+           gs[g].group.removeClass("hide");
+       });
+       
+       Object.each(props, function(p){
+           p.prop.addClass("hide");
+       });
+       
+       Object.each(props, function(p, key){
+           if(~elP.common.indexOf(key) || ~elP[s].indexOf(key)){
+               p.prop.removeClass("hide");
+           }
+       });
+       this.state = s;
    },
    /**
     * function that fires element.update event with the input'scurrent value on keyup or change
@@ -257,8 +379,18 @@ var PropretiesPanel = (function(){
         var input = eve.target;
         var attr = {},
         val = input.get("value"),
-        att = input.get("name");
-        attr[att] = (val==="")?"none":val;
+        att = input.get("name"),
+        group = input.getParent(".group");
+        
+        if(group.hasClass("arrow-end")){
+            var arr = group.getChildren(".proprety").map(function(c){return c.getLast().get("value");});
+            console.log(arr);
+            attr["arrow-end"] = arr.join("-");
+            //console.log(attr["arrow-end"]);
+        } else {
+            attr[att] = val;   
+        }
+        
         
         if(this.selected){
             window.fireEvent("element.update", [attr]);
@@ -275,6 +407,8 @@ var PropretiesPanel = (function(){
         var el = this.selected;
         //console.log(el,attr);
         if(this.selected){el.attr(attr);}
+        
+        //console.log(Object.toQueryString(attr),Object.toQueryString(el.attr()));
     },
     /**
      * selects hides all propreties that don't apply to it,
@@ -283,18 +417,67 @@ var PropretiesPanel = (function(){
      */
     elementSelect: function (el) {
         this.selected = el;
-        this.hideAll();
-        this.showByType(el.type);
-        this.setPropreties(el.attr());
+        this.setState(el.type);
+        console.log(el.attr());
+        this.prop(el.attr());
     },
     /**
      * deselects an element and updates reset this propreties panel back to the global state
      * @param el (Raphael obj)
      */
     elementDeselect: function (el) {
-        
+        //this.setState("canvas");
         //this.selected = null;
        // this.setPropreties(this.attrs);
+    },
+    prop:function(prop,val){
+        if(typeOf(prop)==="null"){ //return all propreties in name value object
+           return this.prop(this.elementProps.all);
+        } else if(typeOf(prop)==="array"){//return all propreties in the array in name value object
+            var ps = {};
+            prop.each(function(p){
+                ps[p] = this.prop(p);
+            },this);
+            return ps;
+        } else if(typeOf(prop)==="object"){//set proprety with corrisponding value
+            Object.each(prop,function(v,p){
+                this.prop(p,v);
+            },this);
+        } else if(typeOf(prop)==="string"){
+            if(prop==="transform"){
+                this.prop(groups[prop]);
+            }
+            
+            var p = this.properties[prop];
+            if(!p){ return;}
+            
+            
+            p = p.prop;
+            //console.log(prop,p, val);
+            if(val){ //set prop to val
+                if(p.hasClass("number")){
+                    p.getLast().getPrevious().set("value", val);
+                    return;
+                }
+                if(p.hasClass("color")){
+                    this.colorPicker.setColor(p.getLast().retrieve("vec"), val);
+                    return;
+                }
+                if(p.hasClass("width")){
+                    
+                }
+                
+                p.getLast().set("value", val);
+            } else { //get prop value
+                if(p.hasClass("number")){
+                    return p.getLast().getPrevious().get("value");
+                }
+                if(p.hasClass("color")){
+                    return p.getLast().retrieve("vec").attr("fill");
+                }
+                return p.getLast().get("value");
+            }
+        }
     },
     /**
      * sets the propreties panel's inputs to the passed attrs
@@ -303,12 +486,15 @@ var PropretiesPanel = (function(){
     setPropreties: function(attrs){
         
         //this.clearPropreties();
-        var props = this.propreties;
+        var props = this.properties;
         
         console.log(attrs,props);
        //console.log(attrs);
-       Object.map(props, function(prop, index){
-           return prop.set("value", attrs[index]);
+       Object.each(props, function(prop, index){
+           //console.log(prop)
+           if(index){
+               
+           }
        }, this);
        //console.log(props);
        
@@ -323,33 +509,7 @@ var PropretiesPanel = (function(){
                 props[prop].set("value", "");
             }
         }
-    },
-    /**
-     * hides all propreties in the propreties panel
-     */
-    hideAll: function() {
-        this.panel.getChildren().removeClass("active");
-    },
-    /**
-     * shows all propreties in the propreties panel
-     */
-    showAll: function(){
-        this.panel.getChildern().addClass("active");
-    },
-    /**
-     * shows only the propreties that corrispond to the passed element type
-     * @param type (string) type of a Raphael element can be ["circle", "rect", "ellipse", "path", "text", "image"]
-     */
-    showByType: function(type) {
-        var props = this.propreties,
-            elP = this.elementProps;
-        Object.each(props, function(item, key){
-            if(~elP.common.indexOf(key) || ~elP[type].indexOf(key)){
-                item.getParent().addClass("active");
-            }
-        }, this);
     }
-    
 });
 
 })();

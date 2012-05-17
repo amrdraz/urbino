@@ -8,17 +8,23 @@
 var Panel = new Class({
     Implements:[Options,Events],
     options:{
-        width:"100%",
-        height:"100%",
-        poition:"relative",
-        x:0,
-        y:0
     },
     initialize: function(options){
         
-        this.setOptions(options);
+        //this.setOptions(options);
         
-        this.panel = new Element("div",{styles:this.options});
+        this.panel = new Element("div",{
+            "class":options["class"]||"",
+            styles:{
+                position:options.position||(options.y||options.x)?"absolute":"relative",
+                top:options.y||0,
+                left:options.x||0,
+                "float":options["float"]||"none",
+                width:options.width||"100%",
+                height:options.height||"100%"
+            }
+        });
+        
         this.bound = {
             resize:this.resize.bind(this)
         };
@@ -28,6 +34,14 @@ var Panel = new Class({
         });
     },
     
+    setScroll:function(set){
+        var panel = this.panel, scroller = this.scroller;
+        if(typeOf(set)!=="null"){
+            scroller[(set?"add":"remove")+"Class"]("hide");
+            this.resize(this.width+(set?-1:1)*scroller.getSize().x);
+        } else {
+        }
+    },
     resize: function(x,y){
         this.width = x = x || this.width;
         this.height = y = y || this.height;

@@ -321,7 +321,7 @@ var ElementsPanel = new Class({
                 if(!el.noparse){
                     obj = elementCreate(el);
                     els[el.id] = obj;
-                    a.push(obj.element);
+                    a.splice(0,0,obj.element);
                 }
             });
           return a;  

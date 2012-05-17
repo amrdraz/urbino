@@ -12,7 +12,6 @@ var TabPanel = (function(){
         return new Element("div",{"class":c}).set(s);
     }
     ;
-    
     return new Class({
         Implements:[Options,Events],
         options:{},
@@ -26,7 +25,11 @@ var TabPanel = (function(){
 
             this.tabs = {};
             var panel = this.panel = $(container),
+            w = this.width=options.width||"100%";
+            h = this.height=options.height||"100%";
             tabs = options.tabs || {};
+            
+            
 
             panel.set("class","tab-panel")
             .setStyles({
@@ -34,8 +37,8 @@ var TabPanel = (function(){
                 top:options.y||0,
                 left:options.x||0,
                 "float":options["float"]||"none",
-                width:options.width||"100%",
-                height:options.height||"100%"
+                width:w,
+                height:h
             });
 
             var
@@ -46,14 +49,10 @@ var TabPanel = (function(){
             contentArea = this.content = div("content-area",{styles:{
                 width:"100%",
                 height:options.height-20||"100%"
-            }}),
-            contain = div("container",{styles:{
-                width:options.width||"100%",
-                height:"100%"
-            }}).adopt(headerArea,contentArea)
+            }})
             ;
+            panel.adopt(headerArea,contentArea);
             
-            panel.adopt(contain);
             var lastInsert;
             Object.each(tabs,function(panel,title){
                 this.tabs[title]= {};
@@ -61,9 +60,12 @@ var TabPanel = (function(){
                     "float":"left"
                 }})).inject(headerArea);
                 this.tabs[title].panel = panel;
-                this.tabs[title].content = div("tab-content",{"name":title}).inject(contentArea).adopt(panel.panel);
+                this.tabs[title].content = panel.panel.addClass("tab-content").setStyle("width",w).inject(contentArea);
                 lastInsert = title;
             }, this);
+            
+            this.yScroller = new ScrollBar(this.get(lastInsert).content, false, 10,contentArea.getSize().y);
+            this.yScroller.scrollBar.inject(contentArea);
             
             if(lastInsert){this.select(options.initSelect|| lastInsert);}
             
@@ -78,11 +80,20 @@ var TabPanel = (function(){
             
         },
         select:function(tab){
-            var sel = this.selected = this.get(tab);
+            var sel = this.selected = this.get(tab), scroll = this.yScroller;
             this.header.getChildren().removeClass("selected");
-            this.content.getChildren().removeClass("selected");
+            this.content.getChildren(".tab-content").addClass("hide");
             sel.header.addClass("selected");
-            sel.content.addClass("selected");
+            sel.content.removeClass("hide");
+            scroll.setContent(sel.content);
+            //console.log(sel,sel.content, scroll.isOff);
+            if(scroll.isOff || sel.panel.noScroll){
+                scroll.hide();
+                sel.content.setStyle("width",this.width);
+            } else {
+                scroll.show();
+                sel.content.setStyle("width",this.width-scroll.width);
+            }
         },
         tabSelect : function(e){
             var t = e.target;

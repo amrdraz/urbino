@@ -1,8 +1,16 @@
+/*!
+ * Color Picker 0.1.0 - Cloud Design component
+ *
+ * Copyright (c) 2012 Amr Draz (http://cloud-design.me)
+ * Based on Color Picker (http://raphaeljs.com/colorwheel) by Dmitry Baranovskiy (http://raphaeljs.com)
+ * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
+ */
+
 /**
  * this class defines the color picker
  * @author Amr Draz
- * @requirments Raphael, Mootools, Slider
- * based on Raphael color wheel
+ * @requirments Raphael, Mootools, Mootools Slider
+ * 
  */
 /*global $,$$,console,Class,Events,Options,Element,typeOf,window,Raphael,Slider*/
 
@@ -65,6 +73,8 @@ var ColorPicker = (function(){
         options:{
     
         },
+        noneFill:"135-#fff-#fff:45-#f00:45-#f00:55-#fff:45-#fff",
+        notNoneFill:"135-#fff-#fff:45-#888:45-#888:55-#fff:45-#fff",
         initialize: function(options){
             
             var cont = $$(options.container)[0]||$$("body")[0],
@@ -108,8 +118,8 @@ var ColorPicker = (function(){
                 "color",
                 "scrollH",
                 "show",
-                "hide",
-                "setNone",
+                "cancel",
+                "toggleNone",
                 "inputChange"
             ].each(function(name){
                 this.bound[name] = this[name].bind(this);
@@ -195,7 +205,7 @@ var ColorPicker = (function(){
             this.noneScreen = r.rect(x, y, wh, wh).attr({
                 r: 2,
                 stroke: "none",
-                fill: "135-#fff-#fff:45-#f00:45-#f00:55-#fff:45-#fff"
+                fill: this.noneFill
             }).hide();
             
             //set svg canvas to absolute
@@ -225,17 +235,17 @@ var ColorPicker = (function(){
             var
             okBtn = r.set();
             okBtn.push(r.rect(x+wh-30,wh+10,30,15,3).attr({fill:"#444"}));
-            okBtn.push(r.text(wh,110,"OK").attr({fill:"#eee","font-size":10,"font-weight":10}));
-            okBtn.attr({title:"set color",stroke:"none"})
-            okBtn.mousedown(this.bound.hide).hover(function(){
+            okBtn.push(r.text(wh,110,"X").attr({fill:"#eee","font-size":10,"font-weight":10}));
+            okBtn.attr({title:"Cancel",stroke:"none"});
+            okBtn.mousedown(this.bound.cancel).hover(function(){
                 okBtn[0].attr("fill","#888");okBtn[1].attr("fill","#222");
                 },function(){
                 okBtn[0].attr("fill","#444");okBtn[1].attr("fill","#eee");
             });
             
             //none button
-            this.noneBtn = r.rect(x+wh-90,wh+10,15,15,1).attr({title:"toggle none",stroke:"none",fill:"135-#fff-#fff:45-#888:45-#888:55-#fff:45-#fff"});
-            this.noneBtn.mousedown(this.bound.setNone);
+            this.noneBtn = r.rect(x+wh-90,wh+10,15,15,1).attr({title:"toggle none",stroke:"none",fill:this.notNoneFill});
+            this.noneBtn.mousedown(this.bound.toggleNone);
             
             //liniar gradien button
             this.linBtn = r.rect(x+wh-70,wh+10,15,15,1).attr({title:"not yet functional",stroke:"none",fill:"135-#000-#fff"});
@@ -260,6 +270,7 @@ var ColorPicker = (function(){
             });
             cont.store("cdPicker",this);
         },
+        
         setO:function(val){
             this.O = val/100;
             this.o && this.o.element.set("title","opacity: "+val+"%");
@@ -291,19 +302,24 @@ var ColorPicker = (function(){
             this.update();
         
         },
-        setNone: function(){
-            if (this.isNone){
-                this.isNone = false;
-                this.noneBtn.attr("fill","135-#fff-#fff:45-#888:45-#888:55-#fff:45-#fff");
-                this.noneScreen.hide()
-                this.cursor.show();
+        toggleNone:function(){
+            this.setNone();
+        },
+        setNone: function(none, noUpdate){
+            var vec = this.vec || {};
+            if(typeOf(none)!=="null"){
+                vec.isNone = this.isNone = none;
+                console.log(this.isNone);
+                this.noneBtn.attr("fill",none?this.noneFill:this.notNoneFill);
+                this.noneScreen[none?"show":"hide"]();
+                this.cursor[none?"hide":"show"]();
+                console.log();
+                !none && this.color()=="#ff" && this.color("#f00");
+                !noUpdate && this.update();
             } else {
-                this.isNone = true;
-                this.noneBtn.attr("fill","135-#fff-#fff:45-#f00:45-#f00:55-#fff:45-#fff");
-                this.noneScreen.show();
-                this.cursor.hide();
+                console.log(this.isNone,"to", !this.isNone);
+                this.setNone(!this.isNone);
             }
-            this.update();
         },
         hsbDown : function(e){
             var
@@ -335,14 +351,33 @@ var ColorPicker = (function(){
                 e.stop();
             var t = this.target = e.target.getParent("div"),
             cor = t.getCoordinates(),
-            vec = this.vec = t.retrieve("vec"),
-            color = this.isNone?"none":vec.attr("fill"),
+            vec = t.retrieve("vec"),
+            color,
             p = this.picker
             ;
+            //check if visible
+            if(this.vec && this.vec.cpOn!==vec.cpOn){
+                this.vec.cpOn = false;
+            }
+            this.vec = vec;
             if(vec.cpOn){
                 this.hide();
                 return;
             }
+            vec.cpOn = true;
+            
+            
+            color = vec.attr("fill");
+            console.log(color, vec.isNone);
+            //check if none
+            if(color==="none" || vec.isNone){
+                color = "none";
+                this.setNone(true);
+            } else{
+                this.setNone(false, true);
+            }
+            
+            
             this.o.set(vec.attr("fill-opacity")*100);
             this.initColor = color;
             this.color(color);
@@ -357,10 +392,26 @@ var ColorPicker = (function(){
             vec.cpOn = true;
         },
         hide : function () {
-            var color =  this.color();
+            //var color =  this.color();
             //console.log(color);
-            this.vec.cpOn = false;
+            var vec = this.vec;
+            //vec.attr("fill")==="none" && (vec.isNone = true);
+            vec.cpOn = false;
             this.picker.setStyle("display","none");
+        },
+        cancel : function () {
+            var color =  this.color();
+            console.log(color, this.initColor);
+            if(this.isNone && this.initColor!=="none"){
+                this.setNone(false);
+            } else if(this.initColor==="none"){
+                this.setNone(true);
+            }  else{
+                this.setNone(false, true);
+                this.color(this.initColor);
+                this.update();
+            }
+            this.hide();
         },
         update: function(){
             var color = this.color(), o = this.O;
@@ -392,6 +443,13 @@ var ColorPicker = (function(){
                 return this.isNone?"none":Raphael.hsb(this.H, this.S, this.B);
             }
         },
+        setColor:function(vec, fill){
+            if(fill==="none") {
+                vec.isNone = true;
+                fill = this.noneFill;
+            }
+            vec.attr("fill",fill);
+        },
         inputChange:function(e){
             var color = e.target.get("value");
             if(!Raphael.color(color).error){
@@ -408,11 +466,6 @@ var ColorPicker = (function(){
             swh = wh-5,
             path = ["M 0 0 ",wh,"0 ",wh," ",wh," 0 ",wh," z"].join(),
             div = new Element("div", { "class":o.clas||"",styles:{
-                position:"realtive",
-                    left:o.x,
-                    top:o.y,
-                    width:wh,
-                    height:wh
                 }}).set(o.container || {});
                 
             if(o.label){

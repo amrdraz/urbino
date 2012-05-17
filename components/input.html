@@ -21,76 +21,45 @@
   <script type="text/javascript" src="../core/raphael.js"></script>
   <script type="text/javascript" src="../external/raphael.free_transform.js"></script>
   <script type="text/javascript" src="js/raphael.pathManager.js"></script>
-  <script type="text/javascript" src="js/ScrollBar.js"></script>
-  <script type="text/javascript" src="js/Panel.js"></script>
-  <script type="text/javascript" src="js/CanvasPanel.js"></script>
   <script type="text/javascript" src="js/SlidingLabel.js"></script>
-  <script type="text/javascript" src="js/ColorPicker.js"></script>
   <script type="text/javascript" src="js/TabPanel.js"></script>
   <script type="text/javascript" src="js/ToolPanel.js"></script>
-  <script type="text/javascript" src="js/PropretiesPanel.js"></script>
   <script type="text/javascript" src="js/ElementsPanel.js"></script>
   <script type="text/javascript" src="js/TimePanel.js"></script>
-  <style>
-  	
-  	body > h2 {
-  		
-  		margin:10px 20px ;
-  	}
-  </style>
+  
 </head>
  
 <body>
 
-	<h2>Tab Panel</h2>
 <div class="component active">
-	<div id="canvas" ></div>
-	<div id="container" class=""></div>
+	<h3>Input</h3>
+
 	<script>
 //		window.addEvent("domready", function () {
 	/*global $,$$,console,Class,Element,typeOf,window,R, Raphael,TabPanel, PropretiesPanel,ElementsPanel*/
-
-	var
-	atts ={
-        "transform":"T0 0R0 0 0S1 1 0 0",
-        "opacity":1,
-        "fill":"none",
-        "stroke":"none",
-        "stroke-width":1,
-        "stroke-dasharray":"",
-        "stroke-linecap":"butt",
-        "stroke-linejoin":"bevel",
-        "stroke-miterlimit":1,
-        "text-anchor":"start",
-        "font-family":'Arial, Helvetica, sans-serif',
-        "font-size":18,"font-weight":400, "cursor":"default"},
-	canvas = new TabPanel("canvas", {
-		width:640,
-		height:500,
-		tabs:{
-			canvas:new CanvasPanel()
-			}
-	}),
-	r = canvas.get("canvas").panel.R;
-	r.rect(10,20,200,100).attr(atts).attr({"fill":"#8e4", "stroke-width":16, opacity:0.5});
 	
-	r.image("http://th07.deviantart.net/fs70/150/f/2011/234/e/b/ebd7e4ec15f2a9e7fac55658c583e03d-d47gf4r.jpg",350,350,150,100).attr(atts);
-	r.path("M 50 350 H200V400z").attr(atts).attr({"fill":"#e84"});
-	r.text(250,250,"Be Awesome").attr(atts).attr({"fill":"#e48"});
-	r.ellipse(150,250,30, 20).attr(atts).attr({"fill":"#e48"});
-	r.circle(50,250,30).attr(atts).attr({"fill":"#e48"});
-	side = new TabPanel("container", {
-		x:840,
-		width:300,
-		height:500,
-		tabs:{
-			"Propreties": (new PropretiesPanel()),
-			"Elements":(new ElementsPanel(r, {imgSrc:"../img"}))
-		}
-	});
 // }
 	</script>
 </div>
-
+<div class="component active">
+		<h3>SlidingLabel</h3>
+	<form id="slideForm">
+		<div id="label"></div>
+	</form>
+	<script>
+//		window.addEvent("domready", function () {
+	/*global SlidingLabel,console*/
+		var sl =	new SlidingLabel({
+							container:"#slideForm",
+							onChange:function(val, input){
+								console.log(val, input.retrieve("sufix"));
+							},
+							labels:[{label:"opacity", value:100, min:0, max:100, sufix:"%",factor:100},
+				                    "name"]
+	                });
+//		});
+	</script>
+	
+</div>
 </body>
 </html>

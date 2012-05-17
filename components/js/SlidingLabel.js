@@ -20,15 +20,6 @@ var SlidingLabel = (function (){
         } 
     },
     /**
-     * sets the input value to 0 if empty
-     */
-    isEmpty= function (e) {
-        var
-        input = e.target,
-        val = input.get("value");
-        if (val === "") {input.set("value",0);}  
-    },
-    /**
      * chackes that input does not exceed max or min
      */
     inRange= function (e) {
@@ -63,28 +54,22 @@ var SlidingLabel = (function (){
     initialize : function(options) {
         options = options || {};
         this.setOptions(options);
-        this.container = $(this.options.container);
+        var cont = this.container = $$(options.container||"body")[0];
         
-        this.container.getElements("label.sliding-label").addClass("is-sliding");
-        this.container.getElements("input.sliding-input").set("type", "number");
-    
-        $$("input.sliding-input").each(function(input){
+        //plug into already present labels
+        cont.getElements("input.sliding-input").each(function(input){
             if(input.get("value")===""){
                 input.set("value",0);
             }
+            input.set({"type": "number", readonly:"readonly"});
+            input.addClass("sliding-label is-sliding");
         });
-         
-        this.container.addEvents({
-            "mousedown:relay(label.sliding-label)": this.startSlide.bind(this),
-            "keydown:relay(input.sliding-input)": isNumber,
-            "keyup:relay(input.sliding-input)": inRange,
-            "change:relay(input.sliding-input)": isEmpty
-        });
-        
+        //create one label
         if(this.options.label){
             var label  = this.options.label;
             this.initlabel(label.name,label.options).injec(this.container);
         }
+        //create multiple
         if (this.options.labels) {
             var div,array, labels = this.options.labels;
             Array.from(labels).each(function (label) {
@@ -99,50 +84,96 @@ var SlidingLabel = (function (){
         }
         
         
+        //bind events
+        this.bound = {};
+            [   "startSlide",
+                "startWrite",
+                "endWrite"
+            ].each(function(name){
+                this.bound[name] = this[name].bind(this);
+            }, this);
+         
+        this.container.addEvents({
+            "mousedown:relay(label.sliding-label)": this.bound.startSlide,
+            "mousedown:relay(input.sliding-label)": this.bound.startSlide,
+            "dblclick:relay(input.sliding-input)":this.bound.startWrite,
+            "keydown:relay(input.sliding-input)": this.bound.endWrite,
+            "keydown:relay(input.sliding-input)": isNumber,
+            "keyup:relay(input.sliding-input)": inRange,
+            "blur:relay(input.sliding-input)": this.bound.endWrite,
+            "change:relay(input.sliding-input)": this.bound.endWrit
+        });
     },
-    setOnChange:function (func){
-        this.options.onChange = func;
+    startWrite:function(e){
+        e.stop();
+        var input = e.target;
+        console.log(input);
+
+        input.erase("readonly");
+        input.removeClass("sliding-label");
+        input.removeClass("is-sliding");
+        input.getPrevious("label").addClass("sliding-label");
+    },
+    endWrite:function(e){
+        e.stop();
+        var input = e.target,
+        val = input.get("value");
+        if (val === "") {input.set("value",input.get("min")||0);} 
+        input.set("readonly","readonly");
+        input.addClass("sliding-label");
+        input.addClass("is-sliding");
+        input.getPrevious("label").removeClass("sliding-label");
     },
     /**
-     * mothos for constructing label and it's associated input
+     * mothod for constructing label and it's associated input
      * @param name      (string) label name
      * @param options   (object) configuration for the label input
      * @return div      (Element)
      */
     initLabel:function(name, options){
+
         var
         o = options || {},
-        div = new Element("div", o.container),
+        div = new Element("div", o.container).addClass("sliding-label"),
+        label = new Element("label",{
+            "class":"sliding-label is-sliding",
+            text:(o.label||name)+":",
+            "for":name
+            }).inject(div),
         input = new Element("input",{
+            "class":"sliding-input sliding-label is-sliding",
             "type":"number",
-            "value": o.value || o.min || o.max || 0,
+            "value": typeOf(o.value)!=="null"?o.value:typeOf(o.min)!=="null"?o.min:o.max||0,
             "name":name,
             "step":o.step || "",
             "max":o.max || "",
-            "min":o.min || ""
-            }).set(o.input)
-            .addClass("sliding-input"),
-        label = new Element("label",{
-            text:name+":",
-            "for":name
-            }).set(o.label)
-            .addClass("sliding-label is-sliding");
+            "min":typeOf(o.min)==="null"?"":o.min,
+            readonly:"readonly"
+            }).set(o.input).store("sufix",o.sufix||"").store("factor",o.factor||1).inject(div);
+        
+        if(o.sufix){
+            new Element("span",{
+                "class":"sufix",
+                "text":o.sufix
+            }).inject(div);
+        }
+        //console.log(o,o.min,o.min===0,$(input));
 
-        return div.adopt(label,input);
+        return div;
     },
     /**
      * method that starts the slide action
      * @param eve (Event) for passing the start position
      */
     startSlide: function (e) {
-        
         var
         slidingLabel = this,
-        label = e.target,
+        tag = e.target.nodeName.toLowerCase(),
         startPoint = e.page.x,
-        input = label.getNext("input[name="+label.get("for")+"]"),
-        val = input.get("value").toInt(),
-        startValue = val,
+        input = tag==="label"?e.target.getNext("input[name="+e.target.get("for")+"]"):e.target,
+        val = input.get("value"),
+        factor = input.retrieve("factor")||1,
+        startValue = +val,
         step = input.get("step") || 1,
         max = ( input.get("max")!==null )?input.get("max").toInt():Number.MAX_VALUE,
         min = ( input.get("min")!==null )?input.get("min").toInt():(1-Number.MAX_VALUE),
@@ -155,7 +186,7 @@ var SlidingLabel = (function (){
             if (val>max) { val = max; }
             if (val<min) { val = min; }
             input.set("value", val);
-            slidingLabel.fireEvent("onChange", [val,label,e]);
+            slidingLabel.fireEvent("onChange", [val/factor,input,e]);
          },
         /**
          * method that stops the slide action
@@ -168,11 +199,11 @@ var SlidingLabel = (function (){
     
             window.removeEvent("mousemove", slide);
             window.removeEvent("mouseup", stopSlide);
-            $$("input,form,button,textarea,select").removeClass("is-sliding");
-            this.fireEvent("onEnd", [val,label,e]);
+            $$("input:not(.sliding-label),form,button,textarea,select").removeClass("is-sliding");
+            this.fireEvent("onEnd", [val,input,e]);
         };
         
-        this.fireEvent("onStart",[startValue,label,e]);
+        this.fireEvent("onStart",[startValue,input,e]);
         //body set class so that the cursor doesn't change
         document.body.style.cursor = this.cursor;
         // needed to stop text selection in chrome from http://stackoverflow.com/questions/6388284/click-and-drag-cursor-in-chrome

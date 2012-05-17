@@ -21,7 +21,11 @@
   <script type="text/javascript" src="../core/raphael.js"></script>
   <script type="text/javascript" src="../external/raphael.free_transform.js"></script>
   <script type="text/javascript" src="js/raphael.pathManager.js"></script>
+  <script type="text/javascript" src="js/ScrollBar.js"></script>
+  <script type="text/javascript" src="js/Panel.js"></script>
+  <script type="text/javascript" src="js/CanvasPanel.js"></script>
   <script type="text/javascript" src="js/SlidingLabel.js"></script>
+  <script type="text/javascript" src="js/ColorPicker.js"></script>
   <script type="text/javascript" src="js/TabPanel.js"></script>
   <script type="text/javascript" src="js/ToolPanel.js"></script>
   <script type="text/javascript" src="js/PropretiesPanel.js"></script>
@@ -47,21 +51,19 @@
 	<script>
 //		window.addEvent("domready", function () {
 /*global $,$$,console,Class,Element,typeOf,window,R, Raphael, TabPanel,PropretiesPanel,ToolPanel, ElementsPanel*/
-var r = Raphael("draw", "100%", "100%");
 
 var
-	canvas = new TabPanel("draw", {
-		position:"relative",
-		x:60,
-		
-		width:640,
+	canvas = canvas = new TabPanel("draw", {
+		x:55,
+		width:645,
 		height:500,
 		tabs:{
-			canvas:{R:r ,panel:r.canvas}
+			canvas:new CanvasPanel()
 			}
 	}),
+	r = canvas.get("canvas").panel.R,
 	side = new TabPanel("side", {
-		x:840,
+		x:700,
 		width:300,
 		height:500,
 		initSelect:"Propreties",
@@ -72,9 +74,8 @@ var
 	}),
 	toolPanel = new TabPanel("tools", {
 		x:5,
-		y:60,
 		width:50,
-		height:"auto",
+		height:500,
 		tabs:{
 			"Tools": new ToolPanel(r)
 		}
