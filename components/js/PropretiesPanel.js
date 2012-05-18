@@ -97,7 +97,7 @@ var PropretiesPanel = (function(){
         image:["src"],
         paper:[],
         "arrow-end":["arrow-type","arrow-width","arrow-length"],
-        fillstroke:["opacity","fill","stroke","stroke-width","stroke-dasharray","stroke-linecap","stroke-linejoin",/*"stroke-miterlimit",*/],
+        fillstroke:["opacity","fill","stroke","stroke-width","stroke-dasharray","stroke-linecap","stroke-linejoin"/*,"stroke-miterlimit"*/],
         text:["text-anchor","font-family","font-size","font-weight","text"],
         transform:["origin-x","origin-y","rotate","scale-x","scale-y"],
         clip:["clip-x","clip-y","clip-width","clip-height"],
@@ -143,7 +143,7 @@ var PropretiesPanel = (function(){
         text:["x","y","text","text-anchor","font","font-family","font-size","font-weight","origin-x","origin-y","rotate","scale-x","scale-y","clip-x","clip-y","clip-width","clip-height", "href", "target", "title"],
         image:["x","y","width","height","src","origin-x","origin-y","rotate","scale-x","scale-y","clip-x","clip-y","clip-width","clip-height", "href", "target", "title"],
         path:["translate-x","translate-y","path","arrow-type","arrow-width","arrow-length","origin-x","origin-y","rotate","scale-x","scale-y","clip-x","clip-y","clip-width","clip-height", "href", "target", "title"],
-        canvas:["x","y","width","height",],
+        canvas:["x","y","width","height"],
         all:["clip-x","clip-y","clip-width","clip-height","translate-x","translate-y","origin-x","origin-y","rotate","scale-x","scale-y","x","y","cx","cy","width","height","rx","ry","cr","r","opacity","src","fill","stroke","stroke-width","stroke-dasharray","stroke-linecap","stroke-linejoin",/*"stroke-miterlimit",*/"text-anchor","font-family","font-size","font-weight","text", "href", "target", "title","cursor"]
     },
     states:{
@@ -235,7 +235,7 @@ var PropretiesPanel = (function(){
                 div = this.colorPicker.initFill(p.name,{
                         stroke:(p.name==="stroke"),
                         label:(p.label||p.name),
-                        x:0,y:0,width:50
+                        width:50
                     } );
                 break;
             case "textarea":
@@ -257,34 +257,39 @@ var PropretiesPanel = (function(){
     initialize: function (options) {
         options = options ||{};
         if(options.extraProps) {
-            propreties.combine(options.extraProps);
+            properties.combine(options.extraProps);
         }
         var panel = this.panel = new Element("div", {"class":"prop-panel"});
+        
+        this.selected = [];
+        this.bound = {};
+            [   "updateEvent",
+                "elementSelect",
+                "elementDeselect",
+                "elementUpdate" 
+            ].each(function(name){
+                this.bound[name] = this[name].bind(this);
+            }, this);
         
         this.slidingLabel = new SlidingLabel({
                                 container:panel,
                                 onChange:function(val, input){
-                                    var attr = {}, name = input.get("name"),fact = input.retrieve("factor"), sel = this.selected;
-                                    if(input.getParent().hasClass("transform")){
-                                        if(sel){
-                                            if(sel._.transform.length===0){
-                                                sel.transform("T0 0R0 "+sel.oX+" "+sel.oY+"S0 0 "+sel.oX+" "+sel.oY);
-                                             }
-                                            if(/^origin\-x/.test())
-                                            this.selected._.deg;
-                                        } 
-                                    }
-                                    if(input.getParent().hasClass("clip")){
-                                        
-                                    }
+                                        var attr = {}, name = input.get("name"),fact = input.retrieve("factor"), sel = this.selected;
+                                        if(input.getParent().hasClass("transform")){
+                                            //TODO handel free transform
+                                            return;
+                                        }
+                                        if(input.getParent().hasClass("clip")){
+                                            //TODO set clip
+                                            return;
+                                        }
                                     
                                         attr[input.get("name")] = val;
-                                        console.log(val);
-                                        if(this.selected){
+                                        //console.log(val);
+                                        if(sel.length!==0){
                                             window.fireEvent("element.update", [attr]);
-                                            //TODO fire update event for other panels
                                         } else {
-                                            //toolpanel.setAttr(attr);
+                                            window.fireEvent("panel.update",[attr]);
                                         }
                                     }.bind(this)
                                 });
@@ -292,16 +297,15 @@ var PropretiesPanel = (function(){
             imgSrc:"../img",
             onChange:function(color,o,v){
                 if(v){
-                    var attr = {},
+                    var attr = {}, sel = this.selected,
                         att = v.node.getParent("div").get("for");
                         attr[att]=color;
                         attr[att+"-opacity"]=o;
                     v.attr({"fill":color==="none"?"135-#fff-#fff:45-#f00:45-#f00:55-#fff:45-#fff":color,"fill-opacity":o});
-                    if(this.selected){
+                    if(sel.length!==0){
                         window.fireEvent("element.update", [attr]);
-                        //TODO fire update event for other panels
                     } else {
-                        //toolpanel.setAttr(attr);
+                        window.fireEvent("panel.update",[attr]);
                     }
                 }
             }.bind(this)
@@ -327,13 +331,8 @@ var PropretiesPanel = (function(){
         }, this);
         
         this.setState("canvas");
-        
-        this.bound = {
-            updateEvent: this.updateEvent.bind(this),
-            elementSelect : this.elementSelect.bind(this),
-            elementDeselect : this.elementDeselect.bind(this),
-            elementUpdate : this.elementUpdate.bind(this)
-        };
+
+       
         
         panel.addEvents({
             "keyup:relay(input,textarea)": this.bound.updateEvent,
@@ -377,14 +376,14 @@ var PropretiesPanel = (function(){
     */
    updateEvent: function(eve) {
         var input = eve.target;
-        var attr = {},
+        var attr = {}, sel = this.selected,
         val = input.get("value"),
         att = input.get("name"),
         group = input.getParent(".group");
         
         if(group.hasClass("arrow-end")){
             var arr = group.getChildren(".proprety").map(function(c){return c.getLast().get("value");});
-            console.log(arr);
+            //console.log(arr);
             attr["arrow-end"] = arr.join("-");
             //console.log(attr["arrow-end"]);
         } else {
@@ -392,23 +391,23 @@ var PropretiesPanel = (function(){
         }
         
         
-        if(this.selected){
+        if(sel.length!==0){
             window.fireEvent("element.update", [attr]);
         } else {
-            toolpanel.setAttr(attr);
+            window.fireEvent("panel.update",[attr]);
         }
     },
     /**
-     * if an element is selected updates the current selected element with the passed attribute
+     * updates the current selected element(s) with the passed attribute
      * @param attr (obj) a Raphael attr object ie {attributName:attributeValue}
      * 
      */
-    elementUpdate: function(attr){
-        var el = this.selected;
-        //console.log(el,attr);
-        if(this.selected){el.attr(attr);}
-        
-        //console.log(Object.toQueryString(attr),Object.toQueryString(el.attr()));
+    elementUpdate: function(attr, elm){
+        if(elm){
+            elm.attr(attr);
+        }else{
+            this.selected.each(function(el){el.attr(attr);});   
+        }
     },
     /**
      * selects hides all propreties that don't apply to it,
@@ -416,9 +415,9 @@ var PropretiesPanel = (function(){
      * @param el (Raphael obj)
      */
     elementSelect: function (el) {
-        this.selected = el;
+        this.selected.push(el);
         this.setState(el.type);
-        console.log(el.attr());
+        //console.log(el.attr());
         this.prop(el.attr());
     },
     /**
@@ -426,9 +425,9 @@ var PropretiesPanel = (function(){
      * @param el (Raphael obj)
      */
     elementDeselect: function (el) {
-        //this.setState("canvas");
-        //this.selected = null;
-       // this.setPropreties(this.attrs);
+        this.setState("canvas");
+        var sel = this.selected;
+        sel.splice(sel.indexOf(el),1);
     },
     prop:function(prop,val){
         if(typeOf(prop)==="null"){ //return all propreties in name value object

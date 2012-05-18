@@ -1,4 +1,19 @@
-/**
+/** 
+ * Path Manger raphael plugin
+ * Copyright (c) 2012 Amr Draz
+ * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files 
+(the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, 
+merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished 
+to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY 
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE 
+OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 /*global Raphael*/
 
@@ -15,13 +30,13 @@
 Raphael.fn.pathManager = function(patharray, options, callback) {
     // Enable method chaining
     //if ( subject && subject.customPath ) return subject.customPath;
-    var r = this, pm, guideattr = {"fill":"none", "stroke":"#222"};
+    var r = this, pm, guideattr = {"fill":"none", "stroke":"#4f8"};
     
     var
     options = options || {},
-    handelattr = options.handelattr || {stroke: "#333", "stroke-dasharray": ". "},
-    controlattr = options.controlattr || {r:5,fill: "#222",stroke: "none"},
-    anchorattr = options.anchorattr || {r:5,fill: "#48e",stroke: "#000"},
+    handelattr = options.handelattr || {stroke: "#49f", "stroke-dasharray": ""},
+    controlattr = options.controlattr || {r:2,fill: "#222",stroke: "#48f"},
+    anchorattr = options.anchorattr || {r:3,fill: "#48e",stroke: "#333"},
     isLine = function(bez) {
         return (bez[0]==bez[2] && bez[1]==bez[3] && bez[4]==bez[6] && bez[5]==bez[7]);
     },

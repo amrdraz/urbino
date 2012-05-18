@@ -150,11 +150,11 @@ var TimePanel = new Class({
                 steps:100,
                 wheel:true,
                 onChange:function(val){
-                    console.log(this,val);
+                    //console.log(this,val);
                     timePanel.fireEvent("timeline.zoom", [val]);
                 }
             });
-            console.log(cont,handel);
+            //console.log(cont,handel);
             d.store("slider",slider);
             return d;
         },
@@ -766,7 +766,7 @@ var TimePanel = new Class({
                 el.setStyles({left:del/msPerpx,width:dur/msPerpx});
             });
             slideTo(pos);
-            console.log(zoomLevel, zoomSlider);
+            //console.log(zoomLevel, zoomSlider);
         },
         zoomIn = function(){
             zoomSlider.set((zoomLevel+0.1)*100);
@@ -778,7 +778,7 @@ var TimePanel = new Class({
             var 
             width = timelineArea.getSize().x,
             px = (ms/msPerpx).round();
-            console.log(lastMs, trackerMs);
+            //console.log(lastMs, trackerMs);
             while ((px+100)<=width && zoomLevel<1) {
               zoomLevel+=0.01;
               setMsPerpx(zoomLevel);

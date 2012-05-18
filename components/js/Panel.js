@@ -33,15 +33,7 @@ var Panel = new Class({
             "panel.resize": this.bound.resize
         });
     },
-    
-    setScroll:function(set){
-        var panel = this.panel, scroller = this.scroller;
-        if(typeOf(set)!=="null"){
-            scroller[(set?"add":"remove")+"Class"]("hide");
-            this.resize(this.width+(set?-1:1)*scroller.getSize().x);
-        } else {
-        }
-    },
+
     resize: function(x,y){
         this.width = x = x || this.width;
         this.height = y = y || this.height;

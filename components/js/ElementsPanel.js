@@ -101,24 +101,11 @@ var ElementsPanel = new Class({
         hideToggle = function (e){
             e.stop();
 
-            var el = els[e.target.getParent(".element").get("for")];
-            delete selected[el.el.id];
-            if(el.element.hasClass("hidden")){
-                el.element.removeClass("hidden");
-                el.el.show();
-                Object.each(selected, function(elm,key){
-                    elm.element.removeClass("hidden");
-                    elm.el.show();
-                });
-            } else {
-                el.element.addClass("hidden");
-                el.el.hide();
-                Object.each(selected, function(elm,key){
-                    elm.element.addClass("hidden");
-                    elm.el.hide();
-                });
-            }
-            selected[el.id] = el;
+            var el = els[e.target.getParent(".element").get("for")], hide = el.element.hasClass("hidden");
+           console.log(selected);
+           el.element.toggleClass("hidden");
+           el.el[hide?"show":"hide"]();
+           
         },
        expandToggle = function (e){
             e.stop();
@@ -137,8 +124,7 @@ var ElementsPanel = new Class({
          * @return (div) the div representing the row
          */
          elementCreate = function(el){
-            el.id = (typeOf(el.id)==="number")?el.type+el.id:el.id;
-            
+            el.setId((typeOf(el.id)==="number")?el.type+el.id:el.id);
             var color = el.color|| "#888",
             element = div("element", {"for":el.id}).adopt(
                 div("color", {styles:{
@@ -192,6 +178,7 @@ var ElementsPanel = new Class({
                 selected[id] = els[id];
                 selected[id].element.addClass("selected");
             }
+            //console.log(selected);
         },
         /**
          * selects the elemnets obj by it's element
@@ -219,18 +206,21 @@ var ElementsPanel = new Class({
          */
         elementClick = function (e) {
             e.stopPropagation();
+            if(e.target.hasClass("eye")){return;}
             
             var el = els[((e.target.hasClass("element"))?e.target:e.target.getParent(".element")).get("for")].el;
+            /*
             if(e.control){
                 if(selected[el.id]){
                     window.fireEvent("element.deselect", [el]);
                 } else {
                     window.fireEvent("element.select", [el]);
                 }
-            } else {
+            } else { */
                 window.fireEvent("element.deselect");
                 window.fireEvent("element.select", [el]);
-            }
+            //}
+            console.log(selected);
         },
         /**
          * event handler deletes the element from the elements panel
@@ -304,7 +294,7 @@ var ElementsPanel = new Class({
             if(val!=="" && !els[val]) {
                 els[id].element.getElement(".name").set("text", val);
                 els[id].element.set("for", val);
-                els[id].el.id = val;
+                els[id].el.setId(val);
                 els[val] = els[id];
                 delete els[id];
                 //rowDeselect(id);
@@ -337,7 +327,7 @@ var ElementsPanel = new Class({
             "blur": hideTextField
         });
         
-        panel.addEvents({
+        elements.addEvents({
             "click":notElement,
             "mousedown:relay(.eye)": hideToggle,
             "mousedown:relay(.arrow)": expandToggle,

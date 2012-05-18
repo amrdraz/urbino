@@ -309,11 +309,11 @@ var ColorPicker = (function(){
             var vec = this.vec || {};
             if(typeOf(none)!=="null"){
                 vec.isNone = this.isNone = none;
-                console.log(this.isNone);
+                //console.log(this.isNone);
                 this.noneBtn.attr("fill",none?this.noneFill:this.notNoneFill);
                 this.noneScreen[none?"show":"hide"]();
                 this.cursor[none?"hide":"show"]();
-                console.log();
+                //console.log();
                 !none && this.color()=="#ff" && this.color("#f00");
                 !noUpdate && this.update();
             } else {
@@ -368,7 +368,7 @@ var ColorPicker = (function(){
             
             
             color = vec.attr("fill");
-            console.log(color, vec.isNone);
+            //console.log(color, vec.isNone);
             //check if none
             if(color==="none" || vec.isNone){
                 color = "none";
@@ -448,7 +448,7 @@ var ColorPicker = (function(){
                 vec.isNone = true;
                 fill = this.noneFill;
             }
-            vec.attr("fill",fill);
+            return vec.attr("fill",fill);
         },
         inputChange:function(e){
             var color = e.target.get("value");
@@ -464,8 +464,13 @@ var ColorPicker = (function(){
             o = options || {},
             wh = o.wh || 20,
             swh = wh-5,
-            path = ["M 0 0 ",wh,"0 ",wh," ",wh," 0 ",wh," z"].join(),
+            path = ["M 1 1 ",wh-1,"1 ",wh-1," ",wh-1," 1 ",wh-1," z"].join(),
             div = new Element("div", { "class":o.clas||"",styles:{
+                position:o.position||(o.y||o.x)?"absolute":"relative",
+                top:o.y||0,
+                left:o.x||0,
+                width:wh,
+                height:wh
                 }}).set(o.container || {});
                 
             if(o.label){
@@ -482,7 +487,7 @@ var ColorPicker = (function(){
                 })).inject(div);
             }
                 
-            (vect({"class":"cd-colorpicker", "for":name,
+            var vec = (vect({"class":"cd-colorpicker", "for":name,
                 styles:{
                     position:"absolute",
                     right:0,
@@ -502,13 +507,13 @@ var ColorPicker = (function(){
                     type:"path",
                     path:(o.stroke) ? [path, "M 5 5 5 ",swh," ",swh," ",swh," ", swh,"5 z"].join():path,
                     stroke:"none",
-                    fill:this.color(),
                    "fill-opacity":this.O
                 }
                 ]
                 )).inject(div);
                 
-           
+                div.store("vec", vec.retrieve("vec"));
+                this.setColor(vec.retrieve("vec"),o.initColor||(o.stroke?"#000":"none"));
                 
             return div;
         }

@@ -54,7 +54,7 @@
 
 var
 	canvas = canvas = new TabPanel("draw", {
-		x:55,
+		x:45,
 		width:645,
 		height:500,
 		tabs:{
@@ -66,7 +66,7 @@ var
 		x:700,
 		width:300,
 		height:500,
-		initSelect:"Propreties",
+		initSelect:"Elements",
 		tabs:{
 			"Propreties": (new PropretiesPanel()),
 			"Elements":(new ElementsPanel(r, {imgSrc:"../img"}))
@@ -74,7 +74,7 @@ var
 	}),
 	toolPanel = new TabPanel("tools", {
 		x:5,
-		width:50,
+		width:40,
 		height:500,
 		tabs:{
 			"Tools": new ToolPanel(r)

@@ -3,35 +3,61 @@
  * @author Amr Draz
  * @requirments Raphael, pathManager, Moootools
  */
-/*global $,$$,console,Class,Element,typeOf,window,R*/
+/*global $,$$,console,Class,Element,typeOf,window,R,ColorPicker*/
 
 var ToolPanel = new Class({
 
-/**
- * function that returns the attributes of the global state
- * @return attrs (obj) Raphael attr object formate {attrName:attrValue,...}
- */
-getAttr:function(){
-    return this.attrs;
-},
-/**
- * function that sets the attributes of the global state
- */
-setAttr:function(att, val){
-    if(typeOf(att)=="object"){
-        for(val in att){
-            if(att.hasOwnProperty(val)){
-                this.setAttr(val,att[val]);
-            }
+    /**
+     * function that returns the attributes of the global state
+     * @return attrs (obj) Raphael attr object formate {attrName:attrValue,...}
+     */
+    getAttr:function(){
+        return this.attrs;
+    },
+    /**
+     * function that sets the attributes of the global state
+     */
+    setAttr:function(att, val){
+        //console.log(this);
+        if(typeOf(att)=="object"){
+            Object.each(att, function(val, key){
+                this.setAttr(key,val);
+            }, this);
+            return;
         }
-        return;
-    }
-    this.attrs[att] = (val=="")?"none":val;
-},
-/**
- * the default global state
- */
-attrs : {"fill":"#48e", "stroke":"none"},
+        this.attrs[att] = (val==="")?"none":val;
+    },
+    icon:{
+        select:"M2,2L2,64L17,41L31,63L45,55L30,35L55,30L2,2"
+    },
+    /**
+     * the scurrently selected element
+     */
+    selected: [],
+    /**
+     * the currently selected path
+     */
+    pm:null,
+    /**
+     * the defualt image src
+     */
+    imgAttr : {src:"http://www.wowace.com/thumbman/avatars/6/707/300x300/600px-718smiley.svg.png.-m0.png"},
+    /**
+     * a boolean that is true when editing or drawing path
+     */
+    drawPath:false,
+    /**
+     * a variable that holds the current selected tool value
+     */
+    toolMode:null,// is a string signifying the mouse mode
+    /**
+     * a boolean to disable 
+     */
+    noShortcut : false,
+
+    /**
+     * text area for writing text
+     */
 /**
  * function which intializes the Tool Panel
  * @param panel (string) id of the DIV element the panel is added too
@@ -39,93 +65,147 @@ attrs : {"fill":"#48e", "stroke":"none"},
  * @param options (obj) extra options when initializing the Panel
  */
 initialize : function(R, options){
-    var panel = this.panel = new Element("div",{"class":"tool-panel"});
-    var 
+    this.paper = R;
+    this.bound = {};
+            [   "keyCommand",
+                "drawStart",
+                "drawDrag",
+                "drawStop",
+                "elementDelete",
+                "elementSelect",
+                "elementDeselect",
+                "mousedown",
+                "dblclick",
+                "hideTextToolArea",
+                "setAttr"
+            ].each(function(name){
+                this.bound[name] = this[name].bind(this);
+            }, this);
+    
     /**
-     * the scurrently selected element
+     * the default global attributes
      */
-    selected=null,
-    /**
-     * the currently selected path
-     */
-    pm=null,
-    /**
-     * the default text size
-     */
-    textAttr = {"font-size":"16px"},
-    /**
-     * the defualt image src
-     */
-    imgAttr = {src:"http://www.wowace.com/thumbman/avatars/6/707/300x300/600px-718smiley.svg.png.-m0.png"},
-    /**
-     * a boolean that is true when editing or drawing path
-     */
-    drawPath=false,
-    /**
-     * a variable that holds the current selected tool value
-     */
-    toolMode=null,// is a string signifying the mouse mode
-    /**
-     * a boolean to disable 
-     */
-    noShortcut = false,
-    /**
+    this.attrs = {"fill":"#48e", "stroke":"none",r:0, "font-size":"18px"};
+    
+    var p = this.panel = new Element("div",{"class":"tool-panel"}),
+    
+        /**
      * sets c to the DIV/SVG R is applied too
      */
-    c = $(R.canvas),
-    /**
-     * text area for writing text
-     */
-    textToolArea = new Element("textarea", { styles:{
+    c = this.c = $(R.canvas),
+    ta = this.textToolArea = new Element("textarea", { styles:{
         "position":"absolute",
         "white-space":"nowrap",
         "display":"none",
         "border":"#000 dashed 1px"
     }}),
+    cp = this.colorPicker = new ColorPicker({
+        imgSrc:"../img",
+        onChange:function(color,o,v){
+            var sel = this.slected;
+            if(v){
+                var attr = {},
+                    att = v.node.getParent("div").get("for");
+                    attr[att]=color;
+                    attr[att+"-opacity"]=o;
+                v.attr({"fill":color==="none"?"135-#fff-#fff:45-#f00:45-#f00:55-#fff:45-#fff":color,"fill-opacity":o});
+                if(sel.length!==0){
+                    window.fireEvent("element.update", [attr]);
+                } else {
+                    window.fireEvent("panel.update",[attr]);
+                }
+            }
+        }.bind(this)
+    });
+    
     /**
      * creates the tool panel and adds the 
      */
-    panelInit = function(panel){
-        var p = $(panel);
+    p.set("html",''+
+        '<div toolType="select" title="select element" class="tool">select</div>'+
+        '<div toolType="rect" title="draw a rectangle" class="tool">rect</div>'+
+        '<div toolType="circle" title="draw a circle" class="tool">circle</div>'+
+        '<div toolType="ellipse" title="draw an ellipse" class="tool">ellipse</div>'+
+        '<div toolType="text" title="write text" class="tool">text</div>'+
+        '<div toolType="image" title="add Image" class="tool">image</div>'+
+        '<div toolType="path" title="draw path" class="tool">path</div>'
+    );
+    var stroke = cp.initFill("stroke",{initColor:this.attrs.stroke,x:15,y:260,width:30,stroke:"stroke"}),
+        fill = cp.initFill("fill",{initColor:this.attrs.fill,x:5,y:250,width:30});
         
-        p.set("html",''+
-            '<div toolType="select" title="select element" class="tool">select</div>'+
-            '<div toolType="rect" title="draw a rectangle" class="tool">rect</div>'+
-            '<div toolType="circle" title="draw a circle" class="tool">circle</div>'+
-            '<div toolType="ellipse" title="draw an ellipse" class="tool">ellipse</div>'+
-            '<div toolType="text" title="write text" class="tool">text</div>'+
-            '<div toolType="image" title="add Image" class="tool">image</div>'+
-            '<div toolType="path" title="draw path" class="tool">path</div>'
-        );
+        this.fill = fill.retrieve("vec");
+        this.stroke = stroke.retrieve("vec");
         
-        p.addEvent("click:relay(.tool)",function(e) {
-            selectMode(e.target.get("toolType"));
-        });
-    }, 
+    p.adopt(
+        stroke,
+        fill
+    );
+    ta.inject(c.getParent());
+    
+    
+    
+    p.addEvent("click:relay(.tool)",function(e) {
+        this.selectMode(e.target.get("toolType"));
+    }.bind(this));
+   
+    ta.addEvents({
+        "keydown": function (eve){
+                if (eve.key === "enter" && !eve.shift){
+                    this.bound.hideTextToolArea();
+                }
+            }.bind(this),
+        "blur": this.bound.hideTextToolArea
+    });
+    
+    c.addEvents({
+        "mousedown": this.bound.mousedown,
+        "dblclick":this.bound.dblclick
+    });
+    window.addEvents({
+        "keyup": this.bound.keyCommand,
+        "draw.start": this.bound.drawStart,
+        "draw.drag": this.bound.drawDrag,
+        "draw.stop": this.bound.drawStop,
+        "element.delete":this.bound.elementDelete,
+        "element.select":this.bound.elementSelect,
+        "element.deselect": this.bound.elementDeselect,
+        "panel.update":this.bound.setAttr
+    });
+    
+},
+    setState: function(st){
+        if(st==="canvas"){
+            this.colorPicker.setColor(this.fill,this.getAttr.fill);
+            this.colorPicker.setColor(this.stroke,this.getAttr.stroke);
+        }
+    },
+
     /**
      * hides the textarea used to write in a text element after applying the text
      */
-    hideTextToolArea= function (){
-        var el = selected;
+    hideTextToolArea: function (){
+        //TODO fix text
+        var selected = this.selected, el = selected, ta = this.textToolArea;
         if(typeOf(el)!=="null" && el.type==="text") {
-            el.attr("text", textToolArea.get("value"));
+            el.attr("text", ta.get("value"));
              if(el.ft){el.ft.unplug();}
             el.ft = R.freeTransform(el);
             el.ft.hideHandles();
-            selected = null;
+            selected = {};
         }
-        textToolArea.set({"value":"", styles:{"display":"none"}});
-        noShortcut=false;
+        ta.set({"value":"", styles:{"display":"none"}});
+        this.noShortcut=false;
     },
     
     /**
      * function responsible for switching tool modes
      */
-    selectMode = function (selectedTool){
-        toolMode = selectedTool;
-        console.log("selected "+ toolMode+" tool");
-        window.fireEvent("element.deselect", [selected]);
-        var tool = $$(".tool[toolType="+toolMode+"]")[0];
+    selectMode : function (selectedTool){
+        this.toolMode = selectedTool;
+        //console.log("selected "+ toolMode+" tool");
+        window.fireEvent("element.deselect");
+        var tool = $$(".tool[toolType="+selectedTool+"]")[0];
+        
         tool.getParent().getElements(".selected").removeClass("selected");
         tool.addClass("selected");
     },
@@ -141,86 +221,94 @@ initialize : function(R, options){
      *  - 'delete' for deleting an element fires a element.delete event
      * 
      */
-    keyCommand = function (eve){
-        
-        if(!noShortcut){ //ment to disable keycomands temporarely
-            drawPath = false;
+    keyCommand : function (eve){
+        var mode;
+        if(!this.noShortcut){ //ment to disable keycomands temporarely
+            this.drawPath = false;
             switch(eve.key){
                 case "v":
-                    selectMode("select");
+                    mode = ("select");
                     break;
                 case "r":
-                    selectMode("rect");
+                    mode = ("rect");
                     break;
                 case "c":
-                    selectMode("circle");
+                    mode = ("circle");
                     break;
                 case "e":
-                    selectMode("ellipse");
+                    mode = ("ellipse");
                     break;
                 case "t":
-                    selectMode("text");
+                    mode = ("text");
                     break;
                 case "i":
-                    selectMode("image");
+                    mode = ("image");
                     break;
                 case "p":
-                    selectMode("path");
+                    this.drawPath = false;
+                    mode = ("path");
                     break;
                 default:break;
             }
-            if(typeOf(selected)!=="null"){
-                switch(eve.key){
-                    case "delete":
-                        eve.stop();
-                        window.fireEvent("element.delete", [selected]);
-                        break;
-                    default: break;
+            if(mode){
+                this.selectMode(mode);
+            } else{
+                if(eve.key==="delete"){
+                    eve.stop();
+                    window.fireEvent("element.delete");
                 }
             }
+            
         }
     },
     /**
      * handels needed arrangment for when an element is deleted
      */
-    elementDelete =function (){
-        if (selected) {
+    elementDelete :function (){
+        var sel = this.selected;
+        if (sel.length!==0) {
             console.log("deleted element");
             //selected.ft.unplug();
             //selected.remove();
-            selected = null;
-            pm=null;
+            sel = [];
+            this.pm=null;
         }
     },
     /**
      * this method toggles the raphaeltransform handels associated with the selected element(s)
      * @param el (obj) Rapahel element
      */
-    elementSelect= function (el){
+    elementSelect: function (el){
+        var sel = this.selected;
         if(el) {
-            window.fireEvent("element.deselect", [selected]);
-            selected = el;
-            if(selected.ft && !drawPath) {selected.ft.showHandles();}
+            sel.push(el);
+            if(el.ft && !this.drawPath) {el.ft.showHandles();}
         }
     },
     /**
      * this function deselects an element
      * @param el (obj) Rapahel element
      */
-    elementDeselect = function(el){
-        if(el && typeOf(el)!=="null" && el.ft) {
-            if(el.type=="path" && !/path|select/.test(toolMode)){
-                if(drawPath){
-                    drawPath = false;
-                    pm.drawing = false;
-                    pm.unplug();
-                    if(pm.ft){pm.ft.unplug();}
-                    pm.ft = R.freeTransform(pm);
-                    pm.ft.hideHandles();
-                    pm = null;
+    elementDeselect : function(el){
+        var sel = this.selected,drawPath = this.drawPath,pm = this.pm, toolMode=this.toolMode;
+        if(el){
+            sel.splice(sel.indexOf(el),1);
+            if(el.ft) {
+                if(el.type=="path" && !/path|select/.test(toolMode)){
+                    if(drawPath){
+                        this.drawPath = false;
+                        pm.drawing = false;
+                        pm.unplug();
+                        if(pm.ft){pm.ft.unplug();}
+                        pm.ft = R.freeTransform(pm);
+                        pm = null;
+                    }
                 }
+                el.ft.hideHandles();
             }
-             el.ft.hideHandles();
+            this.setState("canvas");
+        } else {
+            sel.each(function(el){this.elementDeselect(el);},this);
         }
     },
     /**
@@ -230,14 +318,14 @@ initialize : function(R, options){
      * @param el (obj) Raphael Obj
      * @param at (obj) attributes of bounding box while drawing
      */
-    elementCreate = function(el, at){
+    elementCreate : function(el, at){
+        var R = this.paper, toolMode = this.toolMode, textToolArea = this.textToolArea, ft;
+        
         if(el.type!=="path") {
-            var ft = R.freeTransform(el);
+            ft = R.freeTransform(el);
             el.ft = ft;
             ft.hideHandles();
         }
-        
-        el.click(function(){if(toolMode=="select"){window.fireEvent("element.select",[this]);}});
         
         if(el.type === "text" ){
             textToolArea.setStyles({
@@ -251,7 +339,7 @@ initialize : function(R, options){
             ft.attrs.translate.x = at.x;
             ft.attrs.translate.y = at.y;
             el.translate(at.x,at.y);
-            noShortcut=true;
+            this.noShortcut=true;
         }
         window.fireEvent("element.create", [el]);
     },
@@ -262,20 +350,22 @@ initialize : function(R, options){
      * if a mousedown occurse on a path controle point a segment.mousedown event is fired
      * @param e (obj) event Object used to get the x y position of the mouse
      */
-    mousedown = function (e) {
-        var
+    mousedown : function (e) {
+        var c = this.c,
+            R = this.paper,
             name = e.target.nodeName, el, els,
             x = (e.page.x - c.getParent().getPosition().x),
             y = (e.page.y - c.getParent().getPosition().y);
             
-        switch (toolMode){
+        switch (this.toolMode){
             case "text":
-                hideTextToolArea(); //no break is intentional
+                this.hideTextToolArea(); //no break is intentional
             case "path": case "rect": case "image": case "circle": case "ellipse"://papeR.clear();
                // if(e.target.nodeName==="svg"||e.target.nodeName==="DIV"){}
               //  if(toolMode=="path" && drawPath){
                 els = R.getElementsByPoint(x,y);
-                el = (els.length>0)?els[els.length-1]:null;
+                el = els[els.length-1];
+                console.log(el);
                 if(el && el.noparse){
                     if(el.control && /anchor|next|prev/.test(el.control)){
                         window.fireEvent("segment.mousedown",[e, el]);
@@ -284,21 +374,34 @@ initialize : function(R, options){
                 }
               //      }
            // timer = (function(){
-               window.fireEvent("element.deselect", [selected]);
+               //console.log(this.getAttr());
+               window.fireEvent("element.deselect");
                 window.fireEvent("draw.start", {"x":x,"y":y, "attrs":this.attrs});
            // }).delay(500);
                 
                 break;
             case "select":
-            default:
-                if(e.target.nodeName==="svg"||e.target.nodeName==="DIV"){
-                    window.fireEvent("element.deselect", [selected]);
-                } else {
-                    //TODO select 
-                    els = R.getElementsByPoint(x,y);
-                    el = (els.length>0)?els[els.length-1]:null;
-                }
+            if(e.target.nodeName==="svg"||e.target.nodeName==="DIV"){
+                window.fireEvent("element.deselect");
+            } else {
+                this.select(e.page.x,e.page.y);
+            }
                 break;
+        }
+    },
+    select:function(x,y){
+        
+        var R = this.paper,
+        el = R.getElementByPoint(x,y);
+        //console.log(x,y,el.id, el.raphaelid, R.getElementByPoint(x,y)); return;
+        
+        if(el){
+            el.noparse = el.noparse || false;
+            //console.log(this.selected,this.selected.indexOf(el));
+            if(!el.noparse && this.selected.indexOf(el)===-1){
+                window.fireEvent("element.deselect");
+                window.fireEvent("element.select", [el]);
+            }
         }
     },
     /**
@@ -307,29 +410,34 @@ initialize : function(R, options){
      * if a path is selected and a double click occurs it allows reediting the path
      * @param e (obj) event object used to get x and y position on canvas
      */
-    dblclick=function  (e){
+    dblclick:function  (e){
         //clearTimeout(timer);
-        var x = (e.page.x - c.getParent().getPosition().x),
+        var c = this.c, R = this.paper,
+        drawPath = this.drawPath,
+        pm = this.pm,
+              x = (e.page.x - c.getParent().getPosition().x),
             y = (e.page.y - c.getParent().getPosition().y),
             el;
             
         if(drawPath){
-            drawPath = false;
-            pm.drawing = false;
+            console.log("he");
+            this.drawPath = false;
             pm.unplug();
             if(pm.ft){pm.ft.unplug();}
             pm.ft = R.freeTransform(pm);
             pm.ft.hideHandles();
-            selectMode("select");
+            this.selectMode("select");
             pm = null;
         } else {
-            el = selected;
+            el = this.selected[0];
             if(el && el.type=="path"){
-                drawPath = true;
+                this.drawPath = true;
                 pm = el;
                 pm.plug();
                 if(pm.ft){(pm.ft.unplug());}
             }
+            
+            
         }
     },
     
@@ -340,42 +448,43 @@ initialize : function(R, options){
      * also rgisters a mouseup event which removes both handlers
      * and fires a draw.end event handler
      */
-    drawStart= function (o) { if(!toolMode.contains("custom")) {
-        var el, select = false, bound =  R.rect(o.x, o.y, 0, 0).attr({
+    drawStart: function (o) {
+        var toolMode = this.toolMode, drawPath = this.drawPath,pm = this.pm;
+        if(!this.toolMode.contains("custom")) {
+            var R = this.paper,c = this.c,
+            el, select = false, bound =  R.rect(o.x, o.y, 0, 0).attr({
                 stroke: "#000",
                 opacity: 0.6
            });
-        switch(toolMode) {
-            case "rect": el = R.rect(o.x,o.y,0,0); break;
-            case "ellipse": el= R.ellipse(o.x,o.x,0,0); break;
-            case "circle": el=R.circle(o.x,o.y,0); break;
-            case "text" : el=R.text(0,0,"").attr(textAttr); bound.attr("stroke-dasharray","--"); break;
-            case "image": el = R.image(imgAttr.src, o.x,o.y, 0,0); break;
-            case "path" :
-            if(pm==null){
-                pm = R.pathManager();
-                elementCreate(pm);
-                drawPath = true;
+            switch(toolMode) {
+                case "rect": el = R.rect(o.x,o.y,0,0); break;
+                case "ellipse": el= R.ellipse(o.x,o.x,0,0); break;
+                case "circle": el=R.circle(o.x,o.y,0); break;
+                case "text" : el=R.text(0,0,""); bound.attr("stroke-dasharray","--"); break;
+                case "image": el = R.image(this.imgAttr.src, o.x,o.y, 0,0); break;
+                case "path" :
+                    if(pm===null){
+                        pm = this.pm = R.pathManager();
+                        this.elementCreate(pm);
+                        drawPath = this.drawPath = true;
+                        
+                       }
+                    el = pm;
+                    pm.insertSegment(o.x,o.y);
+                    var last = pm.segments.last().attr("n");
+                    break;
+                case "select": 
+                    select=true;
+                    break;
             }
-            el = pm;
-            pm.insertSegment(o.x,o.y);
+        (toolMode==="path") && bound.attr("opacity",0);
+        (toolMode!=="select") && el.attr(o.attrs);
+        var drawFire = function (e) {
             
-            var last = pm.segments.last().attr("n");
-            break;
-            case "select": 
-                select=true;
-                break;
-        }
-        if(!select || toolMode==="path") {
-            bound.attr("opacity",0);
-            el.attr(o.attrs);
-        }
-        var drawFire = function (eve) {
-            
-            var nx = eve.page.x - c.getParent().getPosition().x,
-                ny = eve.page.y - c.getParent().getPosition().y,
-                space = (eve.key==="space"),
-                fixed = (eve.shift || toolMode==="circle"),
+            var nx = e.page.x - c.getParent().getPosition().x,
+                ny = e.page.y - c.getParent().getPosition().y,
+                space = (e.key==="space"),
+                fixed = (e.shift || toolMode==="circle"),
                 dx = (nx-o.x),
                 dy = (ny-o.y),
                 x = ((dx>=0)?o.x:nx),
@@ -385,13 +494,13 @@ initialize : function(R, options){
                 cx = x+(w/2),
                 cy = y+(h/2)
                 ;
-            if(toolMode=="path" && drawPath) {
+            if(toolMode==="path" && drawPath) {
                 
                 last.update(dx - (last.dx || 0), dy - (last.dy || 0));
                 last.dx = dx;
                 last.dy = dy;
             } 
-            window.fireEvent("draw.drag", {
+            window.fireEvent("draw.drag", [{
                 "bound":bound,
                 "el":(select)?R.set():el,
                 "x":x,
@@ -399,20 +508,20 @@ initialize : function(R, options){
                 "cx":cx,"cy":cy,
                 "fixed": fixed,
                 "space": space,
-                "alt": (eve.alt)
-            });
+                "alt": (e.alt)
+            },e]);
             
        },
-       drawEnd = function (eve) {
+       drawEnd = function (e) {
             c.removeEvent("mousemove", drawFire);
             c.removeEvent("mouseup", drawEnd);
             document.onselectstart = function() {return true;};
-            if(toolMode=="path" && drawPath) {last.dx = last.dy = 0;}
-            window.fireEvent("draw.stop", {
+            if(this.toolMode=="path" && this.drawPath) {last.dx = last.dy = 0;}
+            window.fireEvent("draw.stop", [{
                 "canvas": c,
                 "el": el,
                 "bound":bound
-            });
+            },e]);
         };
         // needed to stop text drag in chrome from http://stackoverflow.com/questions/6388284/click-and-drag-cursor-in-chrome
         document.onselectstart = function() {return false;};
@@ -437,7 +546,7 @@ initialize : function(R, options){
                 "alt": boolean if alt key is pressed
             }
      */
-    drawDrag= function (o) {
+    drawDrag: function (o) {
         var el = o.el,
         attrs = {
             x: (o.alt)?(o.x-o.width/2):o.x,
@@ -446,7 +555,7 @@ initialize : function(R, options){
             height: o.height
         };
         o.bound.attr(attrs);
-        switch(toolMode) {
+        switch(this.toolMode) {
             case "rect": case "image": el.attr(attrs); break;
             case "ellipse": el.attr({
                 cx:(o.alt)?o.x:o.cx,
@@ -476,48 +585,21 @@ initialize : function(R, options){
      * event handler for draw.stop event
      * 
      */
-    drawStop = function (o){
+    drawStop : function (o,e){
         var el= o.el, at = o.bound.attr();
         
         o.bound.remove();
-        if(toolMode!=="path"){
+        if(this.toolMode!=="path"){
             if(at.width === 0 || at.height === 0) {
                 el.remove();
-                console.log("removed");
+                this.selectMode("select");
+                this.select(e.page.x,e.page.y);
+               // console.log("removed");
             } else {
-                elementCreate(el, at);
+                this.elementCreate(el, at);
             }
         }
         
     }
-    ;
-    
-    textToolArea.addEvents({
-        "keydown": function (eve){
-            if (eve.key === "enter" && !eve.shift){
-                hideTextToolArea();
-            }},
-        "blur": hideTextToolArea
-    });
-    
-    panelInit(panel);
-    textToolArea.inject(c.getParent());
-    
-    $(c).addEvents({
-        "mousedown": mousedown.bind(this),
-        "dblclick":dblclick
-    });
-    
-    window.addEvents({
-        "keyup": keyCommand,
-        "draw.start": drawStart,
-        "draw.drag": drawDrag,
-        "draw.stop": drawStop,
-        "element.delete":elementDelete,
-        "element.select":elementSelect,
-        "element.deselect": elementDeselect
-    });
-}
-
 
 });
