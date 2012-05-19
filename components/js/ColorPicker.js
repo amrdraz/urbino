@@ -459,6 +459,8 @@ var ColorPicker = (function(){
             if(fill==="none") {
                 vec.isNone = true;
                 fill = this.noneFill;
+            } else {
+                vec.isNone = false;
             }
             return vec.attr("fill",fill);
         },

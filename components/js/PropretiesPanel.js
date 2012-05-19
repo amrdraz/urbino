@@ -259,7 +259,11 @@ var PropretiesPanel = (function(){
         if(options.extraProps) {
             properties.combine(options.extraProps);
         }
-        var panel = this.panel = new Element("div", {"class":"prop-panel"});
+        
+        var 
+        
+        imgSrc = (options.imgSrc || "img")+"/",
+        panel = this.panel = new Element("div", {"class":"prop-panel"});
         
         this.selected = [];
         this.bound = {};
@@ -294,7 +298,7 @@ var PropretiesPanel = (function(){
                                     }.bind(this)
                                 });
        this.colorPicker = new ColorPicker({
-            imgSrc:"../img",
+            imgSrc:imgSrc,
             onChange:function(color,o,v){
                 if(v){
                     var attr = {}, sel = this.selected,
@@ -446,6 +450,8 @@ var PropretiesPanel = (function(){
             if(prop==="transform"){
                 this.prop(groups[prop]);
             }
+            //since so as circle r is not confused with rect r
+            if(this.state==="circle"){prop = prop==="r"?"cr":prop;}
             
             var p = this.properties[prop];
             if(!p){ return;}
@@ -474,26 +480,6 @@ var PropretiesPanel = (function(){
                 return p.getLast().get("value");
             }
         }
-    },
-    /**
-     * sets the propreties panel's inputs to the passed attrs
-     * @param attrs (obj) a Raphael attr object i.e. formate {attributName:attributeValue}
-     */
-    setPropreties: function(attrs){
-        
-        //this.clearPropreties();
-        var props = this.properties;
-        
-        console.log(attrs,props);
-       //console.log(attrs);
-       Object.each(props, function(prop, index){
-           //console.log(prop)
-           if(index){
-               
-           }
-       }, this);
-       //console.log(props);
-       
     },
     /**
      * clear the propreties pael's input and resets them to nothing
