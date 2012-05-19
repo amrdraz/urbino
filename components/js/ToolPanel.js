@@ -3,46 +3,21 @@
  * @author Amr Draz
  * @requirments Raphael, pathManager, Moootools
  */
-/*global $,$$,console,Class,Element,typeOf,window,R,Panel,ColorPicker*/
+/*global $,$$,console,Class,Element,typeOf,window,R,Panel,ColorPicker,PropertiesPanel*/
 
-var ToolPanel = new Class({
-    Extends:Panel,
-    //Implements:[Events],
-    /**
-     * function that returns the attributes of the global state
-     * @return attrs (obj) Raphael attr object formate {attrName:attrValue,...}
-     */
-    getAttr:function(){
-        return this.attrs;
-    },
-    /**
-     * function that sets the attributes of the global state
-     */
-    setAttr:function(att, val){
-        //console.log(this);
-        if(typeOf(att)=="object"){
-            Object.each(att, function(val, key){
-                this.setAttr(key,val);
-            }, this);
-            return;
-        }
-        this.attrs[att] = (val==="")?"none":val;
-    },
+var ToolPanel = (function(){
+    
+    return new Class({
+    Extends:PropertiesPanel,
+    
+    
     icon:{
         select:"M2,2L2,64L17,41L31,63L45,55L30,35L55,30L2,2"
     },
     /**
-     * the scurrently selected element
-     */
-    selected: [],
-    /**
      * the currently selected path
      */
     pm:null,
-    /**
-     * the defualt image src
-     */
-    imgAttr : {src:"http://www.wowace.com/thumbman/avatars/6/707/300x300/600px-718smiley.svg.png.-m0.png"},
     /**
      * a boolean that is true when editing or drawing path
      */
@@ -68,26 +43,30 @@ var ToolPanel = new Class({
 initialize : function(R, options){
     options = options || {};
     this.paper = R;
-    this.bound = {};
-            [   "keyCommand",
-                "drawStart",
-                "drawDrag",
-                "drawStop",
-                "elementDelete",
-                "elementSelect",
-                "elementDeselect",
-                "mousedown",
-                "dblclick",
-                "hideTextToolArea",
-                "setAttr"
-            ].each(function(name){
-                this.bound[name] = this[name].bind(this);
-            }, this);
     
+    this.bind([
+       "keyCommand",
+        "drawStart",
+        "drawDrag",
+        "drawStop",
+        "elementDelete",
+        "elementSelect",
+        "elementDeselect",
+        "mousedown",
+        "dblclick",
+        "hideTextToolArea",
+        "panelUpdate"
+    ]);
     /**
-     * the default global attributes
+     * the default fill and stroke color
      */
-    this.attrs = {"fill":"#48e", "stroke":"none",r:0, "font-size":"18px"};
+    var fs = this.fillAttr = {"fill":"#48e", "stroke":"none"};
+    this.setAttr(fs);
+    /**
+     * the defualt image src
+     */
+    this.imgAttr = {src:"http://www.wowace.com/thumbman/avatars/6/707/300x300/600px-718smiley.svg.png.-m0.png"};
+    this.textAttr = {"font-size":"18px"};
     
     //this.parent(options||{});
     //var p = this.panel.addClass("tool-panel"),
@@ -134,15 +113,24 @@ initialize : function(R, options){
         '<div toolType="image" title="add Image" class="tool">image</div>'+
         '<div toolType="path" title="draw path" class="tool">path</div>'
     );
-    var stroke = cp.initFill("stroke",{initColor:this.attrs.stroke,x:15,y:260,width:30,stroke:"stroke"}),
-        fill = cp.initFill("fill",{initColor:this.attrs.fill,x:5,y:250,width:30});
-        
-        this.fill = fill.retrieve("vec");
-        this.stroke = stroke.retrieve("vec");
+    
+    var ps = this.properties = {},
+        props = {
+        "fill":{name:"fill", value:fs.fill,x:5,y:250,width:30,type:"color"},
+        "stroke":{name:"stroke", value:fs.stroke,x:15,y:260,width:30,type:"color"} 
+        },
+        div;
+        Object.each(props,function(p, key){
+            div = this.createInput(p);
+            ps[key]={};
+            ps[key].name = p.name;
+            ps[key].type = p.type;
+            ps[key].prop = div;
+        }, this);
         
     p.adopt(
-        stroke,
-        fill
+        ps.stroke.prop,
+        ps.fill.prop
     );
     ta.inject(c.getParent());
     
@@ -151,6 +139,7 @@ initialize : function(R, options){
     p.addEvent("click:relay(.tool)",function(e) {
         this.selectMode(e.target.get("toolType"));
     }.bind(this));
+   
    
     ta.addEvents({
         "keydown": function (eve){
@@ -173,14 +162,16 @@ initialize : function(R, options){
         "element.delete":this.bound.elementDelete,
         "element.select":this.bound.elementSelect,
         "element.deselect": this.bound.elementDeselect,
-        "panel.update":this.bound.setAttr
+        "panel.update":this.bound.panelUpdate
     });
     
+    
+    //this.selectMode("select");
 },
     setState: function(st){
         if(st==="canvas"){
-            this.colorPicker.setColor(this.fill,this.getAttr.fill);
-            this.colorPicker.setColor(this.stroke,this.getAttr.stroke);
+            this.prop("fill", this.getAttr().fill);
+            this.prop("storke", this.getAttr().stroke);
         }
     },
 
@@ -296,7 +287,6 @@ initialize : function(R, options){
     elementDeselect : function(el){
         var sel = this.selected,drawPath = this.drawPath,pm = this.pm, toolMode=this.toolMode;
         
-            console.log("bla");
         if(el){
             sel.splice(sel.indexOf(el),1);
             if(el.ft) {
@@ -314,9 +304,7 @@ initialize : function(R, options){
             }
             this.setState("canvas");
         } else {
-            console.log("bla");
             sel.each(function(el){this.elementDeselect(el);},this);
-            console.log("bla");
         }
     },
     /**
@@ -373,7 +361,7 @@ initialize : function(R, options){
                
                 els = R.getElementsByPoint(x,y);
                 el = els[els.length-1];
-                console.log(el);
+                //console.log(el);
                 if(el && el.noparse){
                     if(el.control && /anchor|next|prev/.test(el.control)){
                         window.fireEvent("segment.mousedown",[e, el]);
@@ -381,7 +369,7 @@ initialize : function(R, options){
                     return;
                 }
                 window.fireEvent("element.deselect");
-                window.fireEvent("draw.start", {"x":x,"y":y, "attrs":this.attrs});
+                window.fireEvent("draw.start", [{"x":x,"y":y},e]);
                 break;
             case "select":
             if(e.target.nodeName==="svg"||e.target.nodeName==="DIV"){
@@ -460,10 +448,10 @@ initialize : function(R, options){
                 opacity: 0.6
            });
             switch(toolMode) {
-                case "rect": el = R.rect(o.x,o.y,0,0); break;
+                case "rect": el = R.rect(o.x,o.y,0,0,0); break;
                 case "ellipse": el= R.ellipse(o.x,o.x,0,0); break;
                 case "circle": el=R.circle(o.x,o.y,0); break;
-                case "text" : el=R.text(0,0,""); bound.attr("stroke-dasharray","--"); break;
+                case "text" : el=R.text(0,0,"").attr(this.textAttr); bound.attr("stroke-dasharray","--"); break;
                 case "image": el = R.image(this.imgAttr.src, o.x,o.y, 0,0); break;
                 case "path" :
                     if(pm===null){
@@ -481,7 +469,7 @@ initialize : function(R, options){
                     break;
             }
         (toolMode==="path") && bound.attr("opacity",0);
-        (toolMode!=="select") && el.attr(o.attrs);
+        (toolMode!=="select") && el.attr(this.fillAttr);
         var drawFire = function (e) {
             
             var nx = e.page.x - c.getParent().getPosition().x,
@@ -606,3 +594,5 @@ initialize : function(R, options){
     }
 
 });
+
+})();

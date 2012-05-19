@@ -84,7 +84,7 @@ var ColorPicker = (function(){
             picker = cont.retrieve("cdPicker");
             
             //check if picker already initialized
-            if(picker) {return cont.retrieve("picker");}
+            if(picker) {return cont.retrieve("cdPicker");}
             
             
             picker = this.picker = new Element("div",{
@@ -431,14 +431,14 @@ var ColorPicker = (function(){
             this.fireEvent("change",[color, o,this.vec]);
         },
         color : function (color,o) {
-            if (color) {
-                
-                color = Raphael.color(color);
+            
+            color = Raphael.color(color);
+            //console.log(color);
+            if (~color.r) {
                 
                 this.H = color.h;
                 this.S = color.s.round(3);
                 this.B = color.v.round(2);
-                
                 this.h.set((1-this.H)*360);
                 //console.log(this.S, this.S * this.wh + this.x, this.S * this.wh);
                 var x = this.S * this.wh + this.x,
@@ -524,11 +524,12 @@ var ColorPicker = (function(){
                    "fill-opacity":this.O
                 }
                 ]
-                )).inject(div);
+                )).inject(div),
+                color = o.initColor||(o.stroke?"#000":"none");
                 vec = vec.retrieve("vec");
                 div.store("vec", vec);
-                this.setColor(vec,o.initColor||(o.stroke?"#000":"none"));
-                
+                this.setColor(vec,color);
+                this.color(color);
                 this.vec = vec;
                 vec.cpOn = false;
                 

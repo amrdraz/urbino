@@ -7,7 +7,7 @@
  *  
  */
 /*global Rapahel,$,$$,Class,Events,Options,Element,typeOf,SlidingLabel,ColorPicker,window*/
-var PropretiesPanel = (function(){
+var PropertiesPanel = (function(){
     
     var
     /**
@@ -53,9 +53,9 @@ var PropretiesPanel = (function(){
         text: {name:"text", "class":"left row-4",type:"textarea"},               // (string) contents of the text element. Use '\n' for multiline text
         "text-anchor":{name:"text-anchor", "class":"left row-2",type:"select", options:["start","middle","end"]},        // (string) ["start", "middle", "end"], default is "middle"
         "opacity":{name:"opacity", "class":"right row-2",type:"percent", max:100},            // (number)
-        "fill":{name:"fill", "class":"left row-1",type:"color"},                // (string) colour, gradient or image
+        "fill":{name:"fill", label:"fill","class":"left row-1",type:"color"},                // (string) colour, gradient or image
         //"fill-opacity":{name:"fill-opacity", type:"percent"},        // (number)
-        "stroke":{name:"stroke", "class":"left row-2",type:"color"},            // (string) stroke colour
+        "stroke":{name:"stroke", label:"stroke","class":"left row-2",type:"color"},            // (string) stroke colour
         "stroke-dasharray":{name:"stroke-dasharray", label:"dasharray","class":"left row-4 all",type:"select", options:["", "-", ".", "-.", "-..", ". ", "- ", "--", "- .", "--.", "--.."]},    // (string) [“”, "-", ".", "-.", "-..", ". ", "- ", "--", "- .", "--.", "--.."]
         "stroke-linecap":{name:"stroke-linecap", label:"linecap","class":"left row-5 all",type:"select", options:["butt", "square", "round"]},    // (string) ["butt", "square", "round"]
         "stroke-linejoin":{name:"stroke-linejoin", label:"linejoin","class":"left row-6 all",type:"select", options:["bevel", "round", "miter"]},  // (string) ["bevel", "round", "miter"]
@@ -111,6 +111,30 @@ var PropretiesPanel = (function(){
     Implements: [Events, Options],
     options:{
       extraProps:{}  
+    },
+     /**
+     * the scurrently selected element
+     */
+    selected: [],
+    /**
+     * function that returns the attributes of the global state
+     * @return attrs (obj) Raphael attr object formate {attrName:attrValue,...}
+     */
+    getAttr:function(){
+        return this.attrs;
+    },
+    /**
+     * function that sets the attributes of the global state
+     */
+    setAttr:function(att, val){
+        //console.log(this);
+        if(typeOf(att)=="object"){
+            Object.each(att, function(val, key){
+                this.setAttr(key,val);
+            }, this);
+            return;
+        }
+        this.attrs[att] = (val==="")?"none":val;
     },
     /**
      * temp value for global state of attribute
@@ -214,12 +238,12 @@ var PropretiesPanel = (function(){
      *              -element of type textarea
      *              -input of type text
      */
-    createInput: function  (p) {
+    createInput: function  (p, free) {
         var div;
         switch(p.type){
             case "number":
                 div = this.slidingLabel.initLabel(p.name,{label:p.label,
-                        min:p.min, step:p.step, max:p.max,sufix:p.sufix||"px"
+                        value:p.value,min:p.min, step:p.step, max:p.max,sufix:p.sufix||"px"
                     });
                 break;
             case "percent":
@@ -231,11 +255,13 @@ var PropretiesPanel = (function(){
                 div = this.selectInput(p);
                 break;
             case "color":
-                
                 div = this.colorPicker.initFill(p.name,{
                         stroke:(p.name==="stroke"),
-                        label:(p.label||p.name),
-                        width:50
+                        initColor:p.value,
+                        label:p.label,
+                        x:p.x,
+                        y:p.y,
+                        width:p.width||50
                     } );
                 break;
             case "textarea":
@@ -243,7 +269,17 @@ var PropretiesPanel = (function(){
                 break;
             default:  div = this.textInput(p); break;
         }
+        if(free){return div;}
         return div.addClass(p["class"]+" "+p.name+" proprety "+p.type);
+    },
+    /**
+     *This method binds this to the Class finction 
+     */
+    bind:function(arr){
+        this.bound = this.bound || {};
+        Array.from(arr).each(function(name){
+            this.bound[name] = this[name].bind(this);
+        }, this);
     },
     /**
      * intitialize Propreties Panel that contains given propreties
@@ -260,20 +296,19 @@ var PropretiesPanel = (function(){
             properties.combine(options.extraProps);
         }
         
+        if(options.empty){return this;}
+        
         var 
         
-        imgSrc = (options.imgSrc || "img")+"/",
+        imgSrc = this.imgSrc = (options.imgSrc || "img")+"/",
         panel = this.panel = new Element("div", {"class":"prop-panel"});
         
-        this.selected = [];
-        this.bound = {};
-            [   "updateEvent",
-                "elementSelect",
-                "elementDeselect",
-                "elementUpdate" 
-            ].each(function(name){
-                this.bound[name] = this[name].bind(this);
-            }, this);
+        this.bind([   "updateEvent",
+            "elementSelect",
+            "elementDeselect",
+            "elementUpdate",
+            "panelUpdate"
+        ]);
         
         this.slidingLabel = new SlidingLabel({
                                 container:panel,
@@ -290,11 +325,7 @@ var PropretiesPanel = (function(){
                                     
                                         attr[input.get("name")] = val;
                                         //console.log(val);
-                                        if(sel.length!==0){
-                                            window.fireEvent("element.update", [attr]);
-                                        } else {
-                                            window.fireEvent("panel.update",[attr]);
-                                        }
+                                        window.fireEvent("element.update", [attr]);
                                     }.bind(this)
                                 });
        this.colorPicker = new ColorPicker({
@@ -306,11 +337,7 @@ var PropretiesPanel = (function(){
                         attr[att]=color;
                         attr[att+"-opacity"]=o;
                     v.attr({"fill":color==="none"?"135-#fff-#fff:45-#f00:45-#f00:55-#fff:45-#fff":color,"fill-opacity":o});
-                    if(sel.length!==0){
-                        window.fireEvent("element.update", [attr]);
-                    } else {
-                        window.fireEvent("panel.update",[attr]);
-                    }
+                    window.fireEvent("element.update", [attr]);
                 }
             }.bind(this)
         });
@@ -346,7 +373,8 @@ var PropretiesPanel = (function(){
         window.addEvents({
             "element.deselect": this.bound.elementDeselect,
             "element.select":this.bound.elementSelect,
-            "element.update": this.bound.elementUpdate
+            "element.update": this.bound.elementUpdate,
+            "panel.update": this.bound.panelUpdate
         });
         
    },
@@ -387,19 +415,14 @@ var PropretiesPanel = (function(){
         
         if(group.hasClass("arrow-end")){
             var arr = group.getChildren(".proprety").map(function(c){return c.getLast().get("value");});
-            //console.log(arr);
             attr["arrow-end"] = arr.join("-");
-            //console.log(attr["arrow-end"]);
         } else {
             attr[att] = val;   
         }
         
         
-        if(sel.length!==0){
-            window.fireEvent("element.update", [attr]);
-        } else {
-            window.fireEvent("panel.update",[attr]);
-        }
+        window.fireEvent("element.update", [attr]);
+        
     },
     /**
      * updates the current selected element(s) with the passed attribute
@@ -410,7 +433,16 @@ var PropretiesPanel = (function(){
         if(elm){
             elm.attr(attr);
         }else{
-            this.selected.each(function(el){el.attr(attr);});   
+            this.selected.each(function(el){el.attr(attr);});
+            //if(this.selected.length<1){
+                window.fireEvent("panel.update", [attr]);
+            //}
+        }
+    },
+    panelUpdate: function(attr){
+        this.prop(attr);
+        if(this.selected.length===0){
+            this.setAttr(attr);
         }
     },
     /**
