@@ -69,14 +69,20 @@ var TabPanel = (function(){
             
             if(lastInsert){this.select(options.initSelect|| lastInsert);}
             
-            this.bound = {
-                tabSelect:this.tabSelect.bind(this)
-            };
+            this.bound = {};
+            [   "tabSelect",
+                "refreshTab" 
+            ].each(function(name){
+                this.bound[name] = this[name].bind(this);
+            }, this);
             
             panel.addEvents({
                 "mousedown:relay(.header-area h3)":this.bound.tabSelect
             });
-            
+            window.addEvents({
+                "element.select":this.bound.refreshTab,
+                "element.deselect":this.bound.refreshTab,
+            });
             
         },
         select:function(tab){
@@ -94,6 +100,11 @@ var TabPanel = (function(){
                 scroll.show();
                 sel.content.setStyle("width",this.width-scroll.width);
             }
+            //console.log(tab);
+            sel.panel.fireEvent("focus");
+        },
+        refreshTab:function(el){
+            this.select(this.selected.header.get("text"));
         },
         tabSelect : function(e){
             var t = e.target;

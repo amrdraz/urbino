@@ -154,7 +154,7 @@
 				reduce(
 					node.attrs,
 					function(initial, value, name) {
-						if ( name === 'path' ) name = 'd';
+						if ( name === 'path' ) {name = 'd';}
 
 						initial[name] = value.toString();
 
@@ -178,9 +178,9 @@
 		R.svg = true;
 		R.vml = false;
 
-		for ( var node = paper.bottom; node != null; node = node.next ) {
+		for ( var node = paper.bottom; node !== null; node = node.next ) {
 			var attrs = '';
-
+            if(node.noparse){continue;}
 			// Use serializer
 			if ( typeof serializer[node.type] === 'function' ) {
 				svg += serializer[node.type](node);
@@ -188,13 +188,11 @@
 				continue;
 			}
 
-			switch ( node.type ) {
-				case 'image':
+			if ( node.type ==='image') {
 					attrs += ' preserveAspectRatio="none"';
-					break;
 			}
 
-			for ( i in node.attrs ) {
+			for (var i in node.attrs ) {
 				var name = i;
 
 				switch ( i ) {

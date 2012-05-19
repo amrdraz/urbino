@@ -16,21 +16,22 @@
   <link rel='stylesheet' type='text/css' href="components/css/editorCanvas.css"  />
   <link rel='stylesheet' type='text/css' href="components/css/ElementsPanel.css"  />
   <link rel='stylesheet' type='text/css' href="components/css/TimePanel.css"  />
-  <link rel='stylesheet' type='text/css' href="core/mooRainbow.css"  />
+  <link rel='stylesheet' type='text/css' href="css/codemirror.css"  />
 
+  <script type="text/javascript" src="core/codemirror-compressed.js"></script>
   <script type="text/javascript" src="core/mootools-core-full-compat.js"></script>
   <script type="text/javascript" src="core/mootools-more-1.4.0.1.js"></script>
-  <script type="text/javascript" src="core/mooRainbow.js"></script>  
   <script type="text/javascript" src="core/raphael-min.js"></script>
   <script type="text/javascript" src="components/js/raphael.util.js"></script>
   <script type="text/javascript" src="external/raphael.free_transform.js"></script>
+  <script type="text/javascript" src="external/raphael.export.js"></script>
   <script type="text/javascript" src="components/js/raphael.pathManager.js"></script>
   <script type="text/javascript" src="components/js/ScrollBar.js"></script>
   <script type="text/javascript" src="components/js/Panel.js"></script>
   <script type="text/javascript" src="components/js/TabPanel.js"></script>
   <script type="text/javascript" src="components/js/SlidingLabel.js"></script>
   <script type="text/javascript" src="components/js/ColorPicker.js"></script> 
-  
+  <script type="text/javascript" src="components/js/SVGPanel.js"></script>
   <script type="text/javascript" src="components/js/CanvasPanel.js"></script>
   <script type="text/javascript" src="components/js/PropretiesPanel.js"></script>
   <script type="text/javascript" src="components/js/ToolPanel.js"></script>
@@ -51,16 +52,20 @@
 ​
 <script>
 	/*global $,$$,console,Class,Element,typeOf,window,R, Raphael,MooRainbow,TabPanel,TimePanel, PropretiesPanel,ElementsPanel,ToolPanel*/
-	canvas = canvas = new TabPanel("canvas", {
+	var
+	c = new CanvasPanel(),
+	r = c.R,
+	canvas = new TabPanel("canvas", {
 		x:40,
 		y:20,
 		width:680,
 		height:360,
+		initSelect:"Canvas",
 		tabs:{
-			"Canvas":new CanvasPanel()
+			"Canvas":c,
+			"svg":new SVGPanel(r)
 			}
 	}),
-	r = canvas.get("Canvas").panel.R,
 	side = new TabPanel("side", {
 		x:720,
 		y:20,
@@ -68,7 +73,7 @@
 		height:360,
 		initSelect:"Elements",
 		tabs:{
-			"Propreties": (new PropretiesPanel()),
+			"Propreties": (new PropretiesPanel({imgSrc:"img"})),
 			"Elements":(new ElementsPanel(r, {imgSrc:"img"}))
 		}
 	}),
@@ -78,7 +83,7 @@
 		width:40,
 		height:360,
 		tabs:{
-			"Tools": new ToolPanel(r)
+			"Tools": new ToolPanel(r,{imgSrc:"img"})
 		}
 	}),
 	timeline = new TabPanel("timeline", {

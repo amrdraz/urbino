@@ -462,9 +462,6 @@ var PropretiesPanel = (function(){
                     this.colorPicker.setColor(p.getLast().retrieve("vec"), val);
                     return;
                 }
-                if(p.hasClass("width")){
-                    
-                }
                 
                 p.getLast().set("value", val);
             } else { //get prop value

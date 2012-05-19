@@ -10,7 +10,8 @@ Raphael.el.setId = function(id){
 };
 
 Raphael.fn.getElementByNode = function(node){
-    if(/circle|rect|path|ellipse|image|text/.test(node.tagName)){
+    if(/circle|rect|path|ellipse|image|text/.test(node.nodeName)){
         return this.getById(node.raphaelid);
     }
+    return null;
 };

@@ -88,6 +88,7 @@ var ColorPicker = (function(){
             
             
             picker = this.picker = new Element("div",{
+                "class":"color-picker",
                 styles:{
                  position:"absolute",
                  display:options.show?"block":"none",
@@ -120,7 +121,8 @@ var ColorPicker = (function(){
                 "show",
                 "cancel",
                 "toggleNone",
-                "inputChange"
+                "inputChange",
+                "set"
             ].each(function(name){
                 this.bound[name] = this[name].bind(this);
             }, this);
@@ -235,7 +237,7 @@ var ColorPicker = (function(){
             var
             okBtn = r.set();
             okBtn.push(r.rect(x+wh-30,wh+10,30,15,3).attr({fill:"#444"}));
-            okBtn.push(r.text(wh,110,"X").attr({fill:"#eee","font-size":10,"font-weight":10}));
+            okBtn.push(r.text(wh,110,"X").attr({fill:"#eee","font-size":10,"font-weight":900}));
             okBtn.attr({title:"Cancel",stroke:"none"});
             okBtn.mousedown(this.bound.cancel).hover(function(){
                 okBtn[0].attr("fill","#888");okBtn[1].attr("fill","#222");
@@ -269,8 +271,19 @@ var ColorPicker = (function(){
                 "mousedown:relay(.cd-colorpicker)":this.bound.show
             });
             cont.store("cdPicker",this);
+            
+            $$("body").addEvent("mousedown",this.bound.set);
         },
-        
+        set:function(e){
+            var t =$(e.target), vec = this.vec;
+            if(/svg|circle|rect|path|ellipse|image|text/.test(t.nodeName)){
+                !t.getParent("div.cd-colorpicker") && this.hide();
+                return;
+            }
+            if(vec && vec.cpOn && !(t.hasClass("color-picker")||t.getParent(".color-picker"))){
+                this.hide();
+            }
+        },
         setO:function(val){
             this.O = val/100;
             this.o && this.o.element.set("title","opacity: "+val+"%");
@@ -317,7 +330,7 @@ var ColorPicker = (function(){
                 !none && this.color()=="#ff" && this.color("#f00");
                 !noUpdate && this.update();
             } else {
-                console.log(this.isNone,"to", !this.isNone);
+                //console.log(this.isNone,"to", !this.isNone);
                 this.setNone(!this.isNone);
             }
         },
@@ -368,7 +381,6 @@ var ColorPicker = (function(){
             
             
             color = vec.attr("fill");
-            //console.log(color, vec.isNone);
             //check if none
             if(color==="none" || vec.isNone){
                 color = "none";
@@ -389,13 +401,13 @@ var ColorPicker = (function(){
                 "display":"block"
                 });
             
-            vec.cpOn = true;
+           // console.log(color, this.vec);
         },
         hide : function () {
             //var color =  this.color();
             //console.log(color);
             var vec = this.vec;
-            //vec.attr("fill")==="none" && (vec.isNone = true);
+            //console.log(this.vec);
             vec.cpOn = false;
             this.picker.setStyle("display","none");
         },
@@ -424,13 +436,13 @@ var ColorPicker = (function(){
                 color = Raphael.color(color);
                 
                 this.H = color.h;
-                this.S = color.s;
-                this.B = color.v;
+                this.S = color.s.round(3);
+                this.B = color.v.round(2);
                 
                 this.h.set((1-this.H)*360);
-    
+                //console.log(this.S, this.S * this.wh + this.x, this.S * this.wh);
                 var x = this.S * this.wh + this.x,
-                    y = this.B * this.wh + this.y;
+                    y = (1-this.B) * this.wh + this.y;
                 this.cursor.attr({cx: x, cy: y});
                 if(o){
                     this.o.set(o*100);
@@ -511,9 +523,12 @@ var ColorPicker = (function(){
                 }
                 ]
                 )).inject(div);
+                vec = vec.retrieve("vec");
+                div.store("vec", vec);
+                this.setColor(vec,o.initColor||(o.stroke?"#000":"none"));
                 
-                div.store("vec", vec.retrieve("vec"));
-                this.setColor(vec.retrieve("vec"),o.initColor||(o.stroke?"#000":"none"));
+                this.vec = vec;
+                vec.cpOn = false;
                 
             return div;
         }

@@ -3,10 +3,11 @@
  * @author Amr Draz
  * @requirments Raphael, pathManager, Moootools
  */
-/*global $,$$,console,Class,Element,typeOf,window,R,ColorPicker*/
+/*global $,$$,console,Class,Element,typeOf,window,R,Panel,ColorPicker*/
 
 var ToolPanel = new Class({
-
+    Extends:Panel,
+    //Implements:[Events],
     /**
      * function that returns the attributes of the global state
      * @return attrs (obj) Raphael attr object formate {attrName:attrValue,...}
@@ -65,6 +66,7 @@ var ToolPanel = new Class({
  * @param options (obj) extra options when initializing the Panel
  */
 initialize : function(R, options){
+    options = options || {};
     this.paper = R;
     this.bound = {};
             [   "keyCommand",
@@ -87,12 +89,14 @@ initialize : function(R, options){
      */
     this.attrs = {"fill":"#48e", "stroke":"none",r:0, "font-size":"18px"};
     
+    //this.parent(options||{});
+    //var p = this.panel.addClass("tool-panel"),
     var p = this.panel = new Element("div",{"class":"tool-panel"}),
-    
         /**
      * sets c to the DIV/SVG R is applied too
      */
     c = this.c = $(R.canvas),
+    imgSrc = (options.imgSrc || "img")+"/",
     ta = this.textToolArea = new Element("textarea", { styles:{
         "position":"absolute",
         "white-space":"nowrap",
@@ -100,7 +104,7 @@ initialize : function(R, options){
         "border":"#000 dashed 1px"
     }}),
     cp = this.colorPicker = new ColorPicker({
-        imgSrc:"../img",
+        imgSrc:imgSrc,
         onChange:function(color,o,v){
             var sel = this.slected;
             if(v){
@@ -291,6 +295,8 @@ initialize : function(R, options){
      */
     elementDeselect : function(el){
         var sel = this.selected,drawPath = this.drawPath,pm = this.pm, toolMode=this.toolMode;
+        
+            console.log("bla");
         if(el){
             sel.splice(sel.indexOf(el),1);
             if(el.ft) {
@@ -308,7 +314,9 @@ initialize : function(R, options){
             }
             this.setState("canvas");
         } else {
+            console.log("bla");
             sel.each(function(el){this.elementDeselect(el);},this);
+            console.log("bla");
         }
     },
     /**
@@ -357,12 +365,12 @@ initialize : function(R, options){
             x = (e.page.x - c.getParent().getPosition().x),
             y = (e.page.y - c.getParent().getPosition().y);
             
+                //this.colorPicker.hide();
         switch (this.toolMode){
             case "text":
                 this.hideTextToolArea(); //no break is intentional
             case "path": case "rect": case "image": case "circle": case "ellipse"://papeR.clear();
-               // if(e.target.nodeName==="svg"||e.target.nodeName==="DIV"){}
-              //  if(toolMode=="path" && drawPath){
+               
                 els = R.getElementsByPoint(x,y);
                 el = els[els.length-1];
                 console.log(el);
@@ -372,13 +380,8 @@ initialize : function(R, options){
                     }
                     return;
                 }
-              //      }
-           // timer = (function(){
-               //console.log(this.getAttr());
-               window.fireEvent("element.deselect");
+                window.fireEvent("element.deselect");
                 window.fireEvent("draw.start", {"x":x,"y":y, "attrs":this.attrs});
-           // }).delay(500);
-                
                 break;
             case "select":
             if(e.target.nodeName==="svg"||e.target.nodeName==="DIV"){

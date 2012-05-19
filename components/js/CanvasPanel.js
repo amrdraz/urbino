@@ -3,7 +3,7 @@
  * @author Amr Draz
  * @requirments Raphael, Mootools
  */
-/*global $,$$,console,Class,Events,Options,Element,typeOf,window,Raphael*/
+/*global $,$$,console,Class,Events,Options,Element,typeOf,window,Panel,Raphael*/
 
 var CanvasPanel = new Class({
     Extends:Panel,
