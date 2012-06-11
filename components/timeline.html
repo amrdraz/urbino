@@ -22,8 +22,13 @@
   <script type="text/javascript" src="../external/raphael.free_transform.js"></script>
   <script type="text/javascript" src="js/raphael.pathManager.js"></script>
   <script type="text/javascript" src="js/SlidingLabel.js"></script>
+  <script type="text/javascript" src="js/ColorPicker.js"></script>
+  <script type="text/javascript" src="js/Panel.js"></script>
+  <script type="text/javascript" src="js/ScrollBar.js"></script>
   <script type="text/javascript" src="js/TabPanel.js"></script>
-  <script type="text/javascript" src="js/ToolPanel.js"></script>
+  <script type="text/javascript" src="js/PropMixin.js"></script>
+  
+  <script type="text/javascript" src="js/CanvasPanel.js"></script>
   <script type="text/javascript" src="js/ElementsPanel.js"></script>
   <script type="text/javascript" src="js/TimePanel.js"></script>
   
@@ -33,11 +38,24 @@
 
 <div class="component active">
 	<h3>Time Panel</h3>
-	<div id="timeholder"class="canvas"></div>
+	
+	<div id="canvas"></div>
+	<div id="timeholder"></div>
 	<script>
 	/*global $,Raphael, TimePanel,console */
 	
-	var r = Raphael("timeholder", 800,200),
+	var c = new CanvasPanel(),
+	r = c.R,
+	canvas = new TabPanel("canvas", {
+		x:0,
+		y:40,
+		width:1020,
+		height:320,
+		initSelect:"Canvas",
+		tabs:{
+			"Canvas":c
+			}
+	}),
 	
 		anim = function(prop,val,from,to,r){
 			var attr = {};
@@ -108,8 +126,15 @@
 			}
 		}
 
-	var timeline = new TimePanel(r, {imgSrc:"../img"});
-	timeline.panel.inject($("timeholder"),"after");
+	timeline = new TabPanel("timeholder", {
+		x:0,
+		y:320,
+		width:1020,
+		height:220,
+		tabs:{
+			"Timeline":new TimePanel(r,{imgSrc:"../img"})
+		}
+	})
 	
 	</script>
 </div>

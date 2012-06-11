@@ -3,12 +3,13 @@
  * http://www.opensource.org/licenses/mit-license.php
  *
  */
-/*global Raphael*/
+/*global Raphael,$*/
 
 Raphael.fn.freeTransform = function(subject, options, callback) {
 	// Enable method chaining
 	if ( subject.freeTransform ) {return subject.freeTransform;}
-
+	
+   
 	// Add Array.map if the browser doesn't support it
 	if ( !( 'map' in Array.prototype ) ) {
 		Array.prototype.map = function(callback, arg) {
@@ -23,7 +24,9 @@ Raphael.fn.freeTransform = function(subject, options, callback) {
 	}
 
 	var paper = this;
-
+     if(!subject.node.addEvent){$(subject.node);}
+    if(!paper.canvas.getSize()){$(paper.canvas);}
+    var parent = paper.canvas.getParent(); 
 	var bbox = subject.getBBox(true);
 	var ft = subject.freeTransform = {
 		// Keep track of transformations
@@ -48,7 +51,7 @@ Raphael.fn.freeTransform = function(subject, options, callback) {
 			},
 		opts: {
 			attrs: { fill: '#000', stroke: '#000' },
-			boundary: { x: paper._left || 0, y: paper._top  || 0, width: paper.canvas.getSize().x, height: paper.canvas.getSize().y },
+			boundary: { x: paper._left || 0, y: paper._top  || 0, width: parent.getSize().x, height: parent.getSize().y },
 			distance: 1.2,
 			drag: true,
 			dragRotate: false,
@@ -94,13 +97,13 @@ Raphael.fn.freeTransform = function(subject, options, callback) {
 					cx = ft.attrs.center.x + ft.attrs.translate.x + radius[axis] * ft.opts.distance * Math.cos(rad[axis]),
 					cy = ft.attrs.center.y + ft.attrs.translate.y + radius[axis] * ft.opts.distance * Math.sin(rad[axis])
 					;
-//console.log(ft.attrs.center.x , ft.attrs.translate.x , radius[axis] , ft.opts.distance , Math.cos(rad[axis]));
+console.log(ft.attrs.center.x , ft.attrs.translate.x , radius[axis] , ft.opts.distance , Math.cos(rad[axis]));
 				// Keep handle within boundaries
 				if ( ft.opts.boundary ) {
 					cx = Math.max(Math.min(cx, ft.opts.boundary.x + ft.opts.boundary.width),  ft.opts.boundary.x);
 					cy = Math.max(Math.min(cy, ft.opts.boundary.y + ft.opts.boundary.height), ft.opts.boundary.y);
 				}
-//console.log(ft.opts.boundary.x,ft.opts.boundary.width,ft.opts.boundary.x, cx,cy);
+console.log(ft.opts.boundary.x,ft.opts.boundary.width,ft.opts.boundary.x, cx,cy);
 				ft.handles[axis].disc.attr({ cx: cx, cy: cy });
 
 				ft.handles[axis].line.toFront().attr({

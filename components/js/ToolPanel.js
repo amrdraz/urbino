@@ -60,7 +60,7 @@ initialize : function(R, options){
     /**
      * the default fill and stroke color
      */
-    var fs = this.fillAttr = {"fill":"#48e", "stroke":"none"};
+    var fs = {"fill":"#48e", "stroke":"none"};
     this.setAttr(fs);
     /**
      * the defualt image src
@@ -85,18 +85,12 @@ initialize : function(R, options){
     cp = this.colorPicker = new ColorPicker({
         imgSrc:imgSrc,
         onChange:function(color,o,v){
-            var sel = this.slected;
             if(v){
                 var attr = {},
                     att = v.node.getParent("div").get("for");
                     attr[att]=color;
                     attr[att+"-opacity"]=o;
-                v.attr({"fill":color==="none"?"135-#fff-#fff:45-#f00:45-#f00:55-#fff:45-#fff":color,"fill-opacity":o});
-                if(sel.length!==0){
-                    window.fireEvent("element.update", [attr]);
-                } else {
-                    window.fireEvent("panel.update",[attr]);
-                }
+                window.fireEvent("element.update", [attr]);
             }
         }.bind(this)
     });
@@ -276,7 +270,7 @@ initialize : function(R, options){
     elementSelect: function (el){
         var sel = this.selected;
         if(el) {
-            sel.push(el);
+            this.parent(el);
             if(el.ft && !this.drawPath) {el.ft.showHandles();}
         }
     },
@@ -469,7 +463,7 @@ initialize : function(R, options){
                     break;
             }
         (toolMode==="path") && bound.attr("opacity",0);
-        (toolMode!=="select") && el.attr(this.fillAttr);
+        (toolMode!=="select") && el.attr(this.getAttr());
         var drawFire = function (e) {
             
             var nx = e.page.x - c.getParent().getPosition().x,

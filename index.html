@@ -11,8 +11,8 @@
   
   <link rel='stylesheet' type='text/css' href="components/css/components.css" />
   <link rel='stylesheet' type='text/css' href="components/css/slidingLabel.css" />
-  <link rel='stylesheet' type='text/css' href="components/css/propretiesPanel.css" />
   <link rel='stylesheet' type='text/css' href="components/css/TabPanel.css" />
+  <link rel='stylesheet' type='text/css' href="components/css/propretiesPanel.css" />
   <link rel='stylesheet' type='text/css' href="components/css/editorCanvas.css"  />
   <link rel='stylesheet' type='text/css' href="components/css/ElementsPanel.css"  />
   <link rel='stylesheet' type='text/css' href="components/css/TimePanel.css"  />
@@ -21,7 +21,7 @@
   <script type="text/javascript" src="core/codemirror-compressed.js"></script>
   <script type="text/javascript" src="core/mootools-core-full-compat.js"></script>
   <script type="text/javascript" src="core/mootools-more-1.4.0.1.js"></script>
-  <script type="text/javascript" src="core/raphael-min.js"></script>
+  <script type="text/javascript" src="core/raphael.js"></script>
   <script type="text/javascript" src="components/js/raphael.util.js"></script>
   <script type="text/javascript" src="external/raphael.free_transform.js"></script>
   <script type="text/javascript" src="external/raphael.export.js"></script>
@@ -30,8 +30,10 @@
   <script type="text/javascript" src="components/js/Panel.js"></script>
   <script type="text/javascript" src="components/js/TabPanel.js"></script>
   <script type="text/javascript" src="components/js/SlidingLabel.js"></script>
-  <script type="text/javascript" src="components/js/ColorPicker.js"></script> 
-  <script type="text/javascript" src="components/js/SVGPanel.js"></script>
+  <script type="text/javascript" src="components/js/ColorPicker.js"></script>
+  <script type="text/javascript" src="components/js/PropMixin.js"></script> 
+  <script type="text/javascript" src="components/js/CodePanel.js"></script>
+  <script type="text/javascript" src="components/js/MenuPanel.js"></script>
   <script type="text/javascript" src="components/js/CanvasPanel.js"></script>
   <script type="text/javascript" src="components/js/PropertiesPanel.js"></script>
   <script type="text/javascript" src="components/js/ToolPanel.js"></script>
@@ -43,7 +45,7 @@
 </head>
  
 <body>
-
+<div id="container"></div>
 <div id="menu" ></div>
 <div id="tools" class="tools"></div>
 <div id="canvas" ></div>
@@ -52,6 +54,9 @@
 ​
 <script>
 	/*global $,$$,console,Class,Element,typeOf,window,R, Raphael,MooRainbow,TabPanel,TimePanel, PropretiesPanel,ElementsPanel,ToolPanel*/
+	
+	
+    
 	var
 	c = new CanvasPanel(),
 	r = c.R,
@@ -63,7 +68,7 @@
 		initSelect:"Canvas",
 		tabs:{
 			"Canvas":c,
-			"svg":new SVGPanel(r)
+			"SVG":new CodePanel(r, 'svg')
 			}
 	}),
 	side = new TabPanel("side", {
@@ -74,7 +79,8 @@
 		initSelect:"Elements",
 		tabs:{
 			"Propreties": (new PropertiesPanel({imgSrc:"img"})),
-			"Elements":(new ElementsPanel(r, {imgSrc:"img"}))
+			"Elements":(new ElementsPanel(r, {imgSrc:"img"})),
+			"Menu":new MenuPanel(r)
 		}
 	}),
 	toolPanel = new TabPanel("tools", {
@@ -96,6 +102,7 @@
 		}
 	})
 	;
+	console.log("done initializing");
 </script>
 </body>
 </html>

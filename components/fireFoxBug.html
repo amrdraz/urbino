@@ -1,0 +1,92 @@
+<!DOCTYPE HTML>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+  <title>Urbino</title>
+  <!-- blueprint CSS framework -->
+  <link rel="stylesheet" type="text/css" href="css/screen.css" media="screen, projection" />
+  <link rel="stylesheet" type="text/css" href="css/print.css" media="print" />
+  <!--[if lt IE 8]>
+  <link rel="stylesheet" type="text/css" href="css/ie.css" media="screen, projection" />
+  <![endif]-->
+ 
+ 
+  <script type="text/javascript" src="../core/mootools-core-full-compat.js"></script>
+</head>
+ 
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" baseProfile="full" width="300px" height="200px" id="test">
+    <circle cx="150px" cy="100px" r="50px" fill="#ff0000" stroke="#000000" stroke-width="5px"/>
+</svg>
+
+<div id="container"></div>
+​
+<script>
+	//fix for firefox bug with mootools element should add it to Rapahel
+	(function() {
+    // problem
+    var el = document.getElementById('test');
+    console.log(el instanceof Element, typeOf(el), el.addEvent);
+    console.log(document.createElementNS('http://www.w3.org/2000/svg', 'svg') instanceof Element);
+
+    // extension
+    (function(svgtags) {
+        var ns = 'http://www.w3.org/2000/svg',
+            methods = (function(proto, cls) {
+                var hash = {};
+                for (var f in proto) {
+                    if (cls.hasOwnProperty(f)) {
+                        hash[f] = proto[f];
+                    }
+                }
+                return hash;
+            })(Element.prototype, Element);
+
+        svgtags.each(function(tag) {
+            Element.Constructors[tag] = function(props) {
+                return (Object.append(document.createElementNS(ns, tag), methods).set(props));
+            };
+        });
+
+    })(['svg', 'path', 'circle','ellipse','rect','text','image']);
+
+    // test:
+    // constructor
+    var svg = new Element('svg', {
+        'xmlns': 'http://www.w3.org/2000/svg',
+        'version': "1.1",
+        'baseProfile': "full",
+        'width': "300px",
+        'height': "200px"
+    });
+
+    var circle = new Element('circle', {
+        'cx': '150px',
+        'cy': "100px",
+        'r': "50px",
+        'fill': "#f00",
+        'stroke': "#000",
+        'stroke-width': "5px"
+    });
+
+    // methods
+    svg.inject($('container'), 'bottom');
+    svg.grab(circle);
+
+    circle.addEvent('click', function(e) {
+        console.log('click');
+    })
+    circle.store('foo', 'bar');
+
+    console.log(circle instanceof Element, $(circle), typeOf(circle), (typeof circle.addEvent === 'function'), circle.retrieve('foo'));
+    
+    el = document.id('test');
+    
+    $(el).addEvent('click', function(e) {
+        console.log('click');
+    });
+    console.log(el instanceof Element, typeOf(el), el.addEvent);
+    console.log(document.createElementNS('http://www.w3.org/2000/svg', 'svg') instanceof Element);
+})();
+</script>
+</body>
+</html>

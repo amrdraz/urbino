@@ -3,19 +3,65 @@
  * @author Amr Draz
  * @dependency Raphael, MooTools, SlidingLabel, ColorPicker
  */
-/*global Class,Raphael,Events,Options,$,$$,Element,console,window,typeOf,Slider,SlidingLabel */
-var TimePanel = new Class({
+/*global Class,Raphael,Events,Options,$,$$,Element,console,window,typeOf,Slider,SlidingLabel,ScrollBar,PropMixin,ColorPicker */
+var TimePanel = (function(){
+    var
+    buttonAttr = {"fill":"#ddd", "stroke":"none", "cursor":"pointer"},
+    printR = function (paper){
+            var el = paper.top, ids = [];
+             while(el && el!==null) {
+                if(!el.noparse){
+                    ids.push(el.id);
+                }
+                el = el.prev;
+            }
+            console.log(ids);
+        },
+    div = function(c,s){
+        s = s || {};
+        return new Element("div",{"class":c}).set(s);
+    },
+    img = function(src,c,s){
+        s = s || {};
+        return new Element("img",{src:src,"class":c}).set(s);
+    },
+    vect = function(c,icon,trans,evens,title){
+        
+         var d = div("vect "+c), r = Raphael(0,0,"100%","100%"),
+            vec = r.path(icon)
+                    .attr(buttonAttr).attr({"title":title||""})
+                    .transform(trans||"")
+                    .hover(function (){
+                        this.attr("stroke","#48e");
+                    }, function (){
+                        this.attr("stroke","none");
+                    });
+            r.canvas.inject(d);
+            d.addEvents(evens||{});
+            d.store("vec",vec);
+        return d;
+    },
+    has = "hasOwnProperty"
+    ;
     
-    Implements: [Events, Options],
+    return new Class({
     
-    initialize: function (paper, options){
-        var panel = this.panel = new Element("div",{"class":"time-panel"});
-
+    Implements: [Events, Options, PropMixin],
+    
+    noScroll : true,
+    initialize: function (paper, options){        
         options = options || {};
+        
+        
         var
         timePanel = this,
+        width = this.width = options.width||1020,
+        height = this.height = options.height||200,
+        lwidth = this.lwidth = 235,
+        rwidth = this.rwidth = width-lwidth-24,
+        panel = this.panel = div("time-panel", {width:width,height:height}),
+        zwidth = 150,
         imgSrc= (options.imgSrc || "img")+"/",
-        buttonAttr = {"fill":"#ddd", "stroke":"none", "cursor":"pointer"},
         icon = {
             stop: "M5.5,5.5h20v20h-20z",
             end: "M21.167,5.5,21.167,13.681,6.684,5.318,6.684,25.682,21.167,17.318,21.167,25.5,25.5,25.5,25.5,5.5z",
@@ -33,8 +79,8 @@ var TimePanel = new Class({
             trash:"M20.826,5.75l0.396,1.188c1.54,0.575,2.589,1.44,2.589,2.626c0,2.405-4.308,3.498-8.312,3.498c-4.003,0-8.311-1.093-8.311-3.498c0-1.272,1.21-2.174,2.938-2.746l0.388-1.165c-2.443,0.648-4.327,1.876-4.327,3.91v2.264c0,1.224,0.685,2.155,1.759,2.845l0.396,9.265c0,1.381,3.274,2.5,7.312,2.5c4.038,0,7.313-1.119,7.313-2.5l0.405-9.493c0.885-0.664,1.438-1.521,1.438-2.617V9.562C24.812,7.625,23.101,6.42,20.826,5.75zM11.093,24.127c-0.476-0.286-1.022-0.846-1.166-1.237c-1.007-2.76-0.73-4.921-0.529-7.509c0.747,0.28,1.58,0.491,2.45,0.642c-0.216,2.658-0.43,4.923,0.003,7.828C11.916,24.278,11.567,24.411,11.093,24.127zM17.219,24.329c-0.019,0.445-0.691,0.856-1.517,0.856c-0.828,0-1.498-0.413-1.517-0.858c-0.126-2.996-0.032-5.322,0.068-8.039c0.418,0.022,0.835,0.037,1.246,0.037c0.543,0,1.097-0.02,1.651-0.059C17.251,18.994,17.346,21.325,17.219,24.329zM21.476,22.892c-0.143,0.392-0.69,0.95-1.165,1.235c-0.474,0.284-0.817,0.151-0.754-0.276c0.437-2.93,0.214-5.209-0.005-7.897c0.881-0.174,1.708-0.417,2.44-0.731C22.194,17.883,22.503,20.076,21.476,22.892zM11.338,9.512c0.525,0.173,1.092-0.109,1.268-0.633h-0.002l0.771-2.316h4.56l0.771,2.316c0.14,0.419,0.53,0.685,0.949,0.685c0.104,0,0.211-0.017,0.316-0.052c0.524-0.175,0.808-0.742,0.633-1.265l-1.002-3.001c-0.136-0.407-0.518-0.683-0.945-0.683h-6.002c-0.428,0-0.812,0.275-0.948,0.683l-1,2.999C10.532,8.77,10.815,9.337,11.338,9.512z",
             fit: "M1.999,2.332v26.499H28.5V2.332H1.999zM26.499,26.832H4V12.5h8.167V4.332h14.332V26.832zM15.631,17.649l5.468,5.469l-1.208,1.206l5.482,1.469l-1.47-5.481l-1.195,1.195l-5.467-5.466l1.209-1.208l-5.482-1.469l1.468,5.48L15.631,17.649z"
         },
-        selected={}, els={}, selectedAnim = [], context= "global", zoomLevel=1,
-        tColor = "#eee",step = 250,base = 250,msPerpx = 1,trackerMs=0,lastMs=2000,
+        selected={}, els={}, selectedAnim = [], context= "onload", zoomLevel=1,
+        tColor = "#eee",step = 250,base = 250,msPerpx = 1,trackerMs=0,lastMs=0,
         play=false,timer,timelineWidth,timelineHeight,
         baseArr = [250,500,1000,5000,15000,30000,60000,120000,300000,600000,1200000],
         divsArr = [  2,  5,   4,   3,    4,    4,    4,     4,     5,     4,     4],
@@ -47,101 +93,18 @@ var TimePanel = new Class({
                            function (callback) {
                                timer = setTimeout(callback, step);
                            },
-        printR = function (paper){
-            var el = paper.top, ids = [];
-             while(el && el!==null) {
-                if(!el.noparse){
-                    ids.push(el.id);
-                }
-                el = el.prev;
-            }
-            console.log(ids);
-        },
-        controlHoverIn = function (){
-            this.attr("stroke","#48e");
-        },
-        controlHoverOut = function (){
-            this.attr("stroke","none");
-        },
-        div = function(c,s){
-            s = s || {};
-            return new Element("div",{"class":c}).set(s);
-        },
-        img = function(src,c,s){
-            s = s || {};
-            return new Element("img",{src:src,"class":c}).set(s);
-        },
-        vect = function(c,icon,trans,evens,title){
-            
-             var d = div("vect "+c), r = Raphael(d,"100%","100%"),
-                vec = r.path(icon)
-                        .attr(buttonAttr).attr({"title":title||""})
-                        .transform(trans||"")
-                        .hover(controlHoverIn, controlHoverOut);
-                d.addEvents(evens||{});
-                d.store("vec",vec);
-            return d;
-        },
-        has = "hasOwnProperty",
-        getLarger = function(arr,horizontal){
-          var h = (horizontal?'x':'y'),
-          i=0,ii=arr.length,
-          max = (arr[i].getScrollSize()[h] - arr[i].getSize()[h]);
-          for (i=1; i < ii; i++) {
-            max.max((arr[i].getScrollSize()[h] - arr[i].getSize()[h]));
-          }
-          
-          return max;
-        },
-        makeScrollbar = function (contents,scrollbar,handle,horizontal,ignoreMouse){
-            var
-            i,ii,
-            steps = getLarger(contents,horizontal),
-            slider = new Slider(scrollbar, handle, {    
-                steps: steps,
-                mode: (horizontal?'horizontal':'vertical'),
-                onChange: function(step){
-                    // Scrolls the content element in x or y direction.
-                    //console.log(slider, step);
-                    var x = (horizontal?step:0);
-                    var y = (horizontal?0:step);
-                    
-                    contents.each(function(c) {
-                        c.scrollTo(x, y);
-                    });
-                    
-                    
-                    if(horizontal){timePanel.fireEvent("timeline.redraw");}
-                }
-            }),
-            scrollFunc = function(e) {
-                    e.stop();
-                    var step = slider.step - e.wheel * 10;
-                    
-                    console.log(step);
-                    slider.set(step);
-            };
-            
-            if( !(ignoreMouse) ){
-                for (i = 0, ii = contents.length; i < ii; i++) {
-                    contents[i].addEvent('mousewheel', scrollFunc);
-                }
-            }
-            $(document.body).addEvent('mouseleave',function(){slider.drag.stop();});
-            
-            return slider;
-        },
+        
         playEvent = function(){timePanel.fireEvent("timeline.play.toggle");},
         setToStart = function(){
                         setTrackerMs(0);
                         slideTo(0);
                 },
         moveToEnd = function(){ setTrackerMs(lastMs); slideTo(lastMs/msPerpx);},
-        makeZoomSlider = function(){
+        makeZoomSlider = function(size){
             var 
-            cont = div("container"),
-            handel = div("handel"),
-            d = div("",{id:"timeZoomSlider"}).adopt(
+            cont = div("container", {styles:{left:20,height:20,width:size-40}}),
+            handel = div("handel",{styles:{width:10}}),
+            d = div("",{id:"timeZoomSlider",styles:{height:20,width:size}}).adopt(
                 vect("slide-arrow",icon.minus,"T -4 0 S 0.8",{"mousedown": function(e){timePanel.fireEvent("timeline.zoomout");}},"zoom out"),
                 cont.adopt(handel),
                 vect("slide-arrow",icon.plus,"T -4 0 S 0.8",{"mousedown": function(e){timePanel.fireEvent("timeline.zoomin");}},"zoom in")
@@ -154,27 +117,14 @@ var TimePanel = new Class({
                     timePanel.fireEvent("timeline.zoom", [val]);
                 }
             });
-            //console.log(cont,handel);
+            slider.stepWidth = size-40;
+            //slider.autosize();
             d.store("slider",slider);
             return d;
         },
-        makeScroller = function(id,content, horizontal){
-            var 
-            cont = div("container"),
-            handel = div("handel"),
-            d = div("",{id:id}).adopt(
-                vect("slide-arrow",icon[horizontal?"arrowleft":"arrowup"],"T -7 -7 S 0.8",{},horizontal?"step left":"step up"),
-                cont.adopt(handel),
-                vect("slide-arrow",icon[horizontal?"arrowright":"arrowdown"],"T -7 -7 S 0.8",{},horizontal?"step right":"step down")
-            ),
-            slider = makeScrollbar(content, cont, handel, horizontal ,true);
-            
-            return d.store("slider",slider);
-        },
-        
         /*----------------------- create panel ----------------------*/
         
-        elementsArea = div("elements-area"),
+        elementsArea = div("elements-area",{styles:{width:lwidth}}).inject(panel),
             elementsAreaHeader = div("area-header").adopt(
                 vect("start-button",icon.start,"T -7 -7 S 0.8 0.6",{click:setToStart},"to start"),
                 vect("play-button",icon.play,"T -7 -7 S 0.8",{click:playEvent},"Play animation"),
@@ -192,9 +142,9 @@ var TimePanel = new Class({
                 }
             }).inject(elementsArea),
         
-        seperator = div("seperator"),
+        seperator = div("seperator",{styles:{left:lwidth}}).inject(panel),
         
-        timelineArea = div("timeline-area"),
+        timelineArea = div("timeline-area",{styles:{left:lwidth+5,width:rwidth}}).inject(seperator,"before"),
             scrollArea = div("scroll-area").inject(timelineArea),
             slideTracker = vect("timeline-slider",icon.tracker,"T 2 0 S 1.5",{}),
             timelineHeader = div("area-header").adopt(
@@ -209,19 +159,19 @@ var TimePanel = new Class({
                 div("",{id:"pin"})
             ).inject(scrollArea),
             timelanes = div("area-content").inject(scrollArea),
-            xScroller = makeScroller("timeLineXSlider",[scrollArea],true),
+            xScroller = new ScrollBar([scrollArea],true, rwidth-170,19).setOptions({onChange:function(){
+                                    timePanel.fireEvent("timeline.redraw");
+                                }}),
             timelineFooter = div("area-footer").adopt(
-                makeZoomSlider(),
+                makeZoomSlider(zwidth),
                 vect("fit-button",icon.fit,"T -7 -7 S 0.6",{},"fit to timeline"),
-                xScroller
+                xScroller.scrollBar
             ).inject(timelineArea),
-        yScroller= makeScroller("timeLineYSlider",[elements,timelanes],false),
+        yScroller= new ScrollBar([elements,timelanes],false, 19,height-50,30),
         scrollBar = div("scroll-bar").adopt(
-            yScroller
-        ),
-        xSlider = xScroller.retrieve("slider"),
-        ySlider = yScroller.retrieve("slider"),
-        slidingLabel = new SlidingLabel({
+            yScroller.scrollBar
+        ).inject(panel),
+        slidingLabel = this.slidingLabel = new SlidingLabel({
             container:elements,
             onStart:function(val,label){
                 //TODO is auto-keyfram is set then add a new keyframe
@@ -240,9 +190,20 @@ var TimePanel = new Class({
             onEnd:function(val,label){
                 //TODO if there's a keyframe update it
             }
+        }),
+        colorPicker = this.colorPicker = new ColorPicker({
+            imgSrc:imgSrc,
+            onChange:function(color,o,v){
+                if(v){
+                    var attr = {}, sel = this.selected,
+                        att = v.node.getParent("div").get("for");
+                        attr[att]=color;
+                        attr[att+"-opacity"]=o;
+                    v.attr({"fill":color==="none"?"135-#fff-#fff:45-#f00:45-#f00:55-#fff:45-#fff":color,"fill-opacity":o});
+                    window.fireEvent("element.update", [attr]);
+                }
+            }.bind(this)
         });
-        
-        panel.adopt(timelineArea, elementsArea, seperator, scrollBar);
         
        
         /*-----------------------handeling general events ----------------------*/
@@ -281,6 +242,8 @@ var TimePanel = new Class({
                 elm.element.addClass("expanded");
                 elm.timeline.addClass("expanded");
             }
+            console.log(yScroller.contents);
+            timePanel.fireEvent("panel.scroll.update");
         },
         
         /*-----------------------  operations ----------------------*/
@@ -495,23 +458,22 @@ var TimePanel = new Class({
             mousemove = function(e){
                 var
                 dx = e.page.x - x,
-                slider = xSlider.element,
                 width = elementsArea.getStyle("width").toInt() + dx;
                 x = e.page.x;
                 
                 if(width<=305 && width >= 235) {
                     elementsArea.setStyle("width", width);
                     seperator.setStyle("left", seperator.getStyle("left").toInt() + dx);
-                    timelineArea.setStyle("left", timelineArea.getStyle("left").toInt() + dx);
+                    timelineArea.setStyles({
+                        "left": timelineArea.getStyle("left").toInt() + dx,
+                        "width": timelineArea.getSize().x - dx
+                    });
                     
-                    timelineArea.setStyle("width", timelineArea.getSize().x - dx);
                     timelineHeader.setStyle("width", timelineHeader.getSize().x - dx);
                     scrollArea.setStyle("width", scrollArea.getSize().x - dx);
                     timelanes.setStyle("width", timelanes.getSize().x - dx);
-                    slider.setStyle("width", slider.getSize().x - dx);
-                    xScroller.setStyle("width", xScroller.getSize().x - dx);
+                    xScroller.resize(xScroller.size() - dx);
                     
-                    setTimeLanesWidth(scrollArea.getScrollSize().x);
                 }
                 
             },
@@ -627,35 +589,10 @@ var TimePanel = new Class({
             }
             timeLane.path(pathArr).attr({stroke:"#222", "stroke-width":0.5});
         },
-        resizeSlider = function(size, scrollArea, slider, horizontal){
-            var wh = (horizontal)?"width":"height", xy = (horizontal)?"x":"y",
-            saSize = scrollArea.getSize()[xy],
-            scrollSize = scrollArea.getScrollSize()[xy];
-            
-            
-            if(size==saSize){
-                size=0;
-                slider.detach();
-            } else {
-                size = slider.element.getSize()[xy]*(saSize/size);
-                slider.attach();
-            }
-            slider.knob.setStyle(wh,size);
-            slider.max = scrollSize - saSize;
-            slider.steps = scrollSize - saSize;
-            slider.stepSize = 1;
-            slider.stepWidth = slider.element.getSize()[xy];
-            slider.autosize();
-            
-            //console.log(slider);
-        },
         setTimeLanesWidth = function(width){
             width = width.max(scrollArea.getSize().x);
             scrollArea.getChildren().setStyle("width",width);
-            resizeSlider(width, scrollArea, xSlider, true);
-        },
-        resizeHorizontal = function(){
-            resizeSlider(elements.getScrollSize().y, elements, ySlider, false);
+            xScroller.update();
         },
         seekTo =function (el, ms){
             el.anims = el.anims||{};
@@ -735,11 +672,13 @@ var TimePanel = new Class({
             step = 250-((z*100)%10)*25/multArr[i];
             msPerpx = base/step;
         },
-        slideTo = function(pos){
-            xSlider.set(xSlider.max*(pos/scrollArea.getScrollSize().x).round());
-        },
         
         zoomSlider = timelineFooter.getElement("#timeZoomSlider").retrieve("slider"),
+        slideTo = function(pos){
+            var slider = xScroller.slider;
+            slider.set(slider.max*(pos/xScroller.size()).round());
+            
+        },
         /**
          * This function set the zoom level of the timeline then calculates the ms/px ratio
          * it then sets the tracker resizes the xSlider and redraws the TimeLane numbers
@@ -790,8 +729,7 @@ var TimePanel = new Class({
               setMsPerpx(zoomLevel);
               px = (ms/msPerpx).round();
             }
-            
-            zoomSlider.set(zoomLevel*100);
+            zoomSlider.set(zoomLevel.round(2)*100);
             
             slideTo(0);
             timePanel.fireEvent("timeline.redraw");
@@ -847,6 +785,7 @@ var TimePanel = new Class({
         trackermove = function (dx,dy,x){
             var pos = (x-this.x).max(0);
             //console.log(pos, scrollArea.getSize().x, scrollArea.getScroll().x, scrollArea.getScrollSize().x);
+            
             if(pos<scrollArea.getSize().x+scrollArea.getScroll().x-100 && pos>scrollArea.getScroll().x){
                 setTracker(pos);
             } else {
@@ -1195,8 +1134,8 @@ var TimePanel = new Class({
             "timeline.zoom": setZoomLevel,
             "timeline.redraw": drawTimeLane,
             "timeline.play.toggle": togglePlay,
-            "timeline.resize.horizontal":resizeHorizontal,
-            "timeline.lastMs":setLastMs
+            "timeline.lastMs":setLastMs,
+            "panel.scroll.update":yScroller.update
         });
         elements.addEvents({
             "click":notElement,
@@ -1237,9 +1176,7 @@ var TimePanel = new Class({
         });
         
         
-        
-        //initialize timeline at 4000
-        fitTo(4000);
+       
         
         var a = [], b=[];
         paper.forEach(function(el) {
@@ -1256,6 +1193,19 @@ var TimePanel = new Class({
         elements.adopt(a);
         timelanes.adopt(b);
        
-        timePanel.fireEvent("timeline.resize.horizontal");
+        
+        yScroller.update();
+        
+        //workaround until I make zoom slider seperate
+        (function(){
+            zoomSlider.autosize();
+            //initialize timeline at 4000
+            fitTo(4000);
+            xScroller.update();
+        }).delay(0);
+        //console.log(panel);
     }
 });
+
+
+})();

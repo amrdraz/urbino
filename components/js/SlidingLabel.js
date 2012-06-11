@@ -132,8 +132,11 @@ var SlidingLabel = (function (){
      */
     initLabel:function(name, options){
 
+        console.log("init sliding label");
         var
-        o = options || {},
+        o = options || {};
+        
+        var
         div = new Element("div", o.container).addClass("sliding-label"),
         label = new Element("label",{
             "class":"sliding-label is-sliding",
@@ -142,7 +145,7 @@ var SlidingLabel = (function (){
             }).inject(div),
         input = new Element("input",{
             "class":"sliding-input sliding-label is-sliding",
-            "type":"number",
+            "type":Browser.ie?"text":"number",
             "value": typeOf(o.value)!=="null"?o.value:typeOf(o.min)!=="null"?o.min:o.max||0,
             "name":name,
             "step":o.step || "",
@@ -199,7 +202,7 @@ var SlidingLabel = (function (){
     
             window.removeEvent("mousemove", slide);
             window.removeEvent("mouseup", stopSlide);
-            $$("input:not(.sliding-label),form,button,textarea,select").removeClass("is-sliding");
+            $$("label:not(.sliding-label),input:not(.sliding-label),form,button,textarea,select").removeClass("is-sliding");
             this.fireEvent("onEnd", [val,input,e]);
         };
         

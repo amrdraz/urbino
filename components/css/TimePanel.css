@@ -2,8 +2,9 @@
 	position:relative;
 	
 	min-width:1020px;
-	max-width:1020px;
 	min-height:200px;
+	width:100%;
+	height:100%;
 	
 	background:#333;
 	
@@ -21,8 +22,8 @@
 	
 	min-width: 235px;
 	max-width: 305px;
-	height: 200px;
-	
+	width:100%;
+	height:100%;
 }
 .time-panel .area-content div{
 	position:relative;
@@ -108,14 +109,16 @@
 	right:20px;
 	padding-bottom:1px;
 }
-.time-panel .elements-area .sliding-label{
+.time-panel .elements-area label.sliding-label{
 	top:0px;
-	right:40px;
+	color:#ddd;
+	right:50px;
 	line-height:1;
 }
 .time-panel .elements-area .sliding-input{
 	right:10px;
 	height:10px;
+	width:40px;
 	line-height: 1;
 	font-size: 9px;
 }
@@ -175,7 +178,7 @@
 	width: 3px;
 	border-left:#000 solid 1px;
 	border-right:#000 solid 1px;
-	height: 200px;
+	height: 100%;
 	
 }
 
@@ -185,65 +188,51 @@
 
 .time-panel .timeline-area{
 	top:0px;
-	left:240px;
-	
-	width: 760px;
-	height: 200px;
-	
+	height:100%;
 }
 .time-panel .timeline-area .scroll-area {
 	overflow:hidden;
-	width:759px;
-	height:180px;
+	width:100%;
+	min-height:180px;
+	top:0px;
 }
-.time-panel .scroll-bar {
+
+
+.time-panel > .scroll-bar {
 	top:0px;
 	right:0px;
 	
-	width:20px;
-	height:200px;
+	width:19px;
+	min-height:200px;
 	
 	background: #666;
+	border:none;
 	border-left:#000 solid 1px;
+}
+
+.time-panel .scroll-bar .container{
+	background: #666;
+}
+.time-panel .scroll-bar .container:hover .handel{
+	background: #333;
+}
+.time-panel .scroll-bar .handel{
+	background: #444;
 }
 
 .time-panel .slide-arrow,.time-panel .fit-button {
 	width:18px;
 	height:18px;
-	
 	border:#444 solid 1px;
 }
-
+.time-panel .fit-button {
+	left:150px;
+}
 .time-panel .handel {
 	background:#333;
 }
 .time-panel .container:hover .handel{
 	background:#777;
-}
-
-#timeLineYSlider {
-	top:20px;
-	
-	width:20px;
-	height:160px;
-	
-	background:#555;
-}
-#timeLineYSlider .container{
-	top:20px;
-	width:20px;
-	height:120px;
-}
-#timeLineYSlider .handel {
-	width:20px;
-}
-
-#timeLineYSlider > div:first-child {
-	top:0;
-}
-
-#timeLineYSlider > div:last-child {
-	bottom:0;
 }
 
 
@@ -252,12 +241,14 @@
 .time-panel .area-header{
 	width:100%;
 	height:40px;
+	top:0px;
+	
 	background: #666;
 	
 }
 
 .time-panel .timeline-area .area-header{
-	width:760px;
+	width:100%;
 }
 
 #timeLane {
@@ -303,6 +294,11 @@
 	height:162px;
 }
 
+/*for making sure the Raphael cnavas starts from 0*/
+.time-panel .area-header  svg, .time-panel .area-header DIV,.time-panel .area-footer DIV,.time-panel .area-footer svg {
+	position:absolute !important;
+}
+
 #trackerTime {
 	position:relative !important;
 	
@@ -314,10 +310,6 @@
 	white-space:nowrap;
 	
 	height:10px;
-}
-/*for making sure the Raphael cnavas starts from 0*/
-.time-panel .area-header  svg, .time-panel .area-header DIV,.time-panel .area-footer DIV,.time-panel .area-footer svg {
-	position:absolute !important;
 }
 
 .time-panel .area-header .header-footer {
@@ -337,11 +329,9 @@
 	top:40px;
 	overflow:hidden;
 	width:100%;
-	height:140px;
+	min-height:140px;
 }
-.time-panel .timeline-area .area-content{
-	width:760px;
-}
+
 .time-panel .timeline-area  .anim {
 	position:absolute;
 }
@@ -383,40 +373,13 @@
 
 .time-panel .area-footer {
 	bottom:0px;
-	
+	z-index:3;
 	width:100%;
 	height:19px;
 	background: #666;
 	border-top:#000 solid 1px;
 }
 
-#timeLineXSlider {
-	right:0px;
-
-	width:590px;
-	height:19px;
-	
-	background:#555;
-}
-#timeLineXSlider .container{
-	left:20px;
-	width:550px;
-	height:20px;
-}
-#timeLineXSlider .handel {
-	height:20px;
-}
-
-#timeLineXSlider > div:first-child {
-	left:0;
-}
-#timeLineXSlider > div:last-child {
-	right:0;
-}
-
-.time-panel .fit-button{
-	left:152px;
-}
 
 #timeZoomSlider {
 	left:0px;

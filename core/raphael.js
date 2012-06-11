@@ -4054,6 +4054,16 @@ window.Raphael.svg && function (R) {
         var node = o.node,
             attrs = o.attrs,
             vis = node.style.visibility;
+            //fire fox bug fix with mootools
+        if(window.Browser.firefox){
+            (function(proto, cls) {
+                for (var f in proto) {
+                    if (cls.hasOwnProperty(f)) {
+                        node[f] = proto[f];
+                    }
+                }
+            })(window.Element.prototype, window.Element);
+        }
         node.style.visibility = "hidden";
         for (var att in params) {
             if (params[has](att)) {
@@ -4698,6 +4708,7 @@ window.Raphael.svg && function (R) {
         setFillAndStroke(res, res.attrs);
         return res;
     };
+    
     R._engine.setSize = function (width, height) {
         this.width = width || this.width;
         this.height = height || this.height;
@@ -4742,6 +4753,16 @@ window.Raphael.svg && function (R) {
             } else {
                 container.appendChild(cnvs);
             }
+        }
+        //fire fox bug fix with mootools
+        if(window.Browser.firefox){
+            (function(proto, cls) {
+                for (var f in proto) {
+                    if (cls.hasOwnProperty(f)) {
+                        cnvs[f] = proto[f];
+                    }
+                }
+            })(window.Element.prototype, window.Element);
         }
         container = new R._Paper;
         container.width = width;

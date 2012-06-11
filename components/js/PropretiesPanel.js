@@ -6,8 +6,8 @@
  * @author Amr Draz
  *  
  */
-/*global Rapahel,$,$$,Class,Events,Options,Element,typeOf,PropMixin,SlidingLabel,ColorPicker,window*/
-var PropertiesPanel = (function(){
+/*global Rapahel,$,$$,Class,Events,Options,Element,typeOf,SlidingLabel,ColorPicker,window*/
+var PropretiesPanel = (function(){
     
     var
     /**
@@ -53,9 +53,9 @@ var PropertiesPanel = (function(){
         text: {name:"text", "class":"left row-4",type:"textarea"},               // (string) contents of the text element. Use '\n' for multiline text
         "text-anchor":{name:"text-anchor", "class":"left row-2",type:"select", options:["start","middle","end"]},        // (string) ["start", "middle", "end"], default is "middle"
         "opacity":{name:"opacity", "class":"right row-2",type:"percent", max:100},            // (number)
-        "fill":{name:"fill", label:"fill","class":"left row-1",type:"color"},                // (string) colour, gradient or image
+        "fill":{name:"fill", "class":"left row-1",type:"color"},                // (string) colour, gradient or image
         //"fill-opacity":{name:"fill-opacity", type:"percent"},        // (number)
-        "stroke":{name:"stroke", label:"stroke","class":"left row-2",type:"color"},            // (string) stroke colour
+        "stroke":{name:"stroke", "class":"left row-2",type:"color"},            // (string) stroke colour
         "stroke-dasharray":{name:"stroke-dasharray", label:"dasharray","class":"left row-4 all",type:"select", options:["", "-", ".", "-.", "-..", ". ", "- ", "--", "- .", "--.", "--.."]},    // (string) [“”, "-", ".", "-.", "-..", ". ", "- ", "--", "- .", "--.", "--.."]
         "stroke-linecap":{name:"stroke-linecap", label:"linecap","class":"left row-5 all",type:"select", options:["butt", "square", "round"]},    // (string) ["butt", "square", "round"]
         "stroke-linejoin":{name:"stroke-linejoin", label:"linejoin","class":"left row-6 all",type:"select", options:["bevel", "round", "miter"]},  // (string) ["bevel", "round", "miter"]
@@ -108,33 +108,9 @@ var PropertiesPanel = (function(){
     
     return new Class({
     
-    Implements: [Events, Options, PropMixin],
+    Implements: [Events, Options],
     options:{
       extraProps:{}  
-    },
-     /**
-     * the scurrently selected element
-     */
-    selected: [],
-    /**
-     * function that returns the attributes of the global state
-     * @return attrs (obj) Raphael attr object formate {attrName:attrValue,...}
-     */
-    getAttr:function(){
-        return this.attrs;
-    },
-    /**
-     * function that sets the attributes of the global state
-     */
-    setAttr:function(att, val){
-        //console.log(this);
-        if(typeOf(att)=="object"){
-            Object.each(att, function(val, key){
-                this.setAttr(key,val);
-            }, this);
-            return;
-        }
-        this.attrs[att] = (val==="")?"none":val;
     },
     /**
      * temp value for global state of attribute
@@ -180,6 +156,96 @@ var PropertiesPanel = (function(){
         path:["dimension","path","arrow-end","fillstroke","transform","clip","anchor","cursor"]
     },
     /**
+     * creates a select element for a proprety of type text
+     * @param p (obj) a proprety object that follows the propreties object syntax
+     * @return (DIV) containing select element with its options
+     */
+    textInput: function (p) {
+        var div = new Element("div"),
+            label = new Element("label", {"for":p.name, "text":(p.label||p.name)+":"}),
+            input = new Element("input", {
+                type:"text",
+                name:p.name
+                });
+       return div.adopt(label, input);
+    },
+    /**
+     * creates a select element for a proprety of type textarea
+     * @param p (obj) a proprety object that follows the propreties object syntax
+     * @return (DIV) containing textarea element
+     */
+    textarea: function (p) {
+        var div = new Element("div"),
+            label = new Element("label", {"for":p.name, "text":(p.label||p.name)+":"})
+                .setStyles({'position':'relative', 'clear':'right'}),
+            textarea = new Element("textarea", {
+                name:p.name
+                }).setStyles({'float':'right',"max-width":"200px","max-height":"95px"});
+       return div.adopt(label, textarea);
+    },
+    /**
+     * creates a select element for a proprety of type select
+     * @param p (obj) a proprety object that follows the propreties object syntax
+     * @return (DIV) containing select element with its options
+     */
+    selectInput: function (p) {
+        var div = new Element("div", {"class":p.name+" proprety "+p.type}),
+            label = new Element("label", {"for":p.name, "text":(p.label||p.name)+":"}),
+            select = new Element("select", {"name":p.name }),
+            option;
+            if(typeOf(p.options)==="array"){
+                p.options.each(function(option,i){
+                    (new Element("option", {value:option, text:option})).inject(select);
+                });
+            } else {
+                Object.each(p.options,function(val,text){
+                    (new Element("option", {value:val, text:text})).inject(select);
+                });
+            }
+       return div.adopt(label, select);
+    },
+    /**
+     * creates an element for a proprety of type the specified type
+     * @param p (obj) a proprety object that follows the propreties object syntax
+     * @return (DIV) containing either
+     *              -input of type number with a sliding label
+     *              -input of type number with a sliding label with min:0 max:1 and setp:0.01
+     *              -element of type select with it's options
+     *              -element of type textarea
+     *              -input of type text
+     */
+    createInput: function  (p) {
+        var div;
+        switch(p.type){
+            case "number":
+                div = this.slidingLabel.initLabel(p.name,{label:p.label,
+                        min:p.min, step:p.step, max:p.max,sufix:p.sufix||"px"
+                    });
+                break;
+            case "percent":
+                div = this.slidingLabel.initLabel(p.name,{label:p.label,
+                    value:100,factor:100,sufix:"%", min:0, step:1, max:p.max||""
+                    });
+                break;
+            case "select":
+                div = this.selectInput(p);
+                break;
+            case "color":
+                
+                div = this.colorPicker.initFill(p.name,{
+                        stroke:(p.name==="stroke"),
+                        label:(p.label||p.name),
+                        width:50
+                    } );
+                break;
+            case "textarea":
+                div = this.textarea(p);
+                break;
+            default:  div = this.textInput(p); break;
+        }
+        return div.addClass(p["class"]+" "+p.name+" proprety "+p.type);
+    },
+    /**
      * intitialize Propreties Panel that contains given propreties
      * @param panel (string) the id of the DIV the panel is to be added in
      * @param props (array) and array of the values this panel contains ex: ["fill", "stroke", "stroke-width"]
@@ -194,23 +260,21 @@ var PropertiesPanel = (function(){
             properties.combine(options.extraProps);
         }
         
-        if(options.empty){return this;}
-        
-        console.log("p safe");
         var 
         
-        imgSrc = this.imgSrc = (options.imgSrc || "img")+"/",
+        imgSrc = (options.imgSrc || "img")+"/",
         panel = this.panel = new Element("div", {"class":"prop-panel"});
         
-        this.bind([
-            "updateEvent",
-            "elementSelect",
-            "elementDeselect",
-            "elementUpdate",
-            "panelUpdate"
-        ]);
+        this.selected = [];
+        this.bound = {};
+            [   "updateEvent",
+                "elementSelect",
+                "elementDeselect",
+                "elementUpdate" 
+            ].each(function(name){
+                this.bound[name] = this[name].bind(this);
+            }, this);
         
-        console.log("-p safe");
         this.slidingLabel = new SlidingLabel({
                                 container:panel,
                                 onChange:function(val, input){
@@ -226,31 +290,37 @@ var PropertiesPanel = (function(){
                                     
                                         attr[input.get("name")] = val;
                                         //console.log(val);
-                                        window.fireEvent("element.update", [attr]);
+                                        if(sel.length!==0){
+                                            window.fireEvent("element.update", [attr]);
+                                        } else {
+                                            window.fireEvent("panel.update",[attr]);
+                                        }
                                     }.bind(this)
                                 });
        this.colorPicker = new ColorPicker({
             imgSrc:imgSrc,
             onChange:function(color,o,v){
                 if(v){
-                var attr = {},
-                    att = v.node.getParent("div").get("for");
-                    attr[att]=color;
-                    attr[att+"-opacity"]=o;
-                window.fireEvent("element.update", [attr]);
-            }
+                    var attr = {}, sel = this.selected,
+                        att = v.node.getParent("div").get("for");
+                        attr[att]=color;
+                        attr[att+"-opacity"]=o;
+                    v.attr({"fill":color==="none"?"135-#fff-#fff:45-#f00:45-#f00:55-#fff:45-#fff":color,"fill-opacity":o});
+                    if(sel.length!==0){
+                        window.fireEvent("element.update", [attr]);
+                    } else {
+                        window.fireEvent("panel.update",[attr]);
+                    }
+                }
             }.bind(this)
         });
         
-        console.log("--p safe");
         var ps = this.properties={}, gs=this.groups={};//loop generating propreties by groups
         Object.each(groups, function(props, group){
             gs[group] = {};
             var g = new Element("div", {"class":group+" group"});
             new Element("h4", {text:group}).inject(g);
             props.each(function(p){
-                
-        console.log("p-- safe");
                 var prop = properties[p],
                     div = this.createInput(properties[p]).inject(g);
                 ps[p]={};
@@ -258,15 +328,12 @@ var PropertiesPanel = (function(){
                 ps[p].type = prop.type;
                 ps[p].prop = div;
             }, this);
-            
-        console.log("p- safe");
             new Element("div",{"class":"clear"}).inject(g);
             gs[group].group = g;
             g.inject(panel);
             //console.log();
         }, this);
         
-        console.log("---p safe");
         this.setState("canvas");
 
        
@@ -279,10 +346,33 @@ var PropertiesPanel = (function(){
         window.addEvents({
             "element.deselect": this.bound.elementDeselect,
             "element.select":this.bound.elementSelect,
-            "element.update": this.bound.elementUpdate,
-            "panel.update": this.bound.panelUpdate
+            "element.update": this.bound.elementUpdate
         });
-        console.log("p safe");
+        
+   },
+   setState:function(s){
+        var props = this.properties,
+            elP = this.elementProps,
+            states = this.states,
+            gs = this.groups;
+      // console.log(s,states[s],gs);
+       Object.each(gs, function(g){
+           g.group.addClass("hide");
+       });
+       Object.each(states[s], function(g){
+           gs[g].group.removeClass("hide");
+       });
+       
+       Object.each(props, function(p){
+           p.prop.addClass("hide");
+       });
+       
+       Object.each(props, function(p, key){
+           if(~elP.common.indexOf(key) || ~elP[s].indexOf(key)){
+               p.prop.removeClass("hide");
+           }
+       });
+       this.state = s;
    },
    /**
     * function that fires element.update event with the input'scurrent value on keyup or change
@@ -297,14 +387,19 @@ var PropertiesPanel = (function(){
         
         if(group.hasClass("arrow-end")){
             var arr = group.getChildren(".proprety").map(function(c){return c.getLast().get("value");});
+            //console.log(arr);
             attr["arrow-end"] = arr.join("-");
+            //console.log(attr["arrow-end"]);
         } else {
             attr[att] = val;   
         }
         
         
-        window.fireEvent("element.update", [attr]);
-        
+        if(sel.length!==0){
+            window.fireEvent("element.update", [attr]);
+        } else {
+            window.fireEvent("panel.update",[attr]);
+        }
     },
     /**
      * updates the current selected element(s) with the passed attribute
@@ -315,16 +410,7 @@ var PropertiesPanel = (function(){
         if(elm){
             elm.attr(attr);
         }else{
-            this.selected.each(function(el){el.attr(attr);});
-            //if(this.selected.length<1){
-                window.fireEvent("panel.update", [attr]);
-            //}
-        }
-    },
-    panelUpdate: function(attr){
-        this.prop(attr);
-        if(this.selected.length===0){
-            this.setAttr(attr);
+            this.selected.each(function(el){el.attr(attr);});   
         }
     },
     /**
@@ -343,13 +429,9 @@ var PropertiesPanel = (function(){
      * @param el (Raphael obj)
      */
     elementDeselect: function (el) {
+        this.setState("canvas");
         var sel = this.selected;
-            this.setState("canvas");
-        if(el){
-            sel.splice(sel.indexOf(el),1);
-        } else {
-            sel.each(function(el){this.elementDeselect(el);},this);
-        }
+        sel.splice(sel.indexOf(el),1);
     },
     prop:function(prop,val){
         if(typeOf(prop)==="null"){ //return all propreties in name value object
@@ -368,8 +450,6 @@ var PropertiesPanel = (function(){
             if(prop==="transform"){
                 this.prop(groups[prop]);
             }
-            //since so as circle r is not confused with rect r
-            if(this.state==="circle"){prop = prop==="r"?"cr":prop;}
             
             var p = this.properties[prop];
             if(!p){ return;}
@@ -398,6 +478,26 @@ var PropertiesPanel = (function(){
                 return p.getLast().get("value");
             }
         }
+    },
+    /**
+     * sets the propreties panel's inputs to the passed attrs
+     * @param attrs (obj) a Raphael attr object i.e. formate {attributName:attributeValue}
+     */
+    setPropreties: function(attrs){
+        
+        //this.clearPropreties();
+        var props = this.properties;
+        
+        console.log(attrs,props);
+       //console.log(attrs);
+       Object.each(props, function(prop, index){
+           //console.log(prop)
+           if(index){
+               
+           }
+       }, this);
+       //console.log(props);
+       
     },
     /**
      * clear the propreties pael's input and resets them to nothing

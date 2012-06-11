@@ -27,13 +27,10 @@ input.sliding-label {
 }
 input.sliding-input {
 	position:absolute;
-	right:15px;
+	right:17px;
 	text-align:right;
 	top:2px;
-    line-height: 1px;
     font-size: 11px;
-	height:11px;
-	width:10px;
 	
 }
 span.sufix {

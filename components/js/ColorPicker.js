@@ -30,9 +30,12 @@ var ColorPicker = (function(){
     vect = function(set,els,title){
         els = els || {};
         var d = new Element("div",set),
-        raph = [d,"100%","100%"].combine(els);
-
-            d.store("vec",Raphael(raph)[raph.length-1]);
+        raph = [d,"100%","100%"].combine(els),
+        r = Raphael(raph);
+        r.forEach(function(el){
+            $(el.node);
+        });
+            d.store("vec",r[raph.length-1]);
         return d;
     },
     makeSlider = function(div,x,y,size,pos, step,func){
@@ -236,9 +239,9 @@ var ColorPicker = (function(){
             //ok button
             var
             okBtn = r.set();
-            okBtn.push(r.rect(x+wh-30,wh+10,30,15,3).attr({fill:"#444"}));
-            okBtn.push(r.text(wh,110,"X").attr({fill:"#eee","font-size":10,"font-weight":900}));
-            okBtn.attr({title:"Cancel",stroke:"none"});
+            okBtn.push(r.rect(0,0,30,15,3).attr({fill:"#444",stroke:"none"}));
+            okBtn.push(r.path("M12 4 18 11 M18 4 12 11").attr({transform:"s0.9",stroke:"#eee"}));
+            okBtn.attr({transform:["...T",x+wh-30,wh+10],title:"Cancel"});
             okBtn.mousedown(this.bound.cancel).hover(function(){
                 okBtn[0].attr("fill","#888");okBtn[1].attr("fill","#222");
                 },function(){
@@ -262,8 +265,10 @@ var ColorPicker = (function(){
             this.color(color);
 
             picker.addEvent("mousedown",function(e){e.stop();});
-            sb.node.addEvent("mousedown",this.hsbDown.bind(this));
-            sb.node.addEvent("mousewheel", this.bound.scrollH);
+            $(sb.node).addEvents({
+                "mousedown":this.bound.hsbDown,
+                "mousewheel": this.bound.scrollH
+            });
             this.addEvents({
                 "panel.resize": this.bound.resize
             });
@@ -388,10 +393,9 @@ var ColorPicker = (function(){
             } else{
                 this.setNone(false, true);
             }
-            
-            
             this.o.set(vec.attr("fill-opacity")*100);
             this.initColor = color;
+            inputParse(this.initColorInp, this.initColor);
             this.color(color);
             
             
@@ -426,9 +430,10 @@ var ColorPicker = (function(){
             this.hide();
         },
         update: function(){
-            var color = this.color(), o = this.O;
+            var color = this.color(), o = this.O, vec = this.vec;
             inputParse(this.colorInp, color, o);
-            this.fireEvent("change",[color, o,this.vec]);
+            vec && this.setColor(vec,color);
+            this.fireEvent("change",[color, o,vec]);
         },
         color : function (color,o) {
             
@@ -447,7 +452,6 @@ var ColorPicker = (function(){
                 if(o){
                     this.o.set(o*100);
                 }
-                inputParse(this.initColorInp, this.initColor);
                 inputParse(this.colorInp, color.hex);
                   
                 return this;
