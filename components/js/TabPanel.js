@@ -22,7 +22,6 @@ var TabPanel = (function(){
         initialize: function(container, options){
             
             //this.setOptions(options);
-            console.log("init tabpanel");
             this.tabs = {};
             var panel = this.panel = $(container),
             w = this.width=options.width||"100%",
@@ -55,9 +54,8 @@ var TabPanel = (function(){
             
             var lastInsert;
             
-            console.log("   checking tabs");
             Object.each(tabs,function(panel,title){
-                console.log("tab name",title);
+//                console.log("tab name",title);
                 this.tabs[title]= {};
                 this.tabs[title].header = (new Element("h3", {"for":title, text:title, styles:{
                     "float":"left"
@@ -66,14 +64,11 @@ var TabPanel = (function(){
                 this.tabs[title].content = panel.panel.addClass("tab-content").setStyle("width",w).inject(contentArea);
                 lastInsert = title;
             }, this);
-            console.log("   tabs safe");
             
             this.yScroller = new ScrollBar(this.get(lastInsert).content, false, 10,contentArea.getSize().y);
             this.yScroller.scrollBar.inject(contentArea);
-            console.log("le bla");
             
             if(lastInsert){this.select(options.initSelect|| lastInsert);}
-            console.log("le bla");
             
             this.bound = {};
             [   "tabSelect",
@@ -89,7 +84,6 @@ var TabPanel = (function(){
                 "element.select":this.bound.refreshTab,
                 "element.deselect":this.bound.refreshTab
             });
-            console.log("le bla");
         },
         select:function(tab){
             var sel = this.selected = this.get(tab), scroll = this.yScroller;

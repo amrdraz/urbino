@@ -71,18 +71,6 @@
 			"SVG":new CodePanel(r, 'svg')
 			}
 	}),
-	side = new TabPanel("side", {
-		x:720,
-		y:20,
-		width:300,
-		height:360,
-		initSelect:"Elements",
-		tabs:{
-			"Propreties": (new PropertiesPanel({imgSrc:"img"})),
-			"Elements":(new ElementsPanel(r, {imgSrc:"img"})),
-			"Menu":new MenuPanel(r)
-		}
-	}),
 	toolPanel = new TabPanel("tools", {
 		x:0,
 		y:20,
@@ -90,6 +78,18 @@
 		height:360,
 		tabs:{
 			"Tools": new ToolPanel(r,{imgSrc:"img"})
+		}
+	}),
+	side = new TabPanel("side", {
+		x:720,
+		y:20,
+		width:300,
+		height:360,
+		initSelect:"Propreties",
+		tabs:{
+			"Propreties": (new PropertiesPanel({imgSrc:"img"})),
+			"Elements":(new ElementsPanel(r, {imgSrc:"img"})),
+			"Menu":new MenuPanel(r)
 		}
 	}),
 	timeline = new TabPanel("timeline", {

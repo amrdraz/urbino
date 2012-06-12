@@ -132,7 +132,7 @@ var SlidingLabel = (function (){
      */
     initLabel:function(name, options){
 
-        console.log("init sliding label");
+        //console.log("init sliding label");
         var
         o = options || {};
         

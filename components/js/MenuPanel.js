@@ -35,7 +35,8 @@ var MenuPanel = new Class({
     },
     svgExport: function (e) {
         var r = new Request ( {
-            url: "svgw.php"
+            url: "svgw.php",
+            async:false,
         }).post(Object.toQueryString({"svg": this.paper.toSVG()}));
     },
     raphaelExport : function (e) {

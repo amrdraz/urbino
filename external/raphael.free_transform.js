@@ -97,13 +97,13 @@ Raphael.fn.freeTransform = function(subject, options, callback) {
 					cx = ft.attrs.center.x + ft.attrs.translate.x + radius[axis] * ft.opts.distance * Math.cos(rad[axis]),
 					cy = ft.attrs.center.y + ft.attrs.translate.y + radius[axis] * ft.opts.distance * Math.sin(rad[axis])
 					;
-console.log(ft.attrs.center.x , ft.attrs.translate.x , radius[axis] , ft.opts.distance , Math.cos(rad[axis]));
+//console.log(ft.attrs.center.x , ft.attrs.translate.x , radius[axis] , ft.opts.distance , Math.cos(rad[axis]));
 				// Keep handle within boundaries
 				if ( ft.opts.boundary ) {
 					cx = Math.max(Math.min(cx, ft.opts.boundary.x + ft.opts.boundary.width),  ft.opts.boundary.x);
 					cy = Math.max(Math.min(cy, ft.opts.boundary.y + ft.opts.boundary.height), ft.opts.boundary.y);
 				}
-console.log(ft.opts.boundary.x,ft.opts.boundary.width,ft.opts.boundary.x, cx,cy);
+//console.log(ft.opts.boundary.x,ft.opts.boundary.width,ft.opts.boundary.x, cx,cy);
 				ft.handles[axis].disc.attr({ cx: cx, cy: cy });
 
 				ft.handles[axis].line.toFront().attr({

@@ -7,7 +7,14 @@
 /*global Class,Element,typeOf,Raphael*/
 
 var PropMixin = new Class({
-    
+    div : function(c,s){
+        s = s || {};
+        return new Element("div",{"class":c}).set(s);
+    },
+    img : function(src,c,s){
+        s = s || {};
+        return new Element("img",{src:src,"class":c}).set(s);
+    },
     vec : function(set,els){
         els = els || {};
         var d = new Element("div",set),
@@ -128,6 +135,7 @@ var PropMixin = new Class({
            g.group.addClass("hide");
        });
        Object.each(states[s], function(g){
+           //console.log(gs, g, gs[g]);
            gs[g].group.removeClass("hide");
        });
        

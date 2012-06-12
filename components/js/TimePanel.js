@@ -818,14 +818,16 @@ var TimePanel = (function(){
             if(!el || !prop){throw new Error("missing arguments");}
             el.anims = el.anims||{};
             var i,ii,del,a,b,temp,p =el.anims[prop] = el.anims[prop] || [],
-            color = els[el.id].color,
+            color,
             lane,anims,first,firstMs,last, lastMS;
             val = val || el.attr(prop);
             ms = ms || trackerMs;
             //first time insert
             if(p.length===0){
+                console.log(p);
                 a = el.anims[prop][0] = animCreate(prop,el.attr(prop),0,0);
                 if(Object.getLength(el.anims)==1){
+                    console.log(el);
                     els[el.id] = elementCreate(el);
                 } else {
                     lane.adopt(
@@ -843,7 +845,8 @@ var TimePanel = (function(){
                 return el;
 
             }
-            
+            console.log(el);
+            color = els[el.id].color;
             lane = els[el.id].timeline.getElement(".prop[prop="+prop+"]");
             anims = lane.getChildren();
             //index not specified
@@ -929,7 +932,7 @@ var TimePanel = (function(){
             var target = e.target,
             el = els[target.getParent(".element").get("for")].el,
             prop = target.getParent().getPrevious().get("prop");
-            animInsert(el,prop);
+            window.fireEvent("keyframe.insert", [el, prop]);
         },
         animDelete = function(e){
             if(!e || (e && e.key==="delete")){
@@ -1143,7 +1146,7 @@ var TimePanel = (function(){
             "mousedown:relay(.eye)": hideToggle,
             "mousedown:relay(.arrow)": expandToggle,
             "dblclick:relay(.name)": changName,
-            "mousedown:relay(.key-frame img)":keyframeInsert
+            "mousedown:relay(.key-frame img)": keyframeInsert
         });
         timelanes.addEvents({
             "mousedown:relay(.anim)":animAction
@@ -1172,7 +1175,8 @@ var TimePanel = (function(){
             "element.deselect": elementDeselect,
             "element.select": elSelect,
             "panel.element.update":elementUpdate,
-            "keydown":animDelete
+            "keydown":animDelete,
+            "keyframe.insert":animInsert
         });
         
         

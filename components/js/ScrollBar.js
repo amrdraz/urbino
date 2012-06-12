@@ -126,7 +126,6 @@ var ScrollBar = (function(){
                 this.contents.invoke("addEvent",'mousewheel', this.bound.scrollFunc);
                 this.scrollOff = false;
             }
-            console.log(this[wh]);
         },
         detach:function(){
             this.slider.detach();

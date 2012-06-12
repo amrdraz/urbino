@@ -38,47 +38,47 @@ var PropertiesPanel = (function(){
      * 
      */
     properties = {    /* documentation taken from Rapahel-src.html */
-        x: {name:"x", "class":"left row-1",label:"x",type:"number"},                // (number)
-        y: {name:"y", "class":"left row-2",label:"y",type:"number"},                   // (number)
-        cx: {name:"cx","class":"left row-1", type:"number"},            // (number)
-        cy: {name:"cy", "class":"left row-2",type:"number"},           // (number)
-        width: {name:"width", "class":"right row-1", label:"width",type:"number"},                // (number)
-        height: {name:"height", "class":"right row-2",label:"height",type:"number"},              // (number)
+        x: {name:"x", "class":"left row-1",label:"x",type:"number", anim:true},                // (number)
+        y: {name:"y", "class":"left row-2",label:"y",type:"number", anim:true},                   // (number)
+        cx: {name:"cx","class":"left row-1", type:"number", anim:true},            // (number)
+        cy: {name:"cy", "class":"left row-2",type:"number", anim:true},           // (number)
+        width: {name:"width", "class":"right row-1", label:"width",type:"number", anim:true},                // (number)
+        height: {name:"height", "class":"right row-2",label:"height",type:"number", anim:true},              // (number)
                       // r (number)
-                cr: {name:"r", "class":"right row-1",label:"radius",type:"number"},               // (number) fpr circle radius
-                r: {name:"r", "class":"left row-1",label:"radius",type:"number"},               // (number) for rect corner
+                cr: {name:"r", "class":"right row-1",label:"radius",type:"number", anim:true},               // (number) fpr circle radius
+                r: {name:"r", "class":"left row-1",label:"radius",type:"number", anim:true},               // (number) for rect corner
 
-        rx: {name:"rx", "class":"right row-1",type:"number"},                // (number)
-        ry: {name:"ry", "class":"right row-2",type:"number"},                // (number)
+        rx: {name:"rx", "class":"right row-1",type:"number", anim:true},                // (number)
+        ry: {name:"ry", "class":"right row-2",type:"number", anim:true},                // (number)
         text: {name:"text", "class":"left row-4",type:"textarea"},               // (string) contents of the text element. Use '\n' for multiline text
         "text-anchor":{name:"text-anchor", "class":"left row-2",type:"select", options:["start","middle","end"]},        // (string) ["start", "middle", "end"], default is "middle"
-        "opacity":{name:"opacity", "class":"right row-2",type:"percent", max:100},            // (number)
-        "fill":{name:"fill", label:"fill","class":"left row-1",type:"color"},                // (string) colour, gradient or image
+        "opacity":{name:"opacity", "class":"right row-2",type:"percent", max:100, anim:true},            // (number)
+        "fill":{name:"fill", label:"fill","class":"left row-1",type:"color", anim:true},                // (string) colour, gradient or image
         //"fill-opacity":{name:"fill-opacity", type:"percent"},        // (number)
-        "stroke":{name:"stroke", label:"stroke","class":"left row-2",type:"color"},            // (string) stroke colour
+        "stroke":{name:"stroke", label:"stroke","class":"left row-2",type:"color", anim:true},            // (string) stroke colour
         "stroke-dasharray":{name:"stroke-dasharray", label:"dasharray","class":"left row-4 all",type:"select", options:["", "-", ".", "-.", "-..", ". ", "- ", "--", "- .", "--.", "--.."]},    // (string) [“”, "-", ".", "-.", "-..", ". ", "- ", "--", "- .", "--.", "--.."]
         "stroke-linecap":{name:"stroke-linecap", label:"linecap","class":"left row-5 all",type:"select", options:["butt", "square", "round"]},    // (string) ["butt", "square", "round"]
         "stroke-linejoin":{name:"stroke-linejoin", label:"linejoin","class":"left row-6 all",type:"select", options:["bevel", "round", "miter"]},  // (string) ["bevel", "round", "miter"]
         //TODO "stroke-miterlimit",// (number)
         //"stroke-opacity":{name:"stroke-opacity", type:"percent"},    // (number)
         "stroke-width":{name:"stroke-width", "class":"right row-3",type:"number", min:1},       // (number) stroke width in pixels, default is '1'
-        path:{name:"path", "class":"left row-1",type:"text"},                // (string) SVG path string format
+        path:{name:"path", "class":"left row-1",type:"text", anim:true},                // (string) SVG path string format
         src:{name:"src", "class":"left row-1",type:"text"},                // (string) image URL, only works for @Element.image element
         font:{name:"font", "class":"left row-1",type:"text"},                // (string)
         "font-family":{label:"font",name:"font-family", "class":"left row-1",type:"select", options:fonts},        // (string)
-        "font-size":{name:"font-size", "class":"left row-3",type:"number", min:0},        // (number) font size in pixels
+        "font-size":{name:"font-size", "class":"left row-3",type:"number", min:0, anim:true},        // (number) font size in pixels
         "font-weight":{name:"font-weight", "class":"right row-3", type:"number", min:100, max:900, step:100, sufix:""},        // (string)
         "href":{name:"href", "class":"left row-2", type:"text"},              // (string) URL, if specified element behaves as hyperlink
         "target":{name:"target", "class":"left row-1", type:"select",options:["_self","_blank","_top","_parent"]},            // (string) used with href
         "title":{name:"title", "class":"left row-3", type:"text"},            // (string) will create tooltip with a given text
         // "transform" (string) see @Element.transform
-            "translate-x":{name:"translate-x", "class":"transfrom left row-1", label:"x",type:"number"},
-            "translate-y":{name:"translate-y", "class":"transfrom right row-1", label:"y",type:"number"},
-            "origin-x":{name:"origin-x", "class":"transfrom left row-1", label:"origin-x",type:"number"},
-            "origin-y":{name:"origin-y", "class":"transfrom right row-1", label:"origin-y",type:"number"},
-            "rotate":{name:"rotate", "class":"transfrom left row-2", label:"Rotate",type:"number", sufix:"°"},
-            "scale-x":{name:"scale-x", "class":"transfrom right row-2", label:"Scale-x",type:"percent"},
-            "scale-y":{name:"scale-y", "class":"transfrom right row-3", label:"Scale-y",type:"percent"},
+            "translate-x":{name:"translate-x", "class":"transfrom left row-1", label:"x",type:"number", anim:true},
+            "translate-y":{name:"translate-y", "class":"transfrom right row-1", label:"y",type:"number", anim:true},
+            "origin-x":{name:"origin-x", "class":"transfrom left row-1", label:"origin-x",type:"number", anim:true},
+            "origin-y":{name:"origin-y", "class":"transfrom right row-1", label:"origin-y",type:"number", anim:true},
+            "rotate":{name:"rotate", "class":"transfrom left row-2", label:"Rotate",type:"number", sufix:"°", anim:true},
+            "scale-x":{name:"scale-x", "class":"transfrom right row-2", label:"Scale-x",type:"percent", anim:true},
+            "scale-y":{name:"scale-y", "class":"transfrom right row-3", label:"Scale-y",type:"percent", anim:true},
        // "arrow-end":{name:"arrow-end"},     // (string) arrowhead on the end of the path. The format for string is '<type>[-<width>[-<length>]]'. Possible types: 'classic', 'block', 'open', 'oval', 'diamond', 'none', width: 'wide', 'narrow', 'midium', length: 'long', 'short', 'midium'.
             "arrow-type":{name:"arrow-type", "class":"left row-1", label:"type",type:"select", options:['none','classic', 'block', 'open', 'oval', 'diamond'] },
             "arrow-width":{name:"arrow-width", "class":"left row-2", label:"width",type:"select", options:['midium','wide', 'narrow'] },
@@ -120,8 +120,16 @@ var PropertiesPanel = (function(){
      * function that returns the attributes of the global state
      * @return attrs (obj) Raphael attr object formate {attrName:attrValue,...}
      */
-    getAttr:function(){
-        return this.attrs;
+    getAttr:function(a){
+        if(a){
+            var obj = {};
+            Array.from(a).each(function(v){
+                obj[v] = this.attrs[v];
+            });
+            return obj;
+        } else{
+            return this.attrs;
+        }
     },
     /**
      * function that sets the attributes of the global state
@@ -196,7 +204,6 @@ var PropertiesPanel = (function(){
         
         if(options.empty){return this;}
         
-        console.log("p safe");
         var 
         
         imgSrc = this.imgSrc = (options.imgSrc || "img")+"/",
@@ -207,10 +214,10 @@ var PropertiesPanel = (function(){
             "elementSelect",
             "elementDeselect",
             "elementUpdate",
-            "panelUpdate"
+            "panelUpdate",
+            "insertKeyframe"
         ]);
         
-        console.log("-p safe");
         this.slidingLabel = new SlidingLabel({
                                 container:panel,
                                 onChange:function(val, input){
@@ -242,47 +249,43 @@ var PropertiesPanel = (function(){
             }.bind(this)
         });
         
-        console.log("--p safe");
         var ps = this.properties={}, gs=this.groups={};//loop generating propreties by groups
         Object.each(groups, function(props, group){
             gs[group] = {};
             var g = new Element("div", {"class":group+" group"});
             new Element("h4", {text:group}).inject(g);
             props.each(function(p){
-                
-        console.log("p-- safe");
-                var prop = properties[p],
-                    div = this.createInput(properties[p]).inject(g);
-                ps[p]={};
-                ps[p].name = prop.name;
-                ps[p].type = prop.type;
+                var
+                prop = properties[p],
+                div = this.createInput(prop).inject(g);
+                prop.anim && this.div("key-frame").adopt(this.img(this.imgSrc+"keyframe.gif")).inject(div, "top");
+                    
+                ps[p]=prop;
                 ps[p].prop = div;
             }, this);
             
-        console.log("p- safe");
             new Element("div",{"class":"clear"}).inject(g);
             gs[group].group = g;
             g.inject(panel);
             //console.log();
         }, this);
         
-        console.log("---p safe");
         this.setState("canvas");
 
        
         
         panel.addEvents({
             "keyup:relay(input,textarea)": this.bound.updateEvent,
-            "change:relay(input, select)": this.bound.updateEvent
+            "change:relay(input, select)": this.bound.updateEvent,
+            "mousedown:relay(.key-frame img)": this.bound.insertKeyframe
         });
         
         window.addEvents({
             "element.deselect": this.bound.elementDeselect,
             "element.select":this.bound.elementSelect,
             "element.update": this.bound.elementUpdate,
-            "panel.update": this.bound.panelUpdate
+            "panel.update": this.bound.panelUpdate,
         });
-        console.log("p safe");
    },
    /**
     * function that fires element.update event with the input'scurrent value on keyup or change
@@ -375,8 +378,8 @@ var PropertiesPanel = (function(){
             if(!p){ return;}
             
             
-            p = p.prop;
             //console.log(prop,p, val);
+            p = p.prop;
             if(val){ //set prop to val
                 if(p.hasClass("number")){
                     p.getLast().getPrevious().set("value", val);
@@ -409,6 +412,15 @@ var PropertiesPanel = (function(){
                 props[prop].set("value", "");
             }
         }
+    },
+    /**
+     * method that extracts property and inserts keyframe into timeline when keyframe image is clicked 
+     */
+    insertKeyframe:function (eve){
+        var attr = eve.target.getParent().getNext("label").get("for"), val = this.prop(attr);
+        this.selected.each(function(el){
+            window.fireEvent("keyframe.insert",[el, attr, val]);
+        },this);
     }
 });
 
