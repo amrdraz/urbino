@@ -590,13 +590,15 @@ path.redraw = function (){
         this.attr("path",(pa.length>0)?pa:"");
     };
 path.unplug = function(){
-    path.segments.remove();
-    path.guide.remove();
-    
-    path.drawing = false;
-    
-    delete path.segments;
-    delete path.guide;
+    if(!path.removed && path.segments){
+        path.segments.remove();
+        path.guide.remove();
+        
+        path.drawing = false;
+        
+        delete path.segments;
+        delete path.guide;   
+    }
 };
 path.plug = function(){
     var pa = path.patharray || path.attr(path),

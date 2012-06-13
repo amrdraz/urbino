@@ -117,7 +117,8 @@ var PropMixin = new Class({
         return div.addClass(p["class"]+" "+p.name+" proprety "+p.type);
     },
     /**
-     *This method binds this to the Class finction 
+     *This method binds this to the Class methods
+     * @param arr (array) array of methods names 
      */
     bind:function(arr){
         this.bound = this.bound || {};

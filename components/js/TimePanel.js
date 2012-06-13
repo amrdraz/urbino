@@ -46,8 +46,8 @@ var TimePanel = (function(){
     
     return new Class({
     
-    Implements: [Events, Options, PropMixin],
-    
+    Implements: [PropMixin],
+    Extends:ElementsPanel,
     noScroll : true,
     initialize: function (paper, options){        
         options = options || {};

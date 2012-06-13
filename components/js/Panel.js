@@ -9,6 +9,16 @@ var Panel = new Class({
     Implements:[Options,Events],
     options:{
     },
+     /**
+     *This method binds this to the Class methods
+     * @param arr (array) array of methods names 
+     */
+    bind:function(arr){
+        this.bound = this.bound || {};
+        Array.from(arr).each(function(name){
+            this.bound[name] = this[name].bind(this);
+        }, this);
+    },
     initialize: function(options){
         
         //this.setOptions(options);
@@ -24,10 +34,9 @@ var Panel = new Class({
                 height:options.height||"100%"
             }
         });
+        this.setOptions(options);
         
-        this.bound = {
-            resize:this.resize.bind(this)
-        };
+        this.bind(["resize"]);
         
         this.addEvents({
             "panel.resize": this.bound.resize

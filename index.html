@@ -62,7 +62,7 @@
 	r = c.R,
 	canvas = new TabPanel("canvas", {
 		x:40,
-		y:20,
+		y:0,
 		width:680,
 		height:360,
 		initSelect:"Canvas",
@@ -71,18 +71,9 @@
 			"SVG":new CodePanel(r, 'svg')
 			}
 	}),
-	toolPanel = new TabPanel("tools", {
-		x:0,
-		y:20,
-		width:40,
-		height:360,
-		tabs:{
-			"Tools": new ToolPanel(r,{imgSrc:"img"})
-		}
-	}),
 	side = new TabPanel("side", {
 		x:720,
-		y:20,
+		y:0,
 		width:300,
 		height:360,
 		initSelect:"Propreties",
@@ -99,6 +90,15 @@
 		height:220,
 		tabs:{
 			"Timeline":new TimePanel(r,{imgSrc:"img"})
+		}
+	}),
+	toolPanel = new TabPanel("tools", {
+		x:0,
+		y:0,
+		width:40,
+		height:360,
+		tabs:{
+			"Tools": new ToolPanel(r,{imgSrc:"img"})
 		}
 	})
 	;

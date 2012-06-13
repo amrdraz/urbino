@@ -108,7 +108,7 @@ var PropretiesPanel = (function(){
     
     return new Class({
     
-    Implements: [Events, Options],
+    Extends: Panel,
     options:{
       extraProps:{}  
     },
@@ -255,15 +255,15 @@ var PropretiesPanel = (function(){
      *                                     i.e nameOfProp:{name:"nameOfProp" type:"typeOfProp" [options:[], min,max,step]}
      */
     initialize: function (options) {
-        options = options ||{};
+        this.parent(options ||{});
         if(options.extraProps) {
             properties.combine(options.extraProps);
         }
         
         var 
         
-        imgSrc = (options.imgSrc || "img")+"/",
-        panel = this.panel = new Element("div", {"class":"prop-panel"});
+        imgSrc = this.options.imgSrc = (this.options.imgSrc || "img")+"/",
+        panel = this.panel.addClass("prop-panel");
         
         this.selected = [];
         this.bound = {};

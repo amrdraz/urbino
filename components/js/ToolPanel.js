@@ -41,7 +41,7 @@ var ToolPanel = (function(){
  * @param options (obj) extra options when initializing the Panel
  */
 initialize : function(R, options){
-    options = options || {};
+    this.parent(options || {});
     this.paper = R;
     
     this.bind([
@@ -70,12 +70,12 @@ initialize : function(R, options){
     
     //this.parent(options||{});
     //var p = this.panel.addClass("tool-panel"),
-    var p = this.panel = new Element("div",{"class":"tool-panel"}),
+    var p = this.panel.addClass("tool-panel"),
         /**
      * sets c to the DIV/SVG R is applied too
      */
     c = this.c = $(R.canvas),
-    imgSrc = (options.imgSrc || "img")+"/",
+    imgSrc = this.options.imgSrc = (this.options.imgSrc || "img")+"/",
     ta = this.textToolArea = new Element("textarea", { styles:{
         "position":"absolute",
         "white-space":"nowrap",
@@ -253,14 +253,23 @@ initialize : function(R, options){
     /**
      * handels needed arrangment for when an element is deleted
      */
-    elementDelete :function (){
+    elementDelete : function (el){
         var sel = this.selected;
-        if (sel.length!==0) {
-            console.log("deleted element");
-            //selected.ft.unplug();
-            //selected.remove();
-            sel = [];
-            this.pm=null;
+        if(el){
+            if(typeOf(el)==="array"){
+                el.each(function(elm){
+                    this.elementDelete(elm);
+                }, this);
+            } else {
+                this.elementDeselect(el);
+                //TODO move this part elsewhere
+                if(el.ft) { el.ft.unplug();}
+                el.remove();
+            }
+        } else {
+            Object.each(sel, function(elm,key){
+                this.elementDelete(elm);
+            }, this);
         }
     },
     /**
@@ -405,7 +414,6 @@ initialize : function(R, options){
             el;
             
         if(drawPath){
-            console.log("he");
             this.drawPath = false;
             pm.unplug();
             if(pm.ft){pm.ft.unplug();}
