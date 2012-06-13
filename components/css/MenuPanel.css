@@ -1,0 +1,14 @@
+.menu-panel {
+	background:#222;
+}
+.menu-panel a {
+	display:block;
+	padding:8px;
+	line-height:12px;
+	background: #111;
+	border-bottom:#aaa;
+	text-decoration: none;
+}
+.menu-panel a:hover {
+	background: #333;
+}

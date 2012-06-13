@@ -17,18 +17,18 @@ var MenuPanel = new Class({
         this.parent(options||{});
         this.paper = R;
         this.bind(["svgExport","raphaelExport","save","load"]);
-        var p = this.panel;
+        var p = this.panel.addClass("menu-panel");
         p.adopt(
             new Element("a", {href: "svg.php", text: "Download SVG", events: {
                 mousedown: this.bound.svgExport
             }}),
-            new Element("a", {href: "raphael.php", text: "Download Raphael", events: {
+            new Element("a", {href: "raphael.php", title:"Not working",text: "Download Raphael", events: {
                 mousedown: this.bound.rapahelExport
             }}),
-            new Element("a", {text: "Save", events: {
+            new Element("a", {text: "Save", title:"Not working",events: {
                 mousedown: this.bound.save
             }}),
-            new Element("a", {text: "Load", events: {
+            new Element("a", {text: "Load",title:"Not working", events: {
                 mousedown: this.bound.load
             }})
         );
