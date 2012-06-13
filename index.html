@@ -26,12 +26,13 @@
   <script type="text/javascript" src="external/raphael.free_transform.js"></script>
   <script type="text/javascript" src="external/raphael.export.js"></script>
   <script type="text/javascript" src="components/js/raphael.pathManager.js"></script>
+  <script type="text/javascript" src="components/js/PropMixin.js"></script>
+  <script type="text/javascript" src="components/js/ElementsMixin.js"></script>
   <script type="text/javascript" src="components/js/ScrollBar.js"></script>
   <script type="text/javascript" src="components/js/Panel.js"></script>
   <script type="text/javascript" src="components/js/TabPanel.js"></script>
   <script type="text/javascript" src="components/js/SlidingLabel.js"></script>
   <script type="text/javascript" src="components/js/ColorPicker.js"></script>
-  <script type="text/javascript" src="components/js/PropMixin.js"></script> 
   <script type="text/javascript" src="components/js/CodePanel.js"></script>
   <script type="text/javascript" src="components/js/MenuPanel.js"></script>
   <script type="text/javascript" src="components/js/CanvasPanel.js"></script>
@@ -98,7 +99,7 @@
 		width:40,
 		height:360,
 		tabs:{
-			"Tools": new ToolPanel(r,{imgSrc:"img"})
+			"Tools": new ToolPanel(r,{imgSrc:"img", empty:true})
 		}
 	})
 	;

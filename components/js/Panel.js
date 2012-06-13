@@ -16,6 +16,7 @@ var Panel = new Class({
     bind:function(arr){
         this.bound = this.bound || {};
         Array.from(arr).each(function(name){
+            //console.log(name);
             this.bound[name] = this[name].bind(this);
         }, this);
     },

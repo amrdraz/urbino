@@ -108,7 +108,9 @@ var PropertiesPanel = (function(){
     
     return new Class({
     
-    Implements: [Events, Options, PropMixin],
+   
+    Extends: Panel,
+    Implements: [PropMixin],
     options:{
       extraProps:{}  
     },
@@ -197,17 +199,19 @@ var PropertiesPanel = (function(){
      *                                     i.e nameOfProp:{name:"nameOfProp" type:"typeOfProp" [options:[], min,max,step]}
      */
     initialize: function (options) {
-        options = options ||{};
+       
         if(options.extraProps) {
             properties.combine(options.extraProps);
         }
         
+        this.parent(options ||{});
+        
         if(options.empty){return this;}
         
-        var 
         
-        imgSrc = this.imgSrc = (options.imgSrc || "img")+"/",
-        panel = this.panel = new Element("div", {"class":"prop-panel"});
+        var 
+        imgSrc = this.options.imgSrc = (this.options.imgSrc || "img")+"/",
+        panel = this.panel.addClass("prop-panel");
         
         this.bind([
             "updateEvent",
@@ -258,7 +262,7 @@ var PropertiesPanel = (function(){
                 var
                 prop = properties[p],
                 div = this.createInput(prop).inject(g);
-                prop.anim && this.div("key-frame").adopt(this.img(this.imgSrc+"keyframe.gif")).inject(div, "top");
+                prop.anim && this.div("key-frame").adopt(this.img(imgSrc+"keyframe.gif")).inject(div, "top");
                     
                 ps[p]=prop;
                 ps[p].prop = div;
@@ -282,6 +286,7 @@ var PropertiesPanel = (function(){
         
         window.addEvents({
             "element.deselect": this.bound.elementDeselect,
+            "element.delete": this.bound.elementDeselect,
             "element.select":this.bound.elementSelect,
             "element.update": this.bound.elementUpdate,
             "panel.update": this.bound.panelUpdate,

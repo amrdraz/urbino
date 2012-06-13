@@ -116,16 +116,6 @@ var PropMixin = new Class({
         if(free){return div;}
         return div.addClass(p["class"]+" "+p.name+" proprety "+p.type);
     },
-    /**
-     *This method binds this to the Class methods
-     * @param arr (array) array of methods names 
-     */
-    bind:function(arr){
-        this.bound = this.bound || {};
-        Array.from(arr).each(function(name){
-            this.bound[name] = this[name].bind(this);
-        }, this);
-    },
    setState:function(s){
         var props = this.properties,
             elP = this.elementProps,

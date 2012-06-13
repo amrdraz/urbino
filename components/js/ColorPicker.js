@@ -484,9 +484,9 @@ var ColorPicker = (function(){
             swh = wh-5,
             path = ["M 1 1 ",wh-1,"1 ",wh-1," ",wh-1," 1 ",wh-1," z"].join(),
             div = new Element("div", { "class":o.clas||"",styles:{
-                position:o.position||(o.y||o.x)?"absolute":"relative",
-                top:o.y||0,
-                left:o.x||0,
+                position:o.position||(o.y||o.x)?"absolute":"",
+                top:o.y,
+                left:o.x,
                 width:wh,
                 height:wh
                 }}).set(o.container || {});

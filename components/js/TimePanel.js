@@ -6,7 +6,6 @@
 /*global Class,Raphael,Events,Options,$,$$,Element,console,window,typeOf,Slider,SlidingLabel,ScrollBar,PropMixin,ColorPicker */
 var TimePanel = (function(){
     var
-    buttonAttr = {"fill":"#ddd", "stroke":"none", "cursor":"pointer"},
     printR = function (paper){
             var el = paper.top, ids = [];
              while(el && el!==null) {
@@ -17,51 +16,45 @@ var TimePanel = (function(){
             }
             console.log(ids);
         },
-    div = function(c,s){
-        s = s || {};
-        return new Element("div",{"class":c}).set(s);
-    },
-    img = function(src,c,s){
-        s = s || {};
-        return new Element("img",{src:src,"class":c}).set(s);
-    },
-    vect = function(c,icon,trans,evens,title){
-        
-         var d = div("vect "+c), r = Raphael(0,0,"100%","100%"),
-            vec = r.path(icon)
-                    .attr(buttonAttr).attr({"title":title||""})
-                    .transform(trans||"")
-                    .hover(function (){
-                        this.attr("stroke","#48e");
-                    }, function (){
-                        this.attr("stroke","none");
-                    });
-            r.canvas.inject(d);
-            d.addEvents(evens||{});
-            d.store("vec",vec);
-        return d;
-    },
+
     has = "hasOwnProperty"
     ;
     
     return new Class({
     
-    Implements: [PropMixin],
-    Extends:ElementsPanel,
+    Extends:Panel,
+    Implements: [PropMixin, ElementsMixin],
+    options : {
+        imgSrc: "img/",
+        buttonAttr: {"fill":"#ddd", "stroke":"none", "cursor":"pointer"}
+    },
     noScroll : true,
     initialize: function (paper, options){        
-        options = options || {};
-        
-        
+        this.parent(options|| {});
+        this.bind([
+            "hideToggle",
+            "expandToggle",
+            "elementCreate",
+            "elementInsert",
+            "elementDeselect",
+            "elementSelect",
+            "elSelect",
+            "elementClick",
+            "elementDelete",
+            "notElement",
+            "hideTextField",
+            "changeName"
+        ]);
         var
+        vect = this.vect.bind(this), img = this.img, div = this.div,
         timePanel = this,
-        width = this.width = options.width||1020,
-        height = this.height = options.height||200,
+        width = this.width = this.options.width||1020,
+        height = this.height = this.options.height||200,
         lwidth = this.lwidth = 235,
         rwidth = this.rwidth = width-lwidth-24,
-        panel = this.panel = div("time-panel", {width:width,height:height}),
+        panel = this.panel.addClass("time-panel"),
         zwidth = 150,
-        imgSrc= (options.imgSrc || "img")+"/",
+        imgSrc= this.options.imgSrc = (this.options.imgSrc || "img")+"/",
         icon = {
             stop: "M5.5,5.5h20v20h-20z",
             end: "M21.167,5.5,21.167,13.681,6.684,5.318,6.684,25.682,21.167,17.318,21.167,25.5,25.5,25.5,25.5,5.5z",
@@ -325,129 +318,7 @@ var TimePanel = (function(){
                   
             return {color:color,el:el, element:element,timeline:timeLane, anims:anims, maxMs:a.ms};
         },
-        /**
-         * inserts a new element into the elements panel
-         * @param el (Raphael Obj) the element for this row
-         */
-        elementInsert = function(el){
-            var obj = els[el.id] = elementCreate(el);
-            obj.element.inject(panel,"top");
-        },
-        /**
-         * selects the elemnets obj by it's id
-         * @param id (string) the row id in the elements panel
-         */
-        elementDeselect = function (id){
-            if(id) {
-                if(typeOf(id)=="string" && selected[id]) {
-                    selected[id].element.removeClass("selected");
-                    delete selected[id];
-                }
-            } else {
-                Object.each(selected, function(elm,key){
-                    elementDeselect(key);
-                });
-            }
-        },
-        /**
-         * selects the elemnets obj by it's id
-         * @param id (string) the element id in the elements panel
-         */
-        elementSelect = function (id){
-            if(id && els[id] && !selected[id]){
-                selected[id] = els[id];
-                selected[id].element.addClass("selected");
-            }
-        },
-        /**
-         * selects the elemnets obj by it's element
-         * @param el (Raphael Obj) the element to select
-         */
-        elSelect = function (el){
-            if(el && typeOf(el)!=="null"){
-                elementSelect(el.id);
-            }
-        },
-        /**
-         * deselect the elemnets obj by it's element
-         * @param el (Raphael Obj) the element to deselect
-         */
-        elDeselect = function (el){
-            if(el && typeOf(el)!=="null"){
-                elementDeselect(el.id);
-            } else {
-                elementDeselect();
-            }
-        },
-        /**
-         * event handler for element selection allows for multiple selection if ctrl is pressed
-         * @param e (event)
-         */
-        elementClick = function (e) {
-            e.stopPropagation();
-            
-            var el = els[((e.target.hasClass("element"))?e.target:e.target.getParent(".element")).get("for")].el;
-            if(e.control){
-                if(selected[el.id]){
-                    window.fireEvent("element.deselect", [el]);
-                } else {
-                    window.fireEvent("element.select", [el]);
-                }
-            } else {
-                window.fireEvent("element.deselect");
-                window.fireEvent("element.select", [el]);
-            }
-        },
-        /**
-         * event handler deletes the element from the elements panel
-         * @param el (Raphael Obj) the element to delete
-         */
-        elementDelete = function (el){
-            
-            if(el){
-                if(typeOf(el)==="array"){
-                    el.each(function(id){
-                        elementDelete(els[id].el);
-                    });
-                } else {
-                    var id = el && el.id;
-                    if(selected[el.id]){
-                       window.fireEvent("element.deselect", el);
-                    }
-                    els[id].element.destroy();
-                    delete els[id];
-                    //TODO move this part elsewhere
-                    if(el.ft) { el.ft.unplug();}
-                    el.remove();
-                }
-            } else {
-                Object.each(selected, function(elm,key){
-                    elementDelete(elm.el);
-                });
-            }
-        },
-        elementUpdate = function(el) {
-            var inputs, id = el.id;
-            
-            if(els[id]){
-                inputs = els[id].element.getElements("input");
-                
-                inputs.each(function(i){
-                    i.set("value",(el.attr(i.get("name")).round()));
-                });
-            }
-        },
-        /**
-         * checks if user clicked on an element
-         */
-        notElement = function (e) {
-            var el = e.target;
-            if(el.getParent(".element")===null && !el.hasClass("element")) {
-                window.fireEvent("element.deselect");
-            }
-        };
         
-        var
         timeLane = Raphael(timelineArea.getElement("#timeLane"),"100%",10),
         labelLane = Raphael(timelineArea.getElement("#labelLane"),"100%",10),
         triggerLane = Raphael(timelineArea.getElement("#triggerLane"),"100%",10),        
@@ -492,63 +363,6 @@ var TimePanel = (function(){
             window.addEvent("mousemove",mousemove);
             window.addEvent("mouseup",mouseup);
      },
-        parse = function(paper){
-            var a = [];
-            paper.forEach(function(el) {
-                var obj;
-                el.noparse = el.noparse || false;
-                if(!el.noparse){
-                    obj = elementCreate(el);
-                    els[el.id] = obj;
-                    a.push(obj.element);
-                }
-            });
-          return a;  
-        },
-    /*-----------------------handeling what text filed should do ----------------------*/
-        clearSelection = function () {
-            if(document.selection && document.selection.empty) {
-                document.selection.empty();
-            } else if(window.getSelection) {
-                var sel = window.getSelection();
-                sel.removeAllRanges();
-            }
-        },
-        changName = function(e){
-            e.preventDefault();
-            
-            var sel = e.target,
-            size = sel.getSize(),
-            pos = sel.getPosition(panel);
-            
-            clearSelection();
-            
-            textField.setStyles({
-                    "top":pos.y,
-                    "left":pos.x,
-                    "width":100,
-                    "height":size.y,
-                    "display":"block"
-                });
-            textField.id = sel.get("text");
-            textField.set({"value":textField.id});
-            textField.focus();
-            this.noShortcut = true;
-        },
-        hideTextField = function (){
-           var id = textField.id, val = textField.get("value");
-            if(val!=="" && !els[val]) {
-                els[id].element.getElement(".name").set("text", val);
-                els[id].element.set("for", val);
-                els[id].el.id = val;
-                els[val] = els[id];
-                delete els[id];
-                //rowDeselect(id);
-                elementSelect(val);
-            }
-            textField.set({"value":"", styles:{"display":"none"}});
-            this.noShortcut=false;
-        },
         /*-----------------------------------TimeLane------------------------------------------*/
         msToString = function(ms){
             var min,sec;
@@ -1141,11 +955,11 @@ var TimePanel = (function(){
             "panel.scroll.update":yScroller.update
         });
         elements.addEvents({
-            "click":notElement,
-            "click:relay(.row)":elementClick,
-            "mousedown:relay(.eye)": hideToggle,
-            "mousedown:relay(.arrow)": expandToggle,
-            "dblclick:relay(.name)": changName,
+            "click":this.bound.notElement,
+            "click:relay(.row)":this.bound.elementClick,
+            "mousedown:relay(.eye)": this.bound.hideToggle,
+            "mousedown:relay(.arrow)": this.bound.expandToggle,
+            "dblclick:relay(.name)": this.bound.changName,
             "mousedown:relay(.key-frame img)": keyframeInsert
         });
         timelanes.addEvents({
@@ -1156,10 +970,10 @@ var TimePanel = (function(){
         textField.addEvents({
             "keydown": function (eve){
                     if (eve.key === "enter"){
-                        hideTextField();
+                        this.bound.hideTextField();
                     }
                 },
-            "blur": hideTextField
+            "blur": this.bound.hideTextField
         });
         timelineArea.getElement("#timeLane").addEvent("mousedown", trackerSeek);
         timelineArea.getElement(".fit-button").addEvent("mousedown", function(e){e.stop();fitTo(lastMs);});
@@ -1170,11 +984,11 @@ var TimePanel = (function(){
                     });
                     
         window.addEvents({
-            "element.create": elementCreate,
-            "element.delete": elementDelete,
-            "element.deselect": elementDeselect,
-            "element.select": elSelect,
-            "panel.element.update":elementUpdate,
+            "element.create": this.bound.elementCreate,
+            "element.delete": this.bound.elementDelete,
+            "element.deselect": this.bound.elementDeselect,
+            "element.select": this.bound.elSelect,
+            "panel.element.update": this.bound.elementUpdate,
             "keydown":animDelete,
             "keyframe.insert":animInsert
         });
