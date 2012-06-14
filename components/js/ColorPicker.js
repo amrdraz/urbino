@@ -281,12 +281,14 @@ var ColorPicker = (function(){
         },
         set:function(e){
             var t =$(e.target), vec = this.vec;
-            if(/svg|circle|rect|path|ellipse|image|text/.test(t.nodeName)){
-                !t.getParent("div.cd-colorpicker") && this.hide();
-                return;
-            }
-            if(vec && vec.cpOn && !(t.hasClass("color-picker")||t.getParent(".color-picker"))){
-                this.hide();
+            if(vec){
+                if(/svg|circle|rect|path|ellipse|image|text/.test(t.nodeName)){
+                    !t.getParent("div.cd-colorpicker") && this.hide();
+                    return;
+                }
+                if(vec.cpOn && !(t.hasClass("color-picker")||t.getParent(".color-picker"))){
+                    this.hide();
+                }
             }
         },
         setO:function(val){

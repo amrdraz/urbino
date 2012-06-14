@@ -149,6 +149,7 @@ var ElementsMixin = new Class({
         var obj = this.elementCreate(el);
         this.els[el.id] = obj;
         obj.element.inject(this.elements,"top");
+        //console.log(this.els);
     },
     /**
      * selects the elemnets obj by it's id
@@ -172,6 +173,7 @@ var ElementsMixin = new Class({
      * @param id (string) the element id in the elements panel
      */
     elementSelect : function (id){
+        console.log(this.els);
         var els = this.els, sel = this.selected;
         if(id && els[id] && !sel[id]){
             sel[id] = els[id];

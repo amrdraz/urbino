@@ -96,7 +96,6 @@ var ScrollBar = (function(){
                 mode: (mode?'horizontal':'vertical'),
                 onChange: this.bound.slide
             });
-            
         },
         update:function(){
             var
@@ -108,7 +107,6 @@ var ScrollBar = (function(){
             size = saSize.max(scrollSize),
             slider = this.slider,
             sw = this[wh]-this[mode?"height":"width"]*2;
-            
             if(size<=saSize){
                 size=0;
                 this.detach();
@@ -117,7 +115,7 @@ var ScrollBar = (function(){
                 size = sw*(saSize/size);
             }
             slider.knob.setStyle(wh,size);
-            slider.max = scrollSize - saSize;
+            slider.max = slider.range = scrollSize - saSize;
             slider.steps = scrollSize - saSize;
             slider.stepSize = 1;
             slider.stepWidth = sw;

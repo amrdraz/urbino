@@ -22,7 +22,7 @@ var MenuPanel = new Class({
             new Element("a", {href: "svg.php", text: "Download SVG", events: {
                 mousedown: this.bound.svgExport
             }}),
-            new Element("a", {href: "raphael.php", title:"Not working",text: "Download Raphael", events: {
+            new Element("a", {title:"Not working",text: "Download Raphael", events: {
                 mousedown: this.bound.rapahelExport
             }}),
             new Element("a", {text: "Save", title:"Not working",events: {
@@ -40,16 +40,19 @@ var MenuPanel = new Class({
         }).post(Object.toQueryString({"svg": this.paper.toSVG()}));
     },
     raphaelExport : function (e) {
+        return;
         var r = new Request ( {
             url: "svgw.php"
         }).post(Object.toQueryString({"svg": this.paper.toRaphael()}));
     },
     save : function (e) {
+        return;
         var r = new Request ( {
             url: "svgw.php"
         }).post(Object.toQueryString({"svg": this.paper.toRaphael()}));
     },
     load : function (e) {
+        return;
         var r = new Request ( {
             url: "svgw.php"
         }).post(Object.toQueryString({"svg": this.paper.toRaphael()}));

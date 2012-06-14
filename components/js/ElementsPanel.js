@@ -34,14 +34,12 @@ var ElementsPanel = (function() {
         imgSrc: "img/",
         buttonAttr: {"fill":"#eee", "stroke":"none", "cursor":"pointer"}
     },
-    selected: {},
-    els : {},
-    initialize: function (paper, options){
+    initialize: function (paper, els, options){
 
         this.parent(options || {});
         var
         imgSrc= this.options.imgSrc = (this.options.imgSrc || "img")+"/",
-        selected = this.selected, els=  this.els, vect = this.vect.bind(this),icon = this.icon;
+        selected = this.selected = {}, els=  this.els = els, vect = this.vect.bind(this),icon = this.icon;
         this.bind([
             "moveup",
             "movedown",
@@ -50,7 +48,6 @@ var ElementsPanel = (function() {
             "elementCreate",
             "elementInsert",
             "elementDeselect",
-            "elementSelect",
             "elSelect",
             "elementClick",
             "elementDelete",

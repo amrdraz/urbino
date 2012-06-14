@@ -7072,7 +7072,6 @@ var Slider = new Class({
 	set: function(step){
 		if (!((this.range > 0) ^ (step < this.min))) step = this.min;
 		if (!((this.range > 0) ^ (step > this.max))) step = this.max;
-
 		this.step = Math.round(step);
 		
 		return b = this.checkStep()

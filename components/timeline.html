@@ -27,10 +27,11 @@
   <script type="text/javascript" src="js/ScrollBar.js"></script>
   <script type="text/javascript" src="js/TabPanel.js"></script>
   <script type="text/javascript" src="js/PropMixin.js"></script>
-  
+  <script type="text/javascript" src="js/ElementsMixin.js"></script>
   <script type="text/javascript" src="js/CanvasPanel.js"></script>
-  <script type="text/javascript" src="js/ElementsPanel.js"></script>
+  <script type="text/javascript" src="js/PropertiesPanel.js"></script>
   <script type="text/javascript" src="js/TimePanel.js"></script>
+  
   
 </head>
  
@@ -41,6 +42,7 @@
 	
 	<div id="canvas"></div>
 	<div id="timeholder"></div>
+	<div id="pp"></div>
 	<script>
 	/*global $,Raphael, TimePanel,console */
 	
@@ -48,7 +50,7 @@
 	r = c.R,
 	canvas = new TabPanel("canvas", {
 		x:0,
-		y:40,
+		y:0,
 		width:1020,
 		height:320,
 		initSelect:"Canvas",
@@ -128,11 +130,20 @@
 
 	timeline = new TabPanel("timeholder", {
 		x:0,
-		y:320,
+		y:280,
 		width:1020,
 		height:220,
 		tabs:{
 			"Timeline":new TimePanel(r,{imgSrc:"../img"})
+		}
+	})
+	pp = new TabPanel("pp", {
+		x:1020,
+		y:0,
+		width:280,
+		height:500,
+		tabs:{
+			"Properties":new PropertiesPanel({imgSrc:"../img"})
 		}
 	})
 	

@@ -63,27 +63,28 @@
 	var
 	c = new CanvasPanel(),
 	r = c.R,
+	els = {},
 	canvas = new TabPanel("canvas", {
 		x:40,
 		y:0,
 		width:680,
-		height:360,
+		height:380,
 		initSelect:"Canvas",
 		tabs:{
 			"Canvas":c,
-			"SVG":new CodePanel(r, 'svg')
+			"SVG":new CodePanel(r, els,'svg')
 			}
 	}),
 	side = new TabPanel("side", {
 		x:720,
 		y:0,
 		width:300,
-		height:360,
+		height:380,
 		initSelect:"Propreties",
 		tabs:{
 			"Propreties": (new PropertiesPanel({imgSrc:"img"})),
-			"Elements":(new ElementsPanel(r, {imgSrc:"img"})),
-			"Menu":new MenuPanel(r)
+			"Elements":(new ElementsPanel(r, els, {imgSrc:"img"})),
+			"Menu":new MenuPanel(r, els)
 		}
 	}),
 	timeline = new TabPanel("timeline", {
@@ -92,14 +93,14 @@
 		width:1020,
 		height:220,
 		tabs:{
-			"Timeline":new TimePanel(r,{imgSrc:"img"})
+			"Timeline":new TimePanel(r, {imgSrc:"img"})
 		}
 	}),
 	toolPanel = new TabPanel("tools", {
 		x:0,
 		y:0,
 		width:40,
-		height:360,
+		height:380,
 		tabs:{
 			"Tools": new ToolPanel(r,{imgSrc:"img", empty:true})
 		}
