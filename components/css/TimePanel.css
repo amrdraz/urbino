@@ -14,7 +14,9 @@
 .time-panel div, .time-panel svg{
 	position:absolute;
 }
-
+.time-panel .empty {
+	display:none;
+}
 /*---------------------------- elements area ------------------------------*/
 .time-panel .elements-area{
 	top:0px;
@@ -109,14 +111,16 @@
 	right:20px;
 	padding-bottom:1px;
 }
-.time-panel .elements-area label.sliding-label{
+
+.time-panel .elements-area label.sliding-label, .time-panel .elements-area .props .color label{
 	top:0px;
 	color:#ddd;
 	right:50px;
 	line-height:1;
+	border-bottom: none;
 }
 .time-panel .elements-area .sliding-input{
-	right:10px;
+	right:20px;
 	height:10px;
 	width:40px;
 	line-height: 1;
@@ -354,6 +358,7 @@
 	top:3px;
 	width:24px;
 }
+
 .time-panel .timeline-area  .anim .left{
 	clip: rect(0px, 16px, 8px, 12px);
 	left:-12px;
@@ -369,6 +374,12 @@
 .time-panel .timeline-area  .anim .right.selected{
 	 clip:rect(0px, 4px, 8px, 0px);
      right:-20px;
+}
+.time-panel .timeline-area  .anim .full,.time-panel .timeline-area  .anim.end .right{
+	clip: rect(0px, 16px, 8px, 8px);
+}
+.time-panel .timeline-area  .anim .full.selected, .time-panel .timeline-area  .anim.end .right.selected{
+	 clip:rect(0px, 8px, 8px, 0px);
 }
 /*---------The footer section of the timeline and element-are -----*/
 

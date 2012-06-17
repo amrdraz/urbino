@@ -164,6 +164,7 @@ initialize : function(R, options){
 },
     setState: function(st){
         if(st==="canvas"){
+            console.log('setState',this.getAttr().fill);
             this.prop("fill", this.getAttr().fill);
             this.prop("storke", this.getAttr().stroke);
         }

@@ -72,13 +72,13 @@ var PropertiesPanel = (function(){
         "target":{name:"target", "class":"left row-1", type:"select",options:["_self","_blank","_top","_parent"]},            // (string) used with href
         "title":{name:"title", "class":"left row-3", type:"text"},            // (string) will create tooltip with a given text
         // "transform" (string) see @Element.transform
-            "translate-x":{name:"translate-x", "class":"transfrom left row-1", label:"x",type:"number", anim:true},
-            "translate-y":{name:"translate-y", "class":"transfrom right row-1", label:"y",type:"number", anim:true},
-            "origin-x":{name:"origin-x", "class":"transfrom left row-1", label:"origin-x",type:"number", anim:true},
-            "origin-y":{name:"origin-y", "class":"transfrom right row-1", label:"origin-y",type:"number", anim:true},
-            "rotate":{name:"rotate", "class":"transfrom left row-2", label:"Rotate",type:"number", sufix:"°", anim:true},
-            "scale-x":{name:"scale-x", "class":"transfrom right row-2", label:"Scale-x",type:"percent", anim:true},
-            "scale-y":{name:"scale-y", "class":"transfrom right row-3", label:"Scale-y",type:"percent", anim:true},
+            "translate-x":{name:"translate-x", "class":"transform left row-1", label:"x",type:"number", anim:true},
+            "translate-y":{name:"translate-y", "class":"transform right row-1", label:"y",type:"number", anim:true},
+            "origin-x":{name:"origin-x", "class":"transform left row-1", label:"origin-x",type:"number", anim:true},
+            "origin-y":{name:"origin-y", "class":"transform right row-1", label:"origin-y",type:"number", anim:true},
+            "rotate":{name:"rotate", "class":"transform left row-2", label:"Rotate",type:"number", sufix:"°", anim:true},
+            "scale-x":{name:"scale-x", "class":"transform right row-2", label:"Scale-x",type:"percent", anim:true},
+            "scale-y":{name:"scale-y", "class":"transform right row-3", label:"Scale-y",type:"percent", anim:true},
        // "arrow-end":{name:"arrow-end"},     // (string) arrowhead on the end of the path. The format for string is '<type>[-<width>[-<length>]]'. Possible types: 'classic', 'block', 'open', 'oval', 'diamond', 'none', width: 'wide', 'narrow', 'midium', length: 'long', 'short', 'midium'.
             "arrow-type":{name:"arrow-type", "class":"left row-1", label:"type",type:"select", options:['none','classic', 'block', 'open', 'oval', 'diamond'] },
             "arrow-width":{name:"arrow-width", "class":"left row-2", label:"width",type:"select", options:['midium','wide', 'narrow'] },
@@ -422,9 +422,9 @@ var PropertiesPanel = (function(){
      * method that extracts property and inserts keyframe into timeline when keyframe image is clicked 
      */
     insertKeyframe:function (eve){
-        var attr = eve.target.getParent().getNext("label").get("for"), val = this.prop(attr);
+        var attr = eve.target.getParent().getNext("label").get("for");
         this.selected.each(function(el){
-            window.fireEvent("keyframe.insert",[el, attr, val]);
+            window.fireEvent("keyframe.insert", {el:el, prop:attr, value:this.prop(attr), jump:eve.alt});
         },this);
     }
 });

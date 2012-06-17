@@ -1,4 +1,5 @@
 <!DOCTYPE HTML>
+<html>
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
   <title>Urbino</title>
@@ -32,7 +33,6 @@
   <script type="text/javascript" src="js/PropertiesPanel.js"></script>
   <script type="text/javascript" src="js/TimePanel.js"></script>
   
-  
 </head>
  
 <body>
@@ -46,57 +46,7 @@
 	<script>
 	/*global $,Raphael, TimePanel,console */
 	
-	var c = new CanvasPanel(),
-	r = c.R,
-	canvas = new TabPanel("canvas", {
-		x:0,
-		y:0,
-		width:1020,
-		height:320,
-		initSelect:"Canvas",
-		tabs:{
-			"Canvas":c
-			}
-	}),
-	
-		anim = function(prop,val,from,to,r){
-			var attr = {};
-			r = r || 1;
-			attr[prop] = val;
-			return Raphael.animation(attr, to).delay(from).repeat(r);
-		},
-		insertKeyFrame = function(el,prop,val,ms,i){
-			el.anims = el.anims||{};
-			var ii,del,a,b,temp,p =el.anims[prop] = el.anims[prop] || [];
-			//first time insert
-			if(p.length===0){
-				el.anims[prop][0] = anim(prop,val,0,ms);
-				return el.anims[prop][0];
-			}
-			//index not specified
-			if(!i){
-				i=0;
-				ii=p.length;
-				do{
-					i++;
-				}while(i<ii && p[i-1].ms<ms);
-			}
-			a = p[i-1];
-			if(a.ms===ms){
-				a.anim["100"][prop] = val;
-				return a;
-			}
-			if(a.ms<ms){
-				b = anim(prop,val,a.ms,ms);
-			} else {
-				b = anim(prop,val,a.del,ms);
-				a.del = ms;
-				i--;
-			}
-			p.splice(i,0,b);
-			return b;
-		},
-		test = function(name,func,n){
+	var test = function(name,func,n){
 			var r=0,res={name:name,total:0,avreg:0,max:0,min:0},s,e,i=0;
 			n=n||1;
 			
@@ -113,21 +63,27 @@
 			} while(i < n);
 			res.avreg = (res.total/n).round();
 			return res;
-		};
-		var rect,i,j,jj,x,att,elc = 3,ntimes=1,els=[],step=1000,attr=["x",/*"y","cx","cy","r",*/"width","height"];
-		for(var k=0;k<elc;k++){
-			rect = r.rect(20,20,100,50);
-			rect.id = "rect"+k;
-			els.push(rect);
-			for(j=0,jj = attr.length;j<jj;j++){
-				att=attr[j];
-				for(i=0;i<=2;i++){
+		},
+		insertAnimSting = function(str){
+			//TODO create a method that parses an animation string
+			for(i=0;i<=ntimes;i++){
 					x = i*step;
-					insertKeyFrame(rect,att,(20+i*130),x);
+					window.fireEvent("keyframe.insert", {el:el, prop:prop, jump:e.alt});
+					//(rect,att,(20+i*130),x);
 				}
+		},
+	c = new CanvasPanel(),
+	r = c.R,
+	canvas = new TabPanel("canvas", {
+		x:0,
+		y:0,
+		width:720,
+		height:320,
+		initSelect:"Canvas",
+		tabs:{
+			"Canvas":c
 			}
-		}
-
+	}),
 	timeline = new TabPanel("timeholder", {
 		x:0,
 		y:280,
@@ -136,16 +92,30 @@
 		tabs:{
 			"Timeline":new TimePanel(r,{imgSrc:"../img"})
 		}
-	})
+	}),
 	pp = new TabPanel("pp", {
-		x:1020,
+		x:720,
 		y:0,
-		width:280,
-		height:500,
+		width:300,
+		height:300,
 		tabs:{
 			"Properties":new PropertiesPanel({imgSrc:"../img"})
 		}
-	})
+	});
+	
+	var bool=false,i,j,jj,x,el,att,elc = 1,ntimes=4,step=1000,attr=["x"/*,"y","cx","cy","r","width","height"*/];
+		for(var k=0;k<elc;k++){
+			el = r.rect(20,20,100,50);
+			window.fireEvent("element.create", [el]);
+			for(j=0,jj = attr.length;j<jj;j++){
+				att=attr[j];
+				for(i=0;i<ntimes;i++){
+					x = i*step+250;
+					bool = !bool;
+					window.fireEvent("keyframe.insert", {el:el, prop:att, value:(20+i*130), ms:x, jump:false});
+				}
+			}
+		}
 	
 	</script>
 </div>

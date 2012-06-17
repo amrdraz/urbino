@@ -112,7 +112,6 @@ var SlidingLabel = (function (){
         input.erase("readonly");
         input.removeClass("sliding-label");
         input.removeClass("is-sliding");
-        input.getPrevious("label").addClass("sliding-label");
     },
     endWrite:function(e){
         e.stop();
@@ -122,7 +121,6 @@ var SlidingLabel = (function (){
         input.set("readonly","readonly");
         input.addClass("sliding-label");
         input.addClass("is-sliding");
-        input.getPrevious("label").removeClass("sliding-label");
     },
     /**
      * mothod for constructing label and it's associated input

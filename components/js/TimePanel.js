@@ -17,7 +17,87 @@ var TimePanel = (function(){
             console.log(ids);
         },
 
-    has = "hasOwnProperty"
+    has = "hasOwnProperty",
+     /**
+     * list of web safe fonts mapped to their font-family
+     */
+    fonts={
+        "Times New Roman":'"Times New Roman", Times, serif',
+        "Trebuchet MS":'"Trebuchet MS", Helvetica, sans-serif',
+        Georgia:'Georgia, serif',
+        "Palatino Linotype":'"Palatino Linotype","Book Antiqua", Palatino, serif',
+        Arial:'Arial, Helvetica, sans-serif',
+        "Arial Black":'Arial Black, Gadget, sans-serif',
+        "Comic Sans MS":'"Comic Sans MS", cursive, sans-serif',
+        Impact:'Impact, Charcoal, sans-serif',
+        "Lucida Sans Unicode":'"Lucida Sans Unicode", "Lucida Grande", sans-serif',
+        Tahoma:'Tahoma, Geneva, sans-serif',
+        Verdana:'Verdana, Geneva, sans-serif',
+        "Courier New":'"Courier New", Courier, monospace',
+        "Lucida Console":'"Lucida Console", Monaco, monospace'},
+        /**
+     * object containing the discription of all Raphael element attributes
+     * following the proprotiess syntax
+     * nameOfProp:{name:"nameOfProp" type:"typeOfProp" [options:[], min,max,step]}
+     *      -name corresponds to the element's proprety name
+     *      -type (string) can be ["number", "precent", "text", "textarea", "select"]
+     *      -options (array) options for select element in case type is select
+     *      -min, max, setp (number) in case type is percent or number
+     * 
+     */
+    properties = {    /* documentation taken from Rapahel-src.html */
+        x: {name:"x", "class":"prop-label",label:"x",type:"number", anim:true},                // (number)
+        y: {name:"y", "class":"prop-label",label:"y",type:"number", anim:true},                   // (number)
+        cx: {name:"cx","class":"prop-label", type:"number", anim:true},            // (number)
+        cy: {name:"cy", "class":"prop-label",type:"number", anim:true},           // (number)
+        width: {name:"width", "class":"prop-label", label:"width",type:"number", anim:true},                // (number)
+        height: {name:"height", "class":"prop-label",label:"height",type:"number", anim:true},              // (number)
+                      // r (number)
+                cr: {name:"r", "class":"prop-label",label:"radius",type:"number", anim:true},               // (number) fpr circle radius
+                r: {name:"r", "class":"prop-label",label:"radius",type:"number", anim:true},               // (number) for rect corner
+
+        rx: {name:"rx", "class":"prop-label",type:"number", anim:true},                // (number)
+        ry: {name:"ry", "class":"prop-label",type:"number", anim:true},                // (number)
+        text: {name:"text", "class":"prop-label",type:"textarea"},               // (string) contents of the text element. Use '\n' for multiline text
+        "text-anchor":{name:"text-anchor", "class":"prop-label",type:"select", options:["start","middle","end"]},        // (string) ["start", "middle", "end"], default is "middle"
+        "opacity":{name:"opacity", "class":"prop-label",type:"percent", max:100, anim:true},            // (number)
+        "fill":{name:"fill", label:"fill","class":"prop-label",width:100,wh: 10, colorRight:20, lebelRight:50,type:"color", anim:true},                // (string) colour, gradient or image
+        //"fill-opacity":{name:"fill-opacity", type:"percent"},        // (number)
+        "stroke":{name:"stroke", label:"stroke","class":"prop-label", width:100,wh: 10, colorRight:20,lebelRight:50, type:"color", anim:true},            // (string) stroke colour
+        "stroke-dasharray":{name:"stroke-dasharray", label:"dasharray","class":"",type:"select", options:["", "-", ".", "-.", "-..", ". ", "- ", "--", "- .", "--.", "--.."]},    // (string) [“”, "-", ".", "-.", "-..", ". ", "- ", "--", "- .", "--.", "--.."]
+        "stroke-linecap":{name:"stroke-linecap", label:"linecap","class":"",type:"select", options:["butt", "square", "round"]},    // (string) ["butt", "square", "round"]
+        "stroke-linejoin":{name:"stroke-linejoin", label:"linejoin","class":"",type:"select", options:["bevel", "round", "miter"]},  // (string) ["bevel", "round", "miter"]
+        //TODO "stroke-miterlimit",// (number)
+        //"stroke-opacity":{name:"stroke-opacity", type:"percent"},    // (number)
+        "stroke-width":{name:"stroke-width", "class":"prop-label",type:"number", min:1},       // (number) stroke width in pixels, default is '1'
+        path:{name:"path", "class":"prop-label",type:"text", anim:true},                // (string) SVG path string format
+        src:{name:"src", "class":"",type:"text"},                // (string) image URL, only works for @Element.image element
+        font:{name:"font", "class":"",type:"text"},                // (string)
+        "font-family":{label:"font",name:"font-family", "class":"",type:"select", options:fonts},        // (string)
+        "font-size":{name:"font-size", "class":"prop-label",type:"number", min:0, anim:true},        // (number) font size in pixels
+        "font-weight":{name:"font-weight", "class":"", type:"number", min:100, max:900, step:100, sufix:""},        // (string)
+        "href":{name:"href", "class":"", type:"text"},              // (string) URL, if specified element behaves as hyperlink
+        "target":{name:"target", "class":"", type:"select",options:["_self","_blank","_top","_parent"]},            // (string) used with href
+        "title":{name:"title", "class":"", type:"text"},            // (string) will create tooltip with a given text
+        // "transform" (string) see @Element.transform
+            "translate-x":{name:"translate-x", "class":"transform prop-label", label:"x",type:"number", anim:true},
+            "translate-y":{name:"translate-y", "class":"transform prop-label", label:"y",type:"number", anim:true},
+            "origin-x":{name:"origin-x", "class":"transform prop-label", label:"origin-x",type:"number", anim:true},
+            "origin-y":{name:"origin-y", "class":"transform prop-label", label:"origin-y",type:"number", anim:true},
+            "rotate":{name:"rotate", "class":"transform prop-label", label:"Rotate",type:"number", sufix:"°", anim:true},
+            "scale-x":{name:"scale-x", "class":"transform prop-label", label:"Scale-x",type:"percent", anim:true},
+            "scale-y":{name:"scale-y", "class":"transform prop-label", label:"Scale-y",type:"percent", anim:true},
+       // "arrow-end":{name:"arrow-end"},     // (string) arrowhead on the end of the path. The format for string is '<type>[-<width>[-<length>]]'. Possible types: 'classic', 'block', 'open', 'oval', 'diamond', 'none', width: 'wide', 'narrow', 'midium', length: 'long', 'short', 'midium'.
+            "arrow-type":{name:"arrow-type", "class":"", label:"type",type:"select", options:['none','classic', 'block', 'open', 'oval', 'diamond'] },
+            "arrow-width":{name:"arrow-width", "class":"", label:"width",type:"select", options:['midium','wide', 'narrow'] },
+            "arrow-length":{name:"arrow-length", "class":"", label:"length",type:"select", options:['midium','short', 'long'] },
+        // "clip-rect",        // (string) comma or space separated values: x, y, width and height
+            "clip-x":{name:"clip-x", "class":"", label:"Clip-x",type:"number"},
+            "clip-y":{name:"clip-y", "class":"", label:"Clip-y",type:"number"},
+            "clip-width":{name:"clip-width", "class":"", label:"Clip-w",type:"number"},
+            "clip-height":{name:"clip-height", "class":"", label:"Clip-h",type:"number"},
+        "cursor":{name:"cursor", "class":"", type:"text"}           // (string) CSS type of the cursor
+    }
     ;
     
     return new Class({
@@ -45,13 +125,21 @@ var TimePanel = (function(){
         imgSrc: "img",
         buttonAttr: {"fill":"#ddd", "stroke":"none", "cursor":"pointer"}
     },
+    
+    /**
+     * predefine list of props for SVG elements
+     */
+    elementProps: {
+        circle:["cx","cy","cr","fill","stroke","rotate","scale-x","scale-y"],
+        rect:["x","y","height","width","r","fill","stroke","rotate","scale-x","scale-y"],
+        ellipse:["cx","cy","rx","ry","fill","stroke","rotate","scale-x","scale-y"],
+        text:["x","y","font-size","fill","stroke","rotate","scale-x","scale-y"],
+        image:["x","y","width","height","fill","stroke","rotate","scale-x","scale-y"],
+        path:["translate-x","translate-y","fill","stroke","path","rotate","scale-x","scale-y"],
+        group:["translate-x","translate-y","fill","stroke","rotate","scale-x","scale-y"],
+    },
     noScroll : true,
-    playEvent : function(){this.fireEvent("timeline.play.toggle");},
-    setToStart : function(){
-                    this.setTrackerMs(0);
-                    this.slideTo(0);
-            },
-    moveToEnd : function(){ this.setTrackerMs(this.lastMs); this.slideTo(this.lastMs/this.msPerpx);},
+    
     makeZoomSlider : function(size){
         var 
         div = this.div, icon = this.icon,
@@ -78,10 +166,12 @@ var TimePanel = (function(){
     initialize: function (paper, options){        
         this.parent(options|| {});
         this.bind([
+            "seperatorMousedown",
             "hideToggle",
             "expandToggle",
             "elementCreate",
             "elementUpdate",
+            "elementUpdateEnd",
             "elementInsert",
             "elementDeselect",
             "elementSelect",
@@ -101,8 +191,8 @@ var TimePanel = (function(){
             "playEvent",
             "moveToEnd",
             "timeLaneSeek",
+            "keyframeAdd",
             "keyframeInsert",
-            "animInsert",
             "animAction",
             "animDelete"
             
@@ -117,15 +207,14 @@ var TimePanel = (function(){
         panel = this.panel.addClass("time-panel"),
         zwidth = 150,
         els = this.els = {},
-        timer,
         requestAnimation = window.requestAnimationFrame       ||
                            window.webkitRequestAnimationFrame ||
                            window.mozRequestAnimationFrame    ||
                            window.oRequestAnimationFrame      ||
                            window.msRequestAnimationFrame     ||
                            function (callback) {
-                               timer = setTimeout(callback, step);
-                           },
+                               this.timer = setTimeout(callback, step);
+                           }.bind(this),
         imgSrc= this.imgSrc = (this.options.imgSrc)+"/",
         icon = this.icon;
         this.selected={};
@@ -163,13 +252,14 @@ var TimePanel = (function(){
                 }
             }).inject(elementsArea),
         
-        seperator = div("seperator",{styles:{left:lwidth}}).inject(panel),
+        seperator = this.seperator = div("seperator",{styles:{left:lwidth}}).inject(panel),
         
         timelineArea = this.timelineArea = div("timeline-area",{styles:{left:lwidth+5,width:rwidth}}).inject(seperator,"before"),
             scrollArea = this.scrollArea = div("scroll-area").inject(timelineArea),
             slideTracker = this.slideTracker= vect("timeline-slider",icon.tracker,"T 2 0 S 1.5",{}),
+            timeLane = div("",{id:"timeLane"}),
             timelineHeader = this.timelineHeader = div("area-header").adopt(
-                div("",{id:"timeLane"}),
+                timeLane,
                 div("",{id:"labelLane"}),
                 div("header-footer",{id:"triggerLane"}),
                 div("",{id:"tracker"}).adopt(
@@ -210,7 +300,7 @@ var TimePanel = (function(){
                 //}
             }.bind(this),
             onEnd:function(val,input){
-                //TODO if there's a keyframe update it
+               // window.fireEvent("element.update.end", [val, input.get("name"), this.els[input.getParent.get("for")].el]);
             }
         }),
         colorPicker = this.colorPicker = new ColorPicker({
@@ -230,7 +320,7 @@ var TimePanel = (function(){
        
         /*-----------------------handeling general events ----------------------*/
 
-        this.timeLane = Raphael(timelineArea.getElement("#timeLane"),"100%",10);
+        this.timeLane = Raphael(timeLane,"100%",10);
         this.labelLane = Raphael(timelineArea.getElement("#labelLane"),"100%",10);
         this.triggerLane = Raphael(timelineArea.getElement("#triggerLane"),"100%",10);
         zoomSlider = this.zoomSlider = timelineFooter.getElement("#timeZoomSlider").retrieve("slider");
@@ -252,17 +342,17 @@ var TimePanel = (function(){
             "panel.scroll.update":yScroller.update.bind(yScroller)
         });
         elements.addEvents({
-            "click":this.bound.notElement,
-            "click:relay(.row)":this.bound.elementClick,
+            "click": this.notElement,
             "mousedown:relay(.eye)": this.bound.hideToggle,
             "mousedown:relay(.arrow)": this.bound.expandToggle,
-            "dblclick:relay(.name)": this.bound.changName,
-            "mousedown:relay(.key-frame img)": this.bound.keyframeInsert
+            "click:relay(.element)": this.bound.elementClick,
+            "dblclick:relay(.name)": this.bound.changeName,
+            "mousedown:relay(.key-frame img)": this.bound.keyframeAdd
         });
         timelanes.addEvents({
             "mousedown:relay(.anim)": this.bound.animAction
         });
-        seperator.addEvent("mousedown",this.seperatorMousedown);
+        seperator.addEvent("mousedown",this.bound.seperatorMousedown);
         
         textField.addEvents({
             "keydown": function (eve){
@@ -272,7 +362,7 @@ var TimePanel = (function(){
                 },
             "blur": this.bound.hideTextField
         });
-        timelineArea.getElement("#timeLane").addEvent("mousedown", this.bound.timeLaneSeek);
+        timeLane.addEvent("mousedown", this.bound.timeLaneSeek);
         timelineArea.getElement(".fit-button").addEvent("mousedown", function(e){e.stop();this.fitTo(this.lastMs);}.bind(this));
         
         //use rapahel bult in drag function to the the drag even on the tracker
@@ -296,13 +386,14 @@ var TimePanel = (function(){
             });
                     
         window.addEvents({
-            "element.create": this.bound.elementCreate,
+            "element.create": this.bound.elementInsert,
             "element.delete": this.bound.elementDelete,
             "element.deselect": this.bound.elementDeselect,
             "element.select": this.bound.elSelect,
+            "element.update.end": this.bound.elementUpdateEnd,
             "panel.element.update": this.bound.elementUpdate,
             "keydown":this.bound.animDelete,
-            "keyframe.insert":this.bound.animInsert
+            "keyframe.insert":this.bound.keyframeInsert
         });
         
         
@@ -337,6 +428,37 @@ var TimePanel = (function(){
         }).bind(this).delay(0);
         //console.log(panel);
     },
+    parse: function() {
+        //TODO
+         Object.each(anims,function(p,key,anims){
+            //add proprety label at element area
+            //s = "element[for="+el.id+"]",
+            //props = this.elements.getChild(s),
+            //timeLanes = this.timelanes.getChild(s);
+            div("prop").adopt(
+                this.createInput(properties[key]).set({"for":id,"prop":key}),
+                div("key-frame").adopt(img(imgSrc+"keyframe.gif"))
+            ).inject(props);
+            //console.log(key,p);
+            //add element at the timeline area
+            a=[];
+            p.each(function(anim){
+                a.push(this.keyframeCreate(anim));
+            }, this);
+            last = p[p.length-1];
+            div("prop",{"prop":key}).adopt(
+                a,
+                div("anim last",{styles:{
+                    width:0,
+                    left:last.ms/msPerpx
+                  }}).store("anim",last).adopt(
+                    img(imgSrc+"keyframe.gif","left start keyframe")
+                  )
+            ).store("type",key).inject(timeLanes);
+            
+            this.lastMs = this.lastMs.max(last.ms);
+        }, this);
+    },
     /**
      * function that handels sliding the seperator between the elements area and the timeline area 
      */
@@ -346,7 +468,7 @@ var TimePanel = (function(){
         mousemove = function(e){
             var
             dx = e.page.x - x,
-            width = this.elementsArea.getStyle("width").toInt() + dx;
+            width = this.elementsArea.getSize().x + dx;
             x = e.page.x;
             
             //other things that need to resize accordingly
@@ -400,44 +522,20 @@ var TimePanel = (function(){
         this.fireEvent("panel.scroll.update");
     },
     /**
-     * Creates a div element with half keyframs for its start and end points representing one anim object
-     * @param anime (obj) the raphael animation object
-     * @param color (string) hex representation of the elements color
-     * @return div (html) the div element representing the animaiton object
-     */
-    keyframeCreate : function(anim,color){
-       var div = this.div, img = this.img,  imgSrc = this.imgSrc, msPerpx = this.msPerpx,
-       d = div("anim",{styles:{
-                   width:anim.ms/msPerpx-anim.del/msPerpx,
-                   left:anim.del/msPerpx
-              }}).store("anim",anim);
-              
-              if(anim.ms!==0){
-                   d.adopt(
-                       img(imgSrc+"keyframe.gif","left keyframe"),
-                       div("body").setStyle("background-color",color),
-                       img(imgSrc+"keyframe.gif","right keyframe")
-                   );
-              } else {
-                   d.addClass("first").adopt(
-                       img(imgSrc+"keyframe.gif","right keyframe")
-                   );
-              }
-        return d;
-    },
-    /**
      * creates a new row based on a Raphael Element and asigns it an id
      * The element is added to the editors els where it is kpt track of
      * @param el (Raphael Obj) the element for this row
      * @return (div) the div representing the row
      */
+    //TODO modify this
     elementCreate : function(el){
-        el.id = (typeOf(el.id)==="number")?el.type+el.id:el.id;
         var div = this.div, img = this.img, imgSrc = this.imgSrc, msPerpx = this.msPerpx,
-        i,ii,c,p,color = Raphael.getColor(0.9),
+        color = el.color = Raphael.getColor(0.9),
+        type = el.type,
+        id = el.id = (typeOf(el.id)==="number")?type+el.id:el.id,
         anims = el.anims || {},a=[],b=[],first,last,
         props = div("props"),
-        element = div("element expanded", {"for":el.id}).adopt(
+        element = div("element expanded empty", {"for":id}).adopt(
             div("color", {styles:{
                     position:"absolute",
                     "background-color":color,
@@ -448,49 +546,96 @@ var TimePanel = (function(){
             div("header").adopt(
                 img(imgSrc+"eye.gif","eye"),
                 img(imgSrc+"light-arrow.gif","arrow"),
-                new Element("label", {"text":el.id, "class":"name"})
+                new Element("label", {"text":id, "class":"name"})
             ),
             props
         ),
         timeLanes = div("props"),
-        timeLane = div("element expanded", {"for":el.id}).adopt(
+        timeLane = div("element expanded empty", {"for":id}).adopt(
             div("header"),
             timeLanes
-        );
+        ),
+        ps={}, ts={},pr,pp;
         
-        Object.each(anims,function(p,key,anims){
+       this.elementProps[type].each(function(p){
             //add proprety label at element area
-            div("prop").adopt(
-                this.slidingLabel.initLabel(key,{value:el.attr(key),container:{"class":"prop-label","for":el.id,"prop":key}}),
-                div("key-frame").adopt(img(imgSrc+"keyframe.gif"))
-            ).inject(props);
+            //s = "element[for="+el.id+"]",
+            //props = this.elements.getChild(s),
+            //timeLanes = this.timelanes.getChild(s);
+            pp = properties[p];
+            if(pp.type === 'color'){
+                pp.value = el.attr(p);
+            }  
+            pr = this.createInput(pp).set({"for":id,"prop":p}).store("for",id).store("prop",p);
+            ps[p] = (pr);
+            div("prop empty").adopt(
+                    pr,
+                    div("key-frame").adopt(img(imgSrc+"keyframe.gif").store("for",id).store("prop",p))
+                ).inject(props);
             //console.log(key,p);
             //add element at the timeline area
-            a=[];
-            p.each(function(anim){
-                a.push(this.keyframeCreate(anim,color));
-            }, this);
-            last = p[p.length-1];
-            div("prop",{"prop":key}).adopt(
-                a,
-                div("anim last",{styles:{
-                    width:0,
-                    left:last.ms/msPerpx
-                  }}).store("anim",last).adopt(
-                    img(imgSrc+"keyframe.gif","left start keyframe")
-                  )
-            ).store("type",key).inject(timeLanes);
-            
-            this.lastMs = this.lastMs.max(last.ms);
+            ts[p] = (div("prop empty",{"prop":p}).store("for",id).store("prop",p).inject(timeLanes));
         }, this);
               
-        return {color:color,el:el, element:element,timeline:timeLane, anims:anims, maxMs:a.ms};
+        return {color:color,el:el, element:element, eProps:ps, timeline:timeLane,  tProps:ts, maxMs:a.ms};
     },
+    /**
+     * inserts a new element into the elements panel
+     * @param el (Raphael Obj) the element for this row
+     */
+    elementInsert : function(el){
+        var obj = this.elementCreate(el);
+        this.els[el.id] = obj;
+        obj.element.inject(this.elements,"top");
+        obj.timeline.inject(this.timelanes, "top")
+        //console.log(this.els);
+    },
+    /**
+     * updates the properties in the elements area according to the passed element's property
+     * then send a updte to the other panels if the element is selected
+     */
     elementUpdate: function(el){
-        $$(".prop-label[for="+el.id+"] input").each(function(i){
-            i.set("value", el.attr(i.get("name")).round());
-        });
+        var id = el.id;
+        //console.log(this.els[id].element);
+        Object.each(this.els[id].eProps, function(p, prop){
+            if(!el.attr(prop)) return;
             
+            if(p.hasClass("color")){
+                this.colorPicker.setColor(p.getLast().retrieve("vec"), el.attr(prop));
+                return;
+            }
+            if(p.hasClass("transform")){
+                return;
+            }
+            //console.log(p, prop, el.attr(prop));
+            p.getLast('input').set("value", el.attr(prop).toInt());
+            
+        }, this);
+        if(this.selected[id]){
+            window.fireEvent("panel.update", el.attr());
+        }
+    },
+    /**
+     * updates the keyframe of the elent with the elements's attribute new value 
+     */
+    elementUpdateEnd : function(val, prop, el) {
+        console.log("hey");
+        var p = el.anims[prop], ms = this.trackerMs;
+        if(ms<p[0].del) {
+            p[0].anim[100][prop] = val;
+            return;
+        }
+        if(p[p.length-1].ms<ms){
+            p[p.length-1].anim[100][prop] = val;
+            return;
+        }
+        p.some(function(a,i){
+            if(a.del<ms && a.ms>ms){
+               p[i-1].anim[100][prop] = val;
+               return true;
+            }
+            return false;
+        });  
     },
     /*-----------------------------------TimeLane------------------------------------------*/
    /**
@@ -557,26 +702,45 @@ var TimePanel = (function(){
         this.xScroller.update();
     },
     /**
-     * updates an element to a certain instance within the anims applied to it
+     * updates an element's attributes that are animating to match the trackers position in the timeline
      * then fires an update event for the panels
      * @param el (obj) Raphael object
      * @param ms (number) milliseconds 
      */
     seekTo : function (el, ms){
-        el.anims = el.anims||{};
+        var a;
         Object.each(el.anims,function(p,k){
-            //(function(){
+            if(p.length===0){
+                return;
+            }
+            a = p[0];
+            if(ms<=a.del) {//before first frame
+                el.attr(k,a.anim[100][k]);
+                return;
+            }
+            a=p[p.length-1];
+            if(a.ms<=ms){//after last frame (optimization)
+                el.attr(k,a.anim[100][k]);
+                return;
+            }
+            if(a.del<ms && a.ms>ms){//last frame (optimization)
+                el.attr(k,p[p.length-2].anim[100][k]);
+                el.status(a,(ms-a.del)/(a.ms-a.del));
+                return;
+            }
             p.some(function(a,i){
-                //console.log(a.del,a.ms,ms,a.del<ms, a.ms>ms,(a.ms>ms));
+                
+                if(a.jump && p[i+1] && p[i+1].jump){
+                   el.attr(k,p[a.del>ms?i-1:i].anim[100][k]);
+                   return true;
+                }
                 if(a.del<ms && a.ms>ms){
                     el.attr(k,p[i-1].anim[100][k]);
-                    
                     el.status(a,(ms-a.del)/(a.ms-a.del));
-                    //console.log(a,ms,((ms-a.del)/(a.ms-a.del)),k,"from",p[i-1].anim[100][k],"to",el.attr(k));
                     return true;
                 }
                 var n = p[i+1];
-                if(a.ms<ms && (!n || n&&ms<n.del )){
+                if(a.ms<ms && (!n || n && ms<n.del )){
                     el.attr(k,p[i].anim[100][k]);
                     return true;
                 }
@@ -594,15 +758,15 @@ var TimePanel = (function(){
         var tracker = this.tracker;
         
         tracker.setStyle("left", pos);
-        trackerMs = this.trackerMs= ((pos)*this.msPerpx).round();
+        var trackerMs = this.trackerMs= ((pos)*this.msPerpx).round();
         
         //console.log("pos*ms/px ",pos,msPerpx," = ", trackerMs);
         
         this.tracker.getLast().set("text", this.msToString(trackerMs));
         
-        Object.each(this.els,function(el){
+        Object.each(this.els,function(elm){
             //(function(){
-                this.seekTo(el.el,trackerMs);
+                this.seekTo(elm.el,trackerMs);
             //}).delay(0);
         }, this);
     },
@@ -625,15 +789,14 @@ var TimePanel = (function(){
      * sets last MS to the latest (as in last in tmie) anims end time 
      */
     setLastMs : function(){
-        var lastMs = 0;
-        Object.each(this.els,function(el){
-            //(function(){
-            Object.each(el.anims,function(p){
-                lastMs = lastMs.max(p[p.length-1].ms);
+        var ms = 0
+        Object.each(this.els,function(elm){
+            
+            Object.each(elm.el.anims,function(p){
+                ms = ms.max(p[p.length-1].ms);
             });
-            //}).delay(0);
         });
-        this.lastMs= lastMs;
+        this.lastMs = ms;
     },
     /*----------------------- timeline zoom ----------------------*/
    /**
@@ -682,7 +845,7 @@ var TimePanel = (function(){
         $$(".anim").each(function(el){
             var obj = el.retrieve('anim'),del = obj.del,dur = obj.ms-del;
             if(el.hasClass("first")){
-                el.setStyle("left",el.getNext().retrieve('anim').del/msPerpx);
+                el.setStyle("left",el.retrieve('anim').del/msPerpx);
                 return;
             }
             if(el.hasClass("last")){
@@ -731,8 +894,11 @@ var TimePanel = (function(){
      */
      timelineStop : function(){        
         this.play=false;
-        clearTimeout(timer);
+        clearTimeout(this.timer);
         this.playButton.attr("path",this.icon.play);
+        Object.each(this.els, function(elm){
+            window.fireEvent("panel.element.update",[elm.el]);
+        }, this)
     },
      /**
      * preview the timeline by moving  the tracker
@@ -753,7 +919,7 @@ var TimePanel = (function(){
         //console.log("play", duration,pow,step);
         this.playButton.attr("path",this.icon.stop);
         this.play=true;
-        timer = (function(){
+        this.timer = (function(){
             if(ms>=lastMs){
                 this.timelineStop();
                 this.setTrackerMs(lastMs);
@@ -774,13 +940,19 @@ var TimePanel = (function(){
             this.timelinePlay();
         }
     },
+    playEvent : function(){this.fireEvent("timeline.play.toggle");},
+    setToStart : function(){
+                    this.setTrackerMs(0);
+                    this.slideTo(0);
+            },
+    moveToEnd : function(){ this.setTrackerMs(this.lastMs); this.slideTo(this.lastMs/this.msPerpx);},
     /**
      * When a user clicks on a part of the timelane the tracker will seek to that position
      */
     timeLaneSeek : function (e){
         if(this.play){this.timelineStop();}
-        var pos = (e.page.x-e.target.getPosition().x).max(0);
-        this.setTracker(pos);
+        var t = e.target.id=="timeLane"?e.target:e.target.getParent('#timeLane');
+        this.setTracker((e.page.x-t.getPosition().x).max(0));
     },
     /*-------------------------------- anim and keyframe manipulation -----------------*/
    /**
@@ -813,11 +985,44 @@ var TimePanel = (function(){
      * @param r (number) number of times to repleat
      * @return anim (obj) animation object
      */
-    animCreate : function(prop,val,from,to,r){
-        var attr = {};
-        r = r || 1;
-        attr[prop] = val;
-        return Raphael.animation(attr, to).delay(from).repeat(r);
+    animCreate : function(o){
+        var attr = {}, a;
+        attr[o.prop] = o.val;
+        if (o.jump){
+            o.del = o.ms
+        }
+        a = Raphael.animation(attr, o.ms).delay(o.del).repeat(o.r || 1);
+        a.jump = o.jump;
+        return a;
+    },
+    
+    /**
+     * Creates a div element with half keyframs for its start and end points representing one anim object
+     * @param anime (obj) the raphael animation object
+     * @param color (string) hex representation of the elements color
+     * @return div (html) the div element representing the animaiton object
+     */
+    keyframeCreate : function(anim,color){
+        var
+        div = this.div, img = this.img,  imgSrc = this.imgSrc, msPerpx = this.msPerpx,
+        d = div("anim",{styles:{
+               width:anim.ms/msPerpx-anim.del/msPerpx,
+               left:anim.del/msPerpx
+        }}).store("anim",anim);
+              
+        if(anim.jump){
+            d.addClass("jump").adopt(
+                img(imgSrc+"keyframe.gif","right full keyframe")
+           );
+        } else {
+           d.adopt(
+               img(imgSrc+"keyframe.gif","left keyframe"),
+               div("body").setStyle("background-color",color),
+               img(imgSrc+"keyframe.gif","right keyframe")
+           );
+        }
+        anim.div =  d;
+        return d;
     },
     /**
      * inserts a new keyframe to the timeline
@@ -827,168 +1032,215 @@ var TimePanel = (function(){
      * @param ms (number)[optional] where to add new keyframe
      * @return the element the keyframe was added to
      */
-    animInsert : function(el,prop, val, ms){
-        if(!el || !prop){throw new Error("missing arguments");}
-        el.anims = el.anims||{};
-        var els = this.els, animCreate = this.animCreate.bind(this), keyframeCreate = this.keyframeCreate.bind(this),
-        i,ii,del,a,b,temp,p =el.anims[prop] = el.anims[prop] || [],
-        color,
-        lane,anims,first,firstMs,last, lastMS;
-        val = val || el.attr(prop);
-        ms = ms || this.trackerMs;
+    keyframeInsert : function(obj){
+        if(!obj.el || !obj.prop){throw new Error("missing arguments");}
+        var
+        el = obj.el, prop = obj.prop, val = obj.value || el.attr(prop),
+        ms = obj.ms || this.trackerMs, jump = obj.jump, del = obj.del || ms,
+        els = this.els, elm = els[el.id], animCreate = this.animCreate.bind(this), keyframeCreate = this.keyframeCreate.bind(this),
+        anims = el.anims = el.anims||{}, p = anims[prop] = anims[prop] || [], color = el.color,
+        i,a,b,temp
+        ;
         //first time insert
         if(p.length===0){
-            console.log(p);
-            a = el.anims[prop][0] = animCreate(prop,el.attr(prop),0,0);
-            if(Object.getLength(el.anims)==1){
-                console.log(el);
-                els[el.id] = this.elementCreate(el);
-            } else {
-                lane.adopt(
-                    keyframeCreate(a, els[el.id].color)
-                        .setStyle("left",ms/msPerpx),
-                    div("anim last",{styles:{
-                        width:0,
-                        left:ms/msPerpx
-                    }}).store("anim",a).adopt(
-                        img(this.imgSrc+"keyframe.gif","left start keyframe")
-                    )
-                );
-                
-            }
+            a = anims[prop][0] = animCreate({prop:prop,val:val, ms:ms, jump:true});
+            elm.tProps[prop].removeClass("empty").grab(keyframeCreate(a, color));
+            $$(
+            elm.eProps[prop].getParent(),
+            elm.element,
+            elm.timeline
+            ).removeClass("empty");
+            
+            this.lastMs = this.lastMs.max(a.ms);
             return el;
 
         }
-        console.log(el);
-        color = els[el.id].color;
-        lane = els[el.id].timeline.getElement(".prop[prop="+prop+"]");
-        anims = lane.getChildren();
         //index not specified
-        if(!i){
-            i=0;
-            ii=p.length;
-            do{
-                i++;
-            }while(i<ii && p[i-1].ms<=ms);
+        i=p.length;
+        //find out the position the keyframe will be instered in p
+        if(p[i-1].ms>ms){//<-- if true insert last
+            //while ms is after keyframe
+            while(i!==0 && p[--i].ms>=ms);
+            if(p[i].ms==ms){//<-- in case ms is exactly on top of a keyframe we are done
+                return el;
+            }
+            !(i===0 && p[i].del>ms) && i++; //++ except if insert first
         }
-        //console.log(i);
-        if(p[i-1].ms>=ms){
-            i--;
-        }
-        a = p[i-1];
-        b=p[i];
-        if(a.ms===ms ||( b && b.del===ms)){
-            return el;
-        }
-        if(i==1){
-            if(anims.length===2){// case |[------].....
-                first = anims[0];
-                firstMs = (first.getPosition(scrollArea).x*msPerpx).round();
-                last = anims[i];
-                lastMS = (last.getPosition(scrollArea).x*msPerpx).round();
-                if(firstMs >trackerMs){
-                    a = animCreate(prop,val,ms,firstMs);
-                    first.setStyle("left",ms/msPerpx);
-                    last.setStyle("left",firstMs/msPerpx);
-                    keyframeCreate(a,color).inject(first,"after");
-                } else{// case []  |
-                    a = animCreate(prop,val,lastMS,ms);
-                    first.setStyle("left",lastMS/msPerpx);
-                    last.setStyle("left",ms/msPerpx);
-                    keyframeCreate(a,color).inject(last,"before");
+        
+        
+        b = p[i];
+        temp = p[i-1];
+        //console.log(i, p, temp, b);
+        if(jump){ //t---x---b.....
+            a = animCreate({prop:prop,val:val, ms:ms, jump:true});
+            k = keyframeCreate(a, color);
+            if(b){ //t---a---b.....
+                if(b.jump){ //case t....|...x
+                    b.div.grab(k, 'before');
+                } else { //t--|---].....
+                    if(temp.ms!==b.del  && ms<b.del){// case [--t---] | [---b---]
+                        temp.div.addClass('end').grab(k, 'after'); //insert
+                        p.splice(i++,0,a);
+                        a = animCreate({prop:prop,val:temp.anim[100][prop], ms:b.del, jump:true});
+                        b.div.grab(keyframeCreate(a,color).addClass('start'), 'before');
+                    } else { // case  x--|---]... or ...][--|-b---] or ..]  [--|-b---]
+                        a.div.addClass('start');
+                        if(temp.jump){
+                           temp.div.removeClass('start');
+                        } else {
+                            temp.div.addClass('end')
+                        }
+                        b.del = ms;
+                        b.div.setStyles({
+                            "left":ms/msPerpx,
+                            "width":(b.ms-ms)/msPerpx
+                        }).grab(k, 'before');
+                    }
                 }
-            } else { //[--a--|-].....
-                a = animCreate(prop,val,b.del,ms);
-                b.del = ms;
-                last=anims[i];
-                last.setStyles({
-                    "left":ms/msPerpx,
-                    "width":(b.ms-ms)/msPerpx
-                });
-                keyframeCreate(a,color).inject(last,"before");
+            } else {// case ...t |
+                temp.div.grab(k, 'after');
+                this.lastMs = this.lastMs.max(a.ms);
             }
-            p.splice(i,0,a);
-            return el;
-
-        }
-        if(b){
-            if(a.ms!==b.del){// case [--a---] | [---b---]
-                temp = animCreate(prop,val,a.ms,ms);
-                keyframeCreate(temp,color).inject(anims[i-1],"after");
-                p.splice(i,0,temp);
-                temp = animCreate(prop,a.anim[100][prop],ms,b.del);
-                keyframeCreate(temp,color).inject(anims[i],"before");
-                p.splice(i+1,0,temp);
-            } else { // case [--a---][--|-b---]or [--a---]  [--|-b---] 
-                console.log(a,b);
-                temp = animCreate(prop,val,b.del,ms);
-                b.del = ms;
-                last = anims[i];
-                last.setStyles({
-                    "left":ms/msPerpx,
-                    "width":(b.ms-ms)/msPerpx
-                });
-                keyframeCreate(temp,color).inject(last,"before");
-                p.splice(i,0,temp);
+        } else { // t--]---b.....
+            if(b){
+                if(temp){
+                    if(b.jump){  //t--]...x.....
+                        a = animCreate({prop:prop,val:val,ms:ms,del:temp.ms});
+                        if(temp.jump){ //x-----].....x
+                            temp.div.addClass('start');
+                        } else { //[-----].....x
+                            temp.div.removeClass('end');
+                        }
+                        temp.div.grab(keyframeCreate(a,color).addClass('end'), 'after');
+                    } else { //t--]---].....
+                        if(temp.ms!==b.del && ms<b.del){// case [--t---] | [---b---]
+                                a = animCreate({prop:prop,val:val,ms:ms,del:temp.ms});
+                                temp.div.grab(keyframeCreate(a,color), 'after');
+                                p.splice(i++,0,a);
+                                a = animCreate({prop:prop,val:temp.anim[100][prop],ms:b.del,del:ms});
+                                b.div.grab(keyframeCreate(a,color), 'before');                            
+                        } else { // case x-----]-----] or ...][--|-b---] or ...]  [--|-b---]
+                            a = animCreate({prop:prop,val:val,ms:ms,del:temp.ms});
+                            b.del = ms;
+                            b.div.setStyles({
+                                "left":ms/msPerpx,
+                                "width":(b.ms-ms)/msPerpx
+                            }).grab(keyframeCreate(a,color), 'before');
+                        }
+                    }
+                } else { //  case | b------]..... inserting a transition before a jump first
+                    console.log(b);
+                    a = animCreate({prop:prop,val:b.anim[100][prop],ms:b.ms,del:ms}); //a transition with the jumps positon and value
+                    b.del = b.ms = ms;b.anim[100][prop] = val; // have the jump take the new position and value so that it remains first
+                    b.div.addClass('start').setStyle("left", ms/msPerpx) //shift the jump keyframe to the new position
+                    // case this is the second insert add class end
+                    .grab(keyframeCreate(a,color).addClass((p.length===1)?'end':''), 'after'); //add the transition
+                    i++;
+                }
+            } else{// case ...t |
+                a = animCreate({prop:prop,val:val,ms:ms,del:temp.ms});
+                if(temp.jump){ //x-----].....
+                    temp.div.addClass('start');
+                } else { //[-----].....
+                    temp.div.removeClass('end');
+                }
+                temp.div.grab(keyframeCreate(a,color).addClass('end'), 'after');
+                this.lastMs = this.lastMs.max(a.ms);
             }
-        } else {// case ...[--b--] |
-            b = animCreate(prop,val,a.ms,ms);
-            last = anims[i];
-            last.setStyle("left",ms/msPerpx);
-            keyframeCreate(b,color).inject(last,"before");
-            console.log(b);
-            p.splice(i,0,b);
-            this.lastMs = this.lastMs.max(b.ms);
-        }
+            
+        } 
+        p.splice(i,0,a); 
         return el;
+
     },
-    keyframeInsert : function(e){
-        var target = e.target,
-        el = this.els[target.getParent(".element").get("for")].el,
-        prop = target.getParent().getPrevious().get("prop");
-        window.fireEvent("keyframe.insert", [el, prop]);
+    /**
+     *ths function is fired when the add keyframe icon is pressed 
+     */
+    keyframeAdd : function(e){
+        var t = e.target;
+        window.fireEvent("keyframe.insert", {el:this.els[t.retrieve("for")].el, prop:t.retrieve("prop"), jump:e.alt});
+    },
+    keyframeDelete :  function(anim){
+        var
+        el = anim.div, msPerpx = this.msPerpx,
+        prop = el.getParent().retrieve('prop'),
+        elm = this.els[el.getParent().retrieve('for')],
+        anims = elm.el.anims[prop],
+        i = anims.indexOf(anim),
+        prev = anims[i-1],
+        next = anims[i+1]
+        ;
+        
+        if(anim.jump){
+            if(anim.div.hasClass('start')){  // ( x )-------]
+                anim.del = anime.ms = next.ms;
+                anim.anim[100][prop] = next.anim[100][prop];
+                anim.div.setStyle('left', next.del);
+                i++;
+                el = next.div;
+                el.hasClass('end') && anim.removeClass('start');
+            }
+        } else {
+            if (el.hasClass('end')){
+                if(prev.div.hasClass('start')){
+                    prev.div.removeClass('start');
+                } else {
+                    prev.div.addClass('end');
+                }
+            } else {
+                if(anim.ms === next.del){
+                    if(prev.div.hasClass('start')){
+                        prev.ms = prev.del = next.del;
+                        prev.div.setStyle('left', next.del);
+                    } else {
+                        next.del = prev.ms;
+                        next.div.setStyles({
+                           width:(next.ms-next.del)/msPerpx,
+                           left:next.del/msPerpx 
+                        });
+                    }
+                } else {
+                    (prev.div.hasClass('start')) && prev.div.removeClass('start')
+                }
+            }
+            
+        }
+        anims.splice(i,1);
+        el.destroy();
+        if(anims.length===0){
+            $$(elm.tProps[prop],elm.eProps[prop].getParent()).addClass('empty');
+            if(Object.every(elm.tProps,function(p){return p.hasClass('empty');})){
+                $$(elm.element,elm.timeline).addClass("empty");
+            }
+        }
     },
     animDelete : function(e){
+        return; //not working
         if(!e || (e && e.key==="delete")){
 
-        $$(".selected !> .anim:not(.last,.first)").each(function(el){
+        $$(".selected !> .anim").each(function(el){
+            console.log("yo");
             var
             els = this.els,
-            type = el.getParent().retrieve("type"),
+            prop = el.getParent().retrieve("prop"),
             next = el.getNext(),
-            isLast = next.hasClass("last"),
+            isLast = next && next.hasClass("end"),
             prev = el.getPrevious(),
-            isFirst = prev.hasClass("first"),
-            elm = els[el.getParent(".element").get("for")],
+            isFirst = prev && prev.hasClass("start"),
+            elm = els[el.getParent().retrieve("for")],
             anim = el.retrieve("anim"),
-            anims = elm.el.anims[type],
+            anims = elm.el.anims[prop],
             i = anims.indexOf(anim)
             ;
             
             if(~i){
-                if(isFirst){
-                    prev.setStyle("left",next.getStyle("left"));
-                }
-                if(isLast){
-                    next.setStyle("left",prev.getCoordinates(scrollArea).right);
-                    next.retrieve("anim",prev.retrieve("anim"));
-                }
                 anims.splice(i,1);
                 el.eliminate("anim");
                 el.destroy();
                 
-                if(anims.length===1){
-                    delete elm.el.anims[type];
-                    
-                    prev.getParent().eliminate("type");
-                    prev.getParent().destroy();
-                    elm.element.getElement(".prop-label[prop="+type+"]").getParent().destroy();
-                    
-                    if(!Object.getLength(elm.anims)){
-                        elm.element.destroy();
-                        elm.timeline.destroy();
-                        delete els[elm.el.id];
-                    }
+                if(anims.length===0){
+                    elm.tProps[prop].addClass('empty');
+                    elm.eProps[prop].addClass('empty');
                 }
             }
             this.animDeselctAll();
@@ -998,7 +1250,7 @@ var TimePanel = (function(){
                 return false;
             });
             */
-        });
+        }, this);
         }
     },
     /**
@@ -1011,44 +1263,45 @@ var TimePanel = (function(){
         //}
         
         var
-        els = this.els,
+        els = this.els, msPerpx = this.msPerpx, trackerMs = this.trackerMs,
         x = e.page.x.toInt(),
-        target = e.target,
-        isKey = target.hasClass("keyframe"),
-        el = target.getParent(),
-        id = el.getParent(".element").get("for"),
-        type = el.getParent().retrieve("type"),
+        target = e.target,                              //the part of te keyframe that was pressed on
+        isKey = target.hasClass("keyframe"),            //if it was on an anim body, this is false
+        el = target.getParent(),                        //the container of the keyframe
+        id = el.getParent().retrieve("for"),            //get the id
+        prop = el.getParent().retrieve("prop"),         //the property
         elm = els[id].el,
-        anim = el.retrieve("anim"),
-        dur = (anim.ms-anim.del),
-        prev = el.getPrevious(),
-        prevAnim = prev && prev.retrieve("anim"),
-        prevVal = prevAnim.anim[100][type],
-        next = el.getNext(),
+        anim = el.retrieve("anim"),                     //get the anim object represented by this el
+        dur = (anim.ms-anim.del),                       //find out duration
+        prev = el.getPrevious(),                        //get prevous anime div
+        prevAnim = prev && prev.retrieve("anim"),       //get previous anim
+        prevVal = (prev?prevAnim:anim).anim[100][prop], //get its value
+        next = el.getNext(),                            //same for next
         nextAnim = next && el.getNext().retrieve("anim"),
-        isFirst = prev.hasClass("first"),
-        min = prevAnim && prevAnim.ms,
-        isLast = next.hasClass("last"),
-        max = isLast?Number.MAX_VALUE:(nextAnim && nextAnim.del-dur),
-        isNext, isLeft,
+        isFirst = prev && prev.hasClass("start"),       //this anim is the start of a series of transitions
+        isLast = el.hasClass("end"),                    //this anim is the end of a series of transitions
+        min = isFirst?0:(prev?prevAnim.ms:0),           //get min and mx distance 
+        max = next?(nextAnim.del-dur):Number.MAX_VALUE, //get max ms the anim can shift
+        isLeft = target.hasClass("left"),
+        isNext,
         mousemove = function(e){
             var
-            msPerpx = this.msPerpx, trackerMs = this.trackerMs,
+            
             dms = (e.page.x - x)*msPerpx,
             del = (anim.del + dms).limit(min,max);
             x = e.page.x;
             
-            if(!isKey){
+            if(!isKey){ //hit the anim body
                 el.setStyle("left",del/msPerpx);
-                
-                if(isLast){next.setStyle("left",(del+dur)/msPerpx);}
-                if(isFirst){prev.setStyle("left",(del)/msPerpx);}
-                
+                if(isFirst){
+                    prev.setStyle("left",(del)/msPerpx);
+                    prevAnim.ms = prevAnim.del = del.round();
+                }
                 
                 anim.del = del = del.round();
                 anim.ms = del+dur;
             } else {
-                if(isLeft){
+                if(isLeft){                     // ....( [ )---------]
                     //hit the right side of the keyframe(start of anim segment)
                     dur=anim.ms-del;
                     el.setStyles({
@@ -1057,82 +1310,106 @@ var TimePanel = (function(){
                     });
                     anim.del = del.round();
                     
-                    if(isFirst){
-                       prev.setStyle("left",del/msPerpx);
-                    }else if(isNext){
-                       prev.setStyle("width",(del-prevAnim.del)/msPerpx);
-                       prevAnim.ms = del.round();
-                    }
-                    
-                } else {
-                    //hit the left side of the keyframe(end of anim segment)
-                    dur = (dur+dms).limit(min,max-anim.del);
-                    //console.log(dur);
-                    del = (anim.del+dur);
-                    if(del>=min && del<=max){
-                        el.setStyle("width",dur/msPerpx);
-                        anim.ms = del.round();
-                        
-                        if(isLast){
-                            next.setStyle("left",del/msPerpx);
-                        } else if(isNext){
-                            nextAnim.del = anim.ms;
-                            
-                            next.setStyles({
-                                "left":del/msPerpx,
-                                "width":(nextAnim.ms-del)/msPerpx
-                            });
+                    if(isNext){
+                        prevAnim.ms = anim.del;
+                        if(isFirst){                    // ...x( [ )---------]
+                            prev.setStyle("left",(del)/msPerpx);
+                            prevAnim.del = prevAnim.ms;
+                        } else {                        // ...]( [ )---------]
+                            prev.setStyle("width",(del-prevAnim.del)/msPerpx);
                         }
                     }
+                    
+                } else {                     // ....[---------( ] ) or .. (x)...
+                    //hit the left side of the keyframe(end of anim segment) or a jump
+                    if(anim.jump){              // ...(x)..........
+                        anim.del = anim.ms = del.round();
+                        el.setStyle("left",del/msPerpx);
+                    } else{                     // ....[---------( ] )
+                        del = (anim.ms+dms).limit(min,max);//for next anim
+                        dur = (del-anim.del);
+                        el.setStyle("width",dur/msPerpx);
+                        anim.ms = del.round()
+                    }
+                    if(isNext){         // ....[-----( ] )[---]... or ....x( [ )----]...
+                        nextAnim.del = anim.ms;
+                        next.setStyles({
+                            "left":del/msPerpx,
+                            "width":(nextAnim.ms-del)/msPerpx
+                        });
+                    }
+                
+                    
                 }
             }
             
             if(trackerMs>=min && trackerMs<=max){
-                elm.attr(type,prevVal);
+                elm.attr(prop,prevVal);
                 elm.status(anim,(trackerMs-del)/(anim.ms-del));
                 window.fireEvent("panel.element.update",[elm]);
             }
-            
-            this.fireEvent("timeline.lastMs");
+            (!next) && this.fireEvent("timeline.lastMs");
         }.bind(this),
         mouseup = function(){
             
             window.removeEvent("mousemove",mousemove);
             window.removeEvent("mouseup",mouseup);
-            $$("input,form,button,textarea,select").removeClass("is-sliding");
+            //$$("input,form,button,textarea,select").removeClass("is-sliding");
             if(isKey){document.body.style.cursor = "default";}
             document.onselectstart = function() {return true;};
-        }.bind(this)
+        }.bind(this),
+        pPrev = prev &&  prev.getPrevious(),
+        pPrevMs = pPrev &&  pPrev.retrieve('anim').ms
         ;
-        
+        //delete
+        if(e.shift){
+            if(!isKey){      // ...(---------)]
+                this.keyframeDelete(anim);
+            } else {         // ---(][)--- or --(]) or ..x]  or   ...(x)... 
+                if(isLeft){ // ---]( [ )--- or ---]  ( [ )---
+                    this.keyframeDelete((prevAnim.ms === anim.del)?prevAnim:anim, true);
+                } else { // ---(])[--- or --(]) or ..x]  or   ...(x)... 
+                    if(next && (nextAnim.del === anim.ms)){   //  ---(])[--- or x---]
+                        this.keyframeDelete(anim, (nextAnim.del === anim.ms));    
+                    } else { //---] [---]  or   ...(x)... ot -----(])...
+                        this.keyframeDelete(anim);
+                    }
+                }
+            }
+            return;
+        }
+            
         if(!isKey){
             this.animSelect(el,isLast);
-            isFirst && this.animSelect(prev);
-            isLast && this.animSelect(next);
+            if(isFirst){                                        // ...(x---------])
+                this.animSelect(prev); //if the start of a transition select the jump key
+                min = pPrev?pPrevMs:0;
+            }
+            //isLast && this.animSelect(next);
         } else{
-            isLeft = target.hasClass("left");
             target.addClass("selected");
-            if(isLeft){
+            if(isLeft){                                             // ...]( [ )---------]
                 isNext = prevAnim.ms === anim.del;
-                if(isNext){
-                    prev.getLast().addClass("selected");
-                    min = (!isFirst &&  prev)? prevAnim.del:0;
-                } else {
-                    min = (!isFirst &&  prev)? prevAnim.ms:0;
-                }
+                isNext &&  prev.getLast().addClass("selected");
+                min = isFirst?(pPrev?pPrevMs:0):(isNext?prevAnim.del:min);
                 max = anim.ms;
-            } else {
+            } else {                                                // ....[---------( ] ) or .. (x)...
                 //hit the left side of the keyframe(end of anim segment)
-                isNext = nextAnim.del === anim.ms ;
-                if(isNext){
-                    next.getFirst().addClass("selected");
-                    max = (!isLast &&  next)?nextAnim.ms:Number.MAX_VALUE;
-                } else {
-                    max = (!isLast &&  next)?nextAnim.del:Number.MAX_VALUE;
+                if(next){
+                    isNext = nextAnim.del === anim.ms ;
+                    if(isNext){       // ...(x)[-----] or ....[----( ] )..[
+                        next.getFirst().addClass("selected");
+                        max = nextAnim.ms;
+                    }else {
+                        max = nextAnim.del;                             // ....[----( ] )..[]
+                    }
+                } 
+                if(!anim.jump){
+                    min = anim.del;
                 }
             }
         }
-        //console.log(min,max);
+        console.log(min,max);
         
         $$("input,form,button,textarea,select").addClass("is-sliding");
         if(isKey){document.body.style.cursor = "w-resize";}

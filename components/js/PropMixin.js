@@ -103,9 +103,12 @@ var PropMixin = new Class({
                         stroke:(p.name==="stroke"),
                         initColor:p.value,
                         label:p.label,
+                        lebelRight:p.lebelRight || '',
+                        colorRight:p.colorRight,
                         x:p.x,
                         y:p.y,
-                        width:p.width||50
+                        width:p.width||50,
+                        wh:p.wh
                     } );
                 break;
             case "textarea":

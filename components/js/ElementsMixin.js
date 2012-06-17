@@ -173,7 +173,6 @@ var ElementsMixin = new Class({
      * @param id (string) the element id in the elements panel
      */
     elementSelect : function (id){
-        console.log(this.els);
         var els = this.els, sel = this.selected;
         if(id && els[id] && !sel[id]){
             sel[id] = els[id];

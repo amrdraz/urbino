@@ -492,7 +492,6 @@ var ColorPicker = (function(){
                 width:wh,
                 height:wh
                 }}).set(o.container || {});
-                
             if(o.label){
                 div.setStyle("width",wh+o.width+5);
                 (new Element("label",{
@@ -501,7 +500,7 @@ var ColorPicker = (function(){
                     styles:{
                         position:"absolute",
                         top:0,
-                        right:wh+5,
+                        right: o.lebelRight || wh+5,
                         "text-align":"right"
                     }
                 })).inject(div);
@@ -510,7 +509,7 @@ var ColorPicker = (function(){
             var vec = (vect({"class":"cd-colorpicker", "for":name,
                 styles:{
                     position:"absolute",
-                    right:0,
+                    right: o.colorRight||0,
                     top:0,
                     height:wh,
                     width:wh
