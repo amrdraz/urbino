@@ -51,7 +51,11 @@ Raphael.el.getOffset = Raphael.st.getOffset = function(){
   */
 Raphael.el.trans =Raphael.st.trans = function(tr,val) {
     //console.log(this);
-    var el = this, bb, ft = el.ft, at = ft.attrs, is = Raphael.is, offx,offy, bb = el.getBBox(), m =el.matrix.split();
+    //if(this.type==="path" && !el.ft ) return;
+    var el = this, bb, ft = el.ft, at = ft.attrs, is = Raphael.is, offx,offy, bb = el.getBBox(), m;
+     if((el.type==="set"?el[0]:el).matrix){
+         m = (el.type==="set"?el[0]:el).matrix.split()
+     }
     if(!tr){
         return Object.append(el.attr(), el.trans(['tx','ty','sx','sy','rotate', 'bwidth', 'bheight']));;
     } else {
@@ -89,20 +93,6 @@ Raphael.el.trans =Raphael.st.trans = function(tr,val) {
                 //at.translate.y += val/2;
                 at.scale.y = val/at.size.y;
                 //el.attr({height:at.size.y, y:at.y});
-                break;
-             case 'r':
-                if(el.type!=='rect'){
-                    at.size.y = at.size.x = at.size.x + val*2 - at.size.x;
-                }
-                el.attr({r:val});
-                break;
-            case 'rx':
-                at.size.x += val*2 - at.size.x;
-                el.attr({rx:val});
-                break;
-            case 'ry':
-                at.size.y += val*2 - at.size.y;
-                el.attr({ry:val});
                 break;
             case 'sx':
             

@@ -114,7 +114,7 @@
 	
 	//auto generate
 	
-	var bool=false,i,j,jj,x,step=1000,el,att,elc = 1,ntimes=3, bb,
+	var bool=false,i,j,jj,x,step=1000,el,att,elc = 0,ntimes=3, bb,
 	els=["rect", "text"],
 	attr=[ "sx"];
 	for(var k=0;k<elc;k++){
@@ -162,7 +162,7 @@
 		}
 	}
 	
-	window.fireEvent("tool.state", ["select"]);
+	//window.fireEvent("tool.state", ["select"]);
 	//select last
 	
 	//window.fireEvent("element.select", [el]);

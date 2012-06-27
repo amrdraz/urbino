@@ -168,7 +168,7 @@ var PropMixin = new Class({
                 break;
             case "percent":
                 div = this.slidingLabel.initLabel(p.name,{label:p.label,
-                    value:p.value||100,factor:100,sufix:"%", min:p.min||"", step:1, max:p.max||""
+                    value:p.value||100,factor:100,sufix:"%", min:typeOf(p.min)==="null"?"":p.min, step:1, max:typeOf(p.max)==="null"?"":p.max
                     });
                 break;
             case "select":

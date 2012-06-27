@@ -46,7 +46,7 @@ var TimePanel = (function(){
         ry: {name:"ry", "class":"prop-label",type:"number", anim:true},                // (number)
         text: {name:"text", "class":"prop-label",type:"textarea"},               // (string) contents of the text element. Use '\n' for multiline text
         "text-anchor":{name:"text-anchor", "class":"prop-label",type:"select", options:["start","middle","end"]},        // (string) ["start", "middle", "end"], default is "middle"
-        "opacity":{name:"opacity", "class":"prop-label",type:"percent", max:100, anim:true},            // (number)
+        "opacity":{name:"opacity", "class":"prop-label",type:"percent",min:0, max:100, anim:true},            // (number)
         "fill":{name:"fill", label:"fill","class":"prop-label",width:100,wh: 10, colorRight:20, lebelRight:50,type:"color", anim:true},                // (string) colour, gradient or image
         //"fill-opacity":{name:"fill-opacity", type:"percent"},        // (number)
         "stroke":{name:"stroke", label:"stroke","class":"prop-label", width:100,wh: 10, colorRight:20,lebelRight:50, type:"color", anim:true},            // (string) stroke colour
@@ -416,6 +416,7 @@ var TimePanel = (function(){
                 b.push(obj.timeline);
                 
                 Object.each(el.anims, function(p, k){
+                    if(k==="transform"){return;} //skip hidden transform proprety
                     $$(
                         obj.tProps[k],
                         obj.eProps[k].getParent(),
@@ -525,6 +526,7 @@ var TimePanel = (function(){
      * @return (div) the div representing the row
      */
     elementCreate : function(el){
+        if(el.type==="set") return {};
         var div = this.div, img = this.img, imgSrc = this.imgSrc, msPerpx = this.msPerpx,
         color = el.color = el.color || Raphael.getColor(0.9),
         type = el.type,
@@ -617,8 +619,11 @@ var TimePanel = (function(){
                 return;
             }
             if(prop==="path"){
-                //TODO
+                el.drawing && el.plug();
                 return;
+            }
+            if(p.hasClass("percent")){
+                p.getLast('input').set("value", (val*=100).round());
             }
             //console.log(p, prop, el.attr(prop));
             p.getLast('input').set("value", val);
@@ -785,11 +790,8 @@ var TimePanel = (function(){
      */
     setLastMs : function(){
         var ms = 0
-        Object.each(this.els,function(elm){
-            Object.each(elm.el.anims,function(p){
-                if (p.length === 0) return;
-                ms = ms.max(p[p.length-1].ms);
-            });
+        Object.each(this.animating,function(elm){
+            ms = elm.anim.ms;
         });
         this.lastMs = ms;
     },
@@ -892,8 +894,9 @@ var TimePanel = (function(){
         clearTimeout(this.timer);
         this.playButton.attr("path",this.icon.play);
         Object.each(this.animating, function(el){
-            el.ft.showHandles();
-            //TODO add path guid hide
+            !(el.type==="path" && el.drawing) && el.ft.showHandles();
+            //console.log(el.aimating.contains("path"));
+            if(el.type==="path" && el.drawing) {el.plug();}
             window.fireEvent("panel.element.update",[el.trans(el.animating),el]);
         }, this);
     },
@@ -916,6 +919,7 @@ var TimePanel = (function(){
         //hide elements properties and guid tools
         Object.each(this.animating, function(el){
             el.ft.hideHandles();
+            if(el.type=="path" && el.drawing) {el.hideManager();}
             window.fireEvent("panel.element.update",['clear',el]);
         }, this);
         this.playButton.attr("path",this.icon.stop);
@@ -1236,6 +1240,7 @@ var TimePanel = (function(){
         });
         
         el.anim = Raphael.animation(nanims, lastMs);
+        
         console.log("combinAnim", anims, nanims, mss);
         return el;
     },
@@ -1488,10 +1493,10 @@ var TimePanel = (function(){
         el.destroy();
         if(anims.length===0){
             $$(elm.tProps[prop],elm.eProps[prop].getParent()).addClass('empty');
-            el.animating.erace(prop);
+            el.animating.erase(prop);
             if(Object.every(elm.tProps,function(p){return p.hasClass('empty');})){
                 $$(elm.element,elm.timeline).addClass("empty");
-                this.animating.erace(el);
+                this.animating.erase(el);
                 delete elm.el.anim;
                 return;
             }
@@ -1633,7 +1638,6 @@ var TimePanel = (function(){
                 elm.status(anim,(trackerMs-del)/(anim.ms-del));
                 window.fireEvent("panel.element.update",[elm.trans(prop),elm]);
             }
-            (!next) && this.fireEvent("timeline.lastMs");
         }.bind(this),
         mouseup = function(){
             
@@ -1641,6 +1645,7 @@ var TimePanel = (function(){
             window.removeEvent("mouseup",mouseup);
             
             this.combineAnim(elm);
+            (!next) && this.fireEvent("timeline.lastMs");//update lastMs
             if(isKey){document.body.style.cursor = "default";}
             document.onselectstart = function() {return true;};
         }.bind(this),

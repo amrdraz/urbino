@@ -141,7 +141,7 @@ initialize : function(options){
     setState: function(st){
        // console.log(st);
         if(st==="canvas"){
-           // console.log("toolpanel setStat",this.getAttr(["fill", "stroke"]));
+            //console.log("toolpanel setStat",this.getAttr(["fill", "stroke"]));
             this.prop(this.getAttr(["fill", "stroke"]));
         } else {
             this.toolMode = st;

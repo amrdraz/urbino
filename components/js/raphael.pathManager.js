@@ -532,6 +532,44 @@ Raphael.fn.pathManager = function(patharray, options, callback) {
         //console.log(segs);
         return path;
     },
+    updateManager = function(p) {
+         var segs = path.segments,pa = path.patharray = Raphael._path2curve(p),
+         x,y, seg;
+         
+         path.attr("path", pa);
+         
+         for (var i=0, ii = pa.length; i < ii; i++) {
+          
+          p = pa[i];
+          x = p[1]; y = p[2];
+          switch(p[0]){
+          case "M":
+              lastM = segs.lastM = i;//mark last start point
+              segs[i].attr({ax:x,ay:y});
+              break;
+          case "C":
+                seg = segs.last();
+                seg.attr({"nx":x, "ny":y});
+                seg.updateHandels();
+                x = p[5]; y = p[6]; //the point this segment is at
+                if(x===p[lastM][1] && y===p[lastM][2] && (!pa[i+1] || pa[i+1][0]=="M" )){
+                    //if this segment aligns with last M an the next segment is eith the end or an M
+                    //TODO segs[i](segment(["Z"], i, {"prev":seg, "next":segs[lastM]}));
+                    segs[lastM].attr({"px":p[3],"py":p[4]});
+                } else {
+                    segs[i].attr({x:x,y:y,px:p[3],py:p[4],nx:x,ny:y});
+                }
+              break;
+          }
+          //TODO make this method a scanner without adding for when seeking in the timeline
+
+          
+        }
+        
+        //console.log(pa);
+        //console.log(segs);
+        return path;
+    },
     parsePath = function (set)  {
         var arr = [], index = 0, p,p2,p3;
         this.handelarray.empty();
@@ -606,11 +644,13 @@ path.unplug = function(){
 path.plug = function(){
     var pa = path.patharray || path.attr(path);
     
+    if(!path.guide.removed) path.guide.remove();
     path.guide = r.path().attr(guideattr);
     path.guide.noparse = true;
     path.guide.click(addSegment);
     
     path.patharray = [];
+    if(!path.guide.segments) path.segments.remove();
     path.segments = r.set();
     path.segments.last = function(){return this[this.length-1];};
     
@@ -620,6 +660,19 @@ path.plug = function(){
     
     parse(pa);
 };
+path.hideManager = function(){
+    path.segments.hide();
+    path.guide.hide();
+};
+path.showManager = function(){
+    path.segments.show();
+    path.guide.show();
+};
+path.updateManager = function(){
+    //TODO
+    //path.unplug();
+    path.plug();
+}
 path.hide = function(oldFunc){
     return function (){
             path.unplug();

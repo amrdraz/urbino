@@ -98,7 +98,7 @@ var CanvasPanel = new Class({
     },
     newLevel: function(el){
         if(!el) return;
-        if(el==="base"){el=false;}
+        if(el==="base"||el==="path"){el=false;}
         if(el && this.isInSet(el)){
             el=el.parent;
         }
@@ -292,10 +292,10 @@ var CanvasPanel = new Class({
                         el = this.level.el || this.selected[0];
                         //console.log(el);
                     } else {
-                        window.fireEvent("element.deselect");
+                        this.selected.length>0 && window.fireEvent("element.deselect");
                         el = true; // reuse of el as a vriable
                         this.elFocus = true;
-                        R = this.newLevel().paper;
+                        R = this.newLevel("path").paper;
                         c = R.canvas;
                     }
                 } else {
@@ -304,7 +304,7 @@ var CanvasPanel = new Class({
                         R = this.level.paper;
                         c = R.canvas;
                     } else {
-                        window.fireEvent("element.deselect");
+                        this.selected.length>0 && window.fireEvent("element.deselect");
                     }
                 }
                 window.fireEvent("tool.state", [state]);
@@ -517,6 +517,7 @@ var CanvasPanel = new Class({
             el.groups = {};
             el.forEach(function(elm){
                 elm.parent = el;
+                elm.setId((typeOf(elm.id)==="number")?elm.type+elm.id:elm.id);
             });
             gs = this.level[this.level.i===0?"paper":"el"].groups
             gs[el.id] = gs[el.id] || el;

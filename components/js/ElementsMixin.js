@@ -146,8 +146,9 @@ var ElementsMixin = new Class({
      */
     elementInsert : function(el){
         var obj = this.elementCreate(el);
+        if(!obj) return;
         this.els[el.id] = obj;
-        obj.element.inject(this.elements,"top");
+        obj.element && obj.element.inject(this.elements,"top");
         obj.timeline && obj.timeline.inject(this.timelanes, "top");
        // console.log(this, obj);
     },
@@ -159,7 +160,7 @@ var ElementsMixin = new Class({
         var sel = this.selected;
         if(id) {
             if(typeOf(id)=="string" && sel[id]) {
-                sel[id].element.removeClass("selected");
+                sel[id].element && sel[id].element.removeClass("selected");
                 sel[id].timeline && sel[id].timeline.removeClass("selected");
                 delete sel[id];
             }
@@ -177,7 +178,7 @@ var ElementsMixin = new Class({
         var els = this.els, sel = this.selected;
         if(id && els[id] && !sel[id]){
             sel[id] = els[id];
-            sel[id].element.addClass("selected");
+            sel[id].element && sel[id].element.addClass("selected");
             sel[id].timeline && sel[id].timeline.addClass("selected");
         }
     },
