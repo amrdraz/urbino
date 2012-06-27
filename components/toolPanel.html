@@ -8,29 +8,37 @@
 	<!--[if lt IE 8]>
 	<link rel="stylesheet" type="text/css" href="css/ie.css" media="screen, projection" />
 	<![endif]-->
-  <link rel='stylesheet' type='text/css' href="css/components.css" />
+     <link rel='stylesheet' type='text/css' href="css/components.css" />
   <link rel='stylesheet' type='text/css' href="css/slidingLabel.css" />
+  <link rel='stylesheet' type='text/css' href="css/TabPanel.css" />
+  
+  <link rel='stylesheet' type='text/css' href="css/editorCanvas.css" />
   <link rel='stylesheet' type='text/css' href="css/propretiesPanel.css" />
-  <link rel='stylesheet' type='text/css' href="css/editorCanvas.css"  />
-  <link rel='stylesheet' type='text/css' href="css/TabPanel.css"  />
   <link rel='stylesheet' type='text/css' href="css/ElementsPanel.css"  />
   <link rel='stylesheet' type='text/css' href="css/TimePanel.css"  />
-   
+
   <script type="text/javascript" src="../core/mootools-core-full-compat.js"></script>
   <script type="text/javascript" src="../core/mootools-more-1.4.0.1.js"></script>
   <script type="text/javascript" src="../core/raphael.js"></script>
-  <script type="text/javascript" src="../external/raphael.free_transform.js"></script>
+  <script type="text/javascript" src="js/raphael.util.js"></script>
   <script type="text/javascript" src="js/raphael.pathManager.js"></script>
+  <script type="text/javascript" src="../external/raphael.free_transform.js"></script>
+    <script type="text/javascript" src="../external/raphael.export.js"></script>
+  <script type="text/javascript" src="../external/Class.XML2Js.js"></script>
+  <script type="text/javascript" src="../external/js_beautify.js"></script>
+  <script type="text/javascript" src="js/PropMixin.js"></script>
+  <script type="text/javascript" src="js/ElementsMixin.js"></script>
   <script type="text/javascript" src="js/ScrollBar.js"></script>
   <script type="text/javascript" src="js/Panel.js"></script>
-  <script type="text/javascript" src="js/CanvasPanel.js"></script>
-  <script type="text/javascript" src="js/SlidingLabel.js"></script>
-  <script type="text/javascript" src="js/ColorPicker.js"></script>
   <script type="text/javascript" src="js/TabPanel.js"></script>
+  <script type="text/javascript" src="js/SlidingLabel.js"></script>
+  
+  <script type="text/javascript" src="js/CodePanel.js"></script>
+  <script type="text/javascript" src="js/ColorPicker.js"></script>
+  <script type="text/javascript" src="js/CanvasPanel.js"></script>
+  <script type="text/javascript" src="js/PropertiesPanel.js"></script>
   <script type="text/javascript" src="js/ToolPanel.js"></script>
-  <script type="text/javascript" src="js/PropretiesPanel.js"></script>
   <script type="text/javascript" src="js/ElementsPanel.js"></script>
-  <script type="text/javascript" src="js/TimePanel.js"></script>
   <style>
   	
   	body > h2 {
@@ -66,21 +74,66 @@ var
 		x:700,
 		width:300,
 		height:500,
-		initSelect:"Elements",
+		initSelect:"Properties",
 		tabs:{
-			"Propreties": (new PropretiesPanel()),
-			"Elements":(new ElementsPanel(r, {imgSrc:"../img"}))
+			"Properties": (new PropertiesPanel({imgSrc:"../img"})),
+			"Elements":(new ElementsPanel({imgSrc:"../img"}))
 		}
 	}),
 	toolPanel = new TabPanel("tools", {
-		x:5,
-		width:50,
-		height:500,
+		x:10,
+		y:0,
+		width:40,
+		height:380,
 		tabs:{
-			"Tools": new ToolPanel(r)
+			"Tools": new ToolPanel({imgSrc:"img", empty:true})
 		}
 	});
-//		});
+	var bool=false,i,j,jj,g,el,att,elc = 3,ntimes=4, bb, els=["rect", "rect"];
+	
+	g = r.set();
+	//g.type = "group";
+	for(var k=0;k<elc;k++){
+		i = k%(els.length);
+		//console.log("test init",el);
+		bb = {
+			x:((Math.random()*600)+50).round(),
+			y:((Math.random()*140)+50).round(),
+			w:((Math.random()*100)+70).round(),
+			h:((Math.random()*100)+50).round()
+		};
+		switch(els[i]){
+		case "path":
+			el = r.pathManager();
+			el.insertSegment(bb.x,bb.y);
+			el.insertSegment(bb.x,bb.y+bb.h);
+			el.insertSegment(bb.x+bb.w,bb.y+bb.h);
+			el.insertSegment(bb.x+bb.w,bb.y);
+			el.unplug();
+			break;
+		case "rect":
+			el = r.rect(bb.x,bb.y,bb.w, bb.h);
+		}
+		window.fireEvent("element.create",[el.attr("fill","#4e8")]);
+		!i && g.push(el.attr("fill","#84e"));
+	}
+	//console.log(g);
+	//window.fireEvent("element.create",[g, "set"]);
+	//window.fireEvent("tool.state", ["select"]);
+	//select last
+	//window.fireEvent("element.select", [el]);
+	//dblclick at 10 100
+	//window.fireEvent("canvas.dblclick", [{x:10, y:100}]);
+	//mousedown at on last element
+	window.fireEvent("canvas.mousedown", [{x:bb.x+10, y:bb.y+10}] );
+	//dblclick at on last element
+	//window.fireEvent("canvas.dblclick", [{x:bb.x+10, y:bb.y+10}] );
+	//unfocus by dblclick
+	//window.fireEvent("canvas.dblclick", [{x:10, y:10}] );
+	//window.fireEvent("canvas.mousedown", [{x:bb.x+10, y:bb.y+10}] );
+	//window.fireEvent("canvas.unfocus");
+	
+	//window.fireEvent("canvas.mousedown", [{x:bb.x+10, y:bb.y+10}] );
 	</script>
 </div>
 

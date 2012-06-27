@@ -20,6 +20,7 @@
   <script type="text/javascript" src="../core/mootools-core-full-compat.js"></script>
   <script type="text/javascript" src="../core/mootools-more-1.4.0.1.js"></script>
   <script type="text/javascript" src="../core/raphael.js"></script>
+  <script type="text/javascript" src="js/raphael.util.js"></script>
   <script type="text/javascript" src="../external/raphael.free_transform.js"></script>
   <script type="text/javascript" src="js/raphael.pathManager.js"></script>
   <script type="text/javascript" src="js/SlidingLabel.js"></script>
@@ -90,7 +91,7 @@
 		width:1020,
 		height:220,
 		tabs:{
-			"Timeline":new TimePanel(r,{imgSrc:"../img"})
+			"Timeline":new TimePanel({imgSrc:"../img"})
 		}
 	}),
 	pp = new TabPanel("pp", {
@@ -103,20 +104,75 @@
 		}
 	});
 	
-	var bool=false,i,j,jj,x,el,att,elc = 1,ntimes=4,step=1000,attr=["x"/*,"y","cx","cy","r","width","height"*/];
-		for(var k=0;k<elc;k++){
-			el = r.rect(20,20,100,50);
-			window.fireEvent("element.create", [el]);
-			for(j=0,jj = attr.length;j<jj;j++){
-				att=attr[j];
-				for(i=0;i<ntimes;i++){
-					x = i*step+250;
-					bool = !bool;
-					window.fireEvent("keyframe.insert", {el:el, prop:att, value:(20+i*130), ms:x, jump:false});
-				}
+	
+	//auto generate
+	
+	var bool=false,i,j,jj,x,step=1000,el,att,elc = 1,ntimes=3, bb,
+	els=["rect", "text"],
+	attr=["sx"];
+	for(var k=0;k<elc;k++){
+		i = k%(els.length);
+		bb = {
+			x:((Math.random()*50)+50).round(),
+			y:((Math.random()*40)+50).round(),
+			w:((Math.random()*50)+70).round(),
+			h:((Math.random()*10)+50).round()
+		};
+		
+		switch(els[i]){
+		case "path":
+			el = r.pathManager();
+			el.insertSegment(bb.x,bb.y);
+			el.insertSegment(bb.x,bb.y+bb.h);
+			el.insertSegment(bb.x+bb.w,bb.y+bb.h);
+			el.insertSegment(bb.x+bb.w,bb.y);
+			el.unplug();
+			break;
+		case "rect":
+			el = r.rect(bb.x,bb.y,bb.w, bb.h);
+			break;
+		case "image":
+			el = r.image("http://www.wowace.com/thumbman/avatars/6/707/300x300/600px-718smiley.svg.png.-m0.png",bb.x,bb.y,bb.w, bb.h);
+			break;
+		case "text":
+			el = r.text(bb.x,bb.y, "Hello World!").attr("font-size","30px");
+			break;
+		}
+		window.fireEvent("element.create",[el.attr("fill","#8e4")]);
+		window.fireEvent("element.select", [el]);
+		
+		//console.log("test init",el.matrix.split());
+		for(j=0,jj = attr.length;j<jj;j++){
+			for(i=0;i<ntimes;i++){
+				x = i*step+250
+				bool = !bool;
+				att = {};
+				att[attr[j]] = ((i*0.3));
+				//console.log(att);
+				//rot att[attr[j]] = ((i*100));
+				//att==="path"?el.attr("path")+" L"+(bb.x+(i*10))+" "+(bb.y+(i*10))
+				window.fireEvent("element.update", [att]);
+				window.fireEvent("keyframe.insert", {el:el, prop:attr[j], ms:x, jump:true});
 			}
 		}
+	}
 	
+	window.fireEvent("tool.state", ["select"]);
+	//select last
+	
+	//window.fireEvent("element.select", [el]);
+	//dblclick at 10 100
+	//window.fireEvent("canvas.dblclick", [{x:10, y:100}]);
+	//mousedown at on last element
+	
+		//console.log("test init",bb);
+	//window.fireEvent("canvas.mousedown", [{x:bb.x+10, y:bb.y+10}] );
+	//dblclick at on last element
+	//window.fireEvent("canvas.dblclick", [{x:bb.x+10, y:bb.y+10}] );
+	//window.fireEvent("canvas.mousedown", [{x:bb.x+10, y:bb.y+10}] );
+	//window.fireEvent("canvas.unfocus");
+	
+	//window.fireEvent("canvas.mousedown", [{x:bb.x+10, y:bb.y+10}] );
 	</script>
 </div>
 

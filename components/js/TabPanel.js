@@ -92,6 +92,9 @@ var TabPanel = (function(){
             sel.header.addClass("selected");
             sel.content.removeClass("hide");
             scroll.setContent(sel.content);
+            
+            
+            sel.panel.fireEvent("focus");
             //console.log(sel,sel.content, scroll.isOff);
             if(scroll.isOff || sel.panel.noScroll){
                 scroll.hide();
@@ -101,7 +104,6 @@ var TabPanel = (function(){
                 sel.content.setStyle("width",this.width-scroll.width);
             }
             //console.log(tab);
-            sel.panel.fireEvent("focus");
         },
         refreshTab:function(el){
             this.select(this.selected.header.get("text"));

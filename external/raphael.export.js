@@ -155,7 +155,7 @@
 					node.attrs,
 					function(initial, value, name) {
 						if ( name === 'path' ) {name = 'd';}
-
+                        //if(name === 'transform') { return initial; }
 						initial[name] = value.toString();
 
 						return initial;
@@ -191,6 +191,9 @@
 			if ( node.type ==='image') {
 					attrs += ' preserveAspectRatio="none"';
 			}
+			if ( node.type ==='path') {
+                    attrs += 'fill-rule="evenodd"';
+            }
 
 			for (var i in node.attrs ) {
 				var name = i;
@@ -205,13 +208,12 @@
 
 						break;
 				}
-
 				if ( name ) {
 					attrs += ' ' + name + '="' + escapeXML(node.attrs[i].toString()) + '"';
 				}
 			}
 
-			svg += '<' + node.type + ' transform="matrix(' + node.matrix.toString().replace(/^matrix\(|\)$/g, '') + ')"' + attrs + '></' + node.type + '>';
+			//svg += '<' + node.type + ' transform="matrix(' + node.matrix.toString().replace(/^matrix\(|\)$/g, '') + ')"' + attrs + '></' + node.type + '>';
 		}
 
 		svg += '</svg>';

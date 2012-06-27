@@ -107,7 +107,7 @@ var SlidingLabel = (function (){
     startWrite:function(e){
         e.stop();
         var input = e.target;
-        console.log(input);
+        //console.log(input);
 
         input.erase("readonly");
         input.removeClass("sliding-label");
@@ -117,7 +117,10 @@ var SlidingLabel = (function (){
         e.stop();
         var input = e.target,
         val = input.get("value");
-        if (val === "") {input.set("value",input.get("min")||0);} 
+        
+        if (input.hasClass("sliding-label")){ return;}
+        if (val === "") {input.set("value",input.get("min")||0);}
+        this.fireEvent("finish", [val/input.retrieve('factor'),input,e]);
         input.set("readonly","readonly");
         input.addClass("sliding-label");
         input.addClass("is-sliding");
@@ -187,7 +190,7 @@ var SlidingLabel = (function (){
             if (val>max) { val = max; }
             if (val<min) { val = min; }
             input.set("value", val);
-            slidingLabel.fireEvent("onChange", [val/factor,input,e]);
+            slidingLabel.fireEvent("change", [val/factor,input,e]);
          },
         /**
          * method that stops the slide action
@@ -201,10 +204,10 @@ var SlidingLabel = (function (){
             window.removeEvent("mousemove", slide);
             window.removeEvent("mouseup", stopSlide);
             $$("label:not(.sliding-label),input:not(.sliding-label),form,button,textarea,select").removeClass("is-sliding");
-            this.fireEvent("onEnd", [val,input,e]);
-        };
-        
-        this.fireEvent("onStart",[startValue,input,e]);
+            
+            this.fireEvent("finish", [val/factor,input,e]);
+        }.bind(this);
+        this.fireEvent("start",[startValue/factor,input,e]);
         //body set class so that the cursor doesn't change
         document.body.style.cursor = this.cursor;
         // needed to stop text selection in chrome from http://stackoverflow.com/questions/6388284/click-and-drag-cursor-in-chrome

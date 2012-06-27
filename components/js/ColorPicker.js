@@ -18,6 +18,7 @@ var ColorPicker = (function(){
     
     var
     inputParse = function(input, color, o){
+        //console.log(color);
         var hsb = Raphael.rgb2hsb(color);
         input.set({
             value: color.replace(/^#(.)\1(.)\2(.)\3$/, "#$1$2$3"),
@@ -468,6 +469,7 @@ var ColorPicker = (function(){
             } else {
                 vec.isNone = false;
             }
+            //console.log(fill);
             return vec.attr("fill",fill);
         },
         inputChange:function(e){

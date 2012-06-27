@@ -1,0 +1,66 @@
+<html>
+    <head>
+        <!-- Setup the language environment -->
+        <script type="text/javascript" src="mootools-core-1.4-full.js"></script>
+        <script type="text/javascript" src="mootools-more-1.4-full.js"></script>
+        <script>
+            //setup mootools hooks
+            var $M = document.id;
+            var $m = $M;
+        </script>
+        <!-- Setup the graphical environment -->
+        <script type="text/javascript" src="raphael.js"></script>
+        
+        <!-- Setup the utilities environment -->
+        <script type="text/javascript" src="xmlsax.js"></script>
+        <script type="text/javascript" src="datalus_lib.js"></script>
+        <script type="text/javascript" src="MidasSAXEventHandler.js"></script>
+        <script type="text/javascript" src="Midas.js"></script>
+        <style>
+            #widget_panel{
+                
+            }
+        </style>
+        
+    </head>
+    <body bgcolor="#222799">
+        <div id="widget_panel"></div>
+        <script>
+            //set up the raphael canvas
+            var panel = Raphael("widget_panel", 1000, 600);
+            //setup our own XML Parser
+            SVGParser = new Class({
+                Extends : MidasXMLParser,
+                open: function(tag, attributes){
+                	switch(tag){
+                    case "path":
+                        //when we find a path, draw it on the raphael canvas
+                        var shape = panel.path(attributes["d"]).attr({
+                            fill:"#338833", 
+                            "stroke-width": 1
+                        });
+                    break;
+                    case "rect":
+						el = r.rect(attributes["x"],attributes["y"],attributes["width"], attributes["height"]);
+						break;
+					case "image":
+						el = r.image(attributes["src"],attributes["x"],attributes["y"],attributes["width"], attributes["height"]);
+						break;
+					case "text":
+						el = r.text(attributes["x"],attributes["y"], "Hello World!").attr("font-size","30px");
+						break;
+					}
+			                }
+            });
+            //instantiate the parser
+            var parser = new SVGParser();
+            var svgRequest = new Request({
+                url: 'FarahRocks.svg',
+                onSuccess: function(responseText, responseXML) {
+                    //once we recieve the SVG, we parse it
+                    parser.parse(responseText);
+                }
+            }).send();
+        </script>
+    </body>
+</html>

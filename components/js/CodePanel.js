@@ -1,9 +1,4 @@
-/**
- * this class defines a panel
- * @author Amr Draz
- * @requirments Raphael, Mootools,CodeMirror
- */
-/*global $,$$,console,Class,Events,Options,Element,typeOf,window,Panel,Raphael,CodeMirror*/
+
 /**
  * this class defines a panel
  * @author Amr Draz
@@ -15,20 +10,27 @@ var CodePanel = new Class({
     Extends:Panel,
     options:{
     },
-    initialize: function(R, mode, options){
+    initialize: function(options){
         
         this.parent(options||{});
-        this.mode = mode;
-        var panel = this.panel.addClass("svg-panel").setStyle("background-color","#eee");
-        this.paper = R;
+        this.paper = options.r;
+        this.bind(["unfocus", "setText"])
+       
+        var
+        mode = this.mode = options.mode,
+        panel = this.panel.addClass("svg-panel").setStyle("background-color","#eee");
         this.text = new Element("textarea").inject(panel);
         this.editor = CodeMirror.fromTextArea(this.text, {
-            mode: 'xml',//(mode === 'svg')?'xml':mode,
+            mode: (mode === 'svg')?'xml':mode,
             indentUnit: 4,
             readOnly:true,
             lineWrapping: true
             });
-        this.addEvent("focus",this.setText.bind(this));
+        this.addEvent("focus",this.bound.setText);
+        window.addEvents({
+            "paper.unfocus":this.bound.unfocus,
+            "paper.focus":this.bound.unfocus
+        });
     },
 
     getSelectedRange: function () {
@@ -42,20 +44,32 @@ var CodePanel = new Class({
       },
     parseMode:  function () {
         var s;
+        //console.log(this.paper);
         switch (this.mode) {
         case 'svg':
             s = this.paper.toSVG();
             break;
         case 'javascript':
-            s = this.paper.toJS();
+            s = js_beautify(this.paper.toJS());
             break;
         }
+        console.log(s);
+       this.paper.print();
         return s;
     },
+    paperUpdate: function(){
+        window.fireEvent("canvas.unfocus",[0]);
+        console.log('hello');
+    },
+    unfocus: function(p){
+        //this.paper = p;
+    },
     setText:function(){
+        //this.paperUpdate();
         var editor = this.editor;
         editor.setValue(this.parseMode());
         CodeMirror.commands.selectAll(editor);
         this.autoFormatSelection();
+        editor.setCursor(1);
     }
 });

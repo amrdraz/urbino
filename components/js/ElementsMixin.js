@@ -121,8 +121,7 @@ var ElementsMixin = new Class({
      * @return (div) the div representing the row
      */
      elementCreate : function(el){
-        el.setId((typeOf(el.id)==="number")?el.type+el.id:el.id), div = this.div, img = this.img;
-        var color = el.color|| "#888", imgSrc = this.options.imgSrc,
+        var color = el.color|| "#888", imgSrc = this.options.imgSrc, div = this.div, img = this.img,
         element = div("element", {"for":el.id}).adopt(
             div("color", {styles:{
                     position:"absolute",
@@ -149,7 +148,8 @@ var ElementsMixin = new Class({
         var obj = this.elementCreate(el);
         this.els[el.id] = obj;
         obj.element.inject(this.elements,"top");
-        //console.log(this.els);
+        obj.timeline && obj.timeline.inject(this.timelanes, "top");
+       // console.log(this, obj);
     },
     /**
      * selects the elemnets obj by it's id
@@ -160,6 +160,7 @@ var ElementsMixin = new Class({
         if(id) {
             if(typeOf(id)=="string" && sel[id]) {
                 sel[id].element.removeClass("selected");
+                sel[id].timeline && sel[id].timeline.removeClass("selected");
                 delete sel[id];
             }
         } else {
@@ -177,6 +178,7 @@ var ElementsMixin = new Class({
         if(id && els[id] && !sel[id]){
             sel[id] = els[id];
             sel[id].element.addClass("selected");
+            sel[id].timeline && sel[id].timeline.addClass("selected");
         }
     },
     /**
@@ -218,12 +220,12 @@ var ElementsMixin = new Class({
             }
         } else { */
             window.fireEvent("element.deselect");
+            console.log(el);
             window.fireEvent("element.select", [el]);
         //}
         //console.log(selected);
     },
-    /**
-     * event handler deletes the element(s) from the elements panel
+     /** event handler deletes the element(s) from the elements panel
      * @param el (Raphael Obj) the element to delete
      */
     elementDelete : function (el){
@@ -239,6 +241,7 @@ var ElementsMixin = new Class({
                    this.elDeselect(el);
                 }
                 els[id].element.destroy();
+                els[id].timeline && els[id].timeline.destroy();
                 delete els[id];
             }
         } else {

@@ -8,29 +8,29 @@
 	<!--[if lt IE 8]>
 	<link rel="stylesheet" type="text/css" href="css/ie.css" media="screen, projection" />
 	<![endif]-->
-  <link rel='stylesheet' type='text/css' href="css/components.css" />
+   <link rel='stylesheet' type='text/css' href="css/components.css" />
   <link rel='stylesheet' type='text/css' href="css/slidingLabel.css" />
+  <link rel='stylesheet' type='text/css' href="css/TabPanel.css" />
   <link rel='stylesheet' type='text/css' href="css/propretiesPanel.css" />
-  <link rel='stylesheet' type='text/css' href="css/editorCanvas.css"  />
-  <link rel='stylesheet' type='text/css' href="css/TabPanel.css"  />
   <link rel='stylesheet' type='text/css' href="css/ElementsPanel.css"  />
   <link rel='stylesheet' type='text/css' href="css/TimePanel.css"  />
-   
+
   <script type="text/javascript" src="../core/mootools-core-full-compat.js"></script>
   <script type="text/javascript" src="../core/mootools-more-1.4.0.1.js"></script>
   <script type="text/javascript" src="../core/raphael.js"></script>
-  <script type="text/javascript" src="../external/raphael.free_transform.js"></script>
+  <script type="text/javascript" src="js/raphael.util.js"></script>
   <script type="text/javascript" src="js/raphael.pathManager.js"></script>
+  <script type="text/javascript" src="js/PropMixin.js"></script>
+  <script type="text/javascript" src="js/ElementsMixin.js"></script>
   <script type="text/javascript" src="js/ScrollBar.js"></script>
   <script type="text/javascript" src="js/Panel.js"></script>
-  <script type="text/javascript" src="js/CanvasPanel.js"></script>
+  <script type="text/javascript" src="js/TabPanel.js"></script>
   <script type="text/javascript" src="js/SlidingLabel.js"></script>
   <script type="text/javascript" src="js/ColorPicker.js"></script>
-  <script type="text/javascript" src="js/TabPanel.js"></script>
+  <script type="text/javascript" src="js/CanvasPanel.js"></script>
+  <script type="text/javascript" src="js/PropertiesPanel.js"></script>
   <script type="text/javascript" src="js/ToolPanel.js"></script>
-  <script type="text/javascript" src="js/PropretiesPanel.js"></script>
   <script type="text/javascript" src="js/ElementsPanel.js"></script>
-  <script type="text/javascript" src="js/TimePanel.js"></script>
   <style>
   	
   	body > h2 {
@@ -71,8 +71,8 @@
 			canvas:new CanvasPanel()
 			}
 	}),
-	r = canvas.get("canvas").panel.R;
-	r.rect(10,20,200,100).attr(atts).attr({"fill":"#8e4", "stroke-width":16, opacity:0.5});
+	r = canvas.get("canvas").panel.R,
+	rec = r.rect(10,20,200,100).attr(atts).attr({"fill":"#8e4", "stroke-width":16, opacity:0.5});
 	
 	r.image("http://th07.deviantart.net/fs70/150/f/2011/234/e/b/ebd7e4ec15f2a9e7fac55658c583e03d-d47gf4r.jpg",350,350,150,100).attr(atts);
 	r.path("M 50 350 H200V400z").attr(atts).attr({"fill":"#e84"});
@@ -83,11 +83,13 @@
 		x:840,
 		width:300,
 		height:500,
+		initSelect:"Properties",
 		tabs:{
-			"Propreties": (new PropretiesPanel()),
+			"Properties": (new PropertiesPanel({imgSrc:"../img"})),
 			"Elements":(new ElementsPanel(r, {imgSrc:"../img"}))
 		}
 	});
+	window.fireEvent("element.select", [rec]);
 // }
 	</script>
 </div>

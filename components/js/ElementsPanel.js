@@ -34,12 +34,12 @@ var ElementsPanel = (function() {
         imgSrc: "img/",
         buttonAttr: {"fill":"#eee", "stroke":"none", "cursor":"pointer"}
     },
-    initialize: function (paper, els, options){
+    initialize: function (options){
 
         this.parent(options || {});
         var
         imgSrc= this.options.imgSrc = (this.options.imgSrc || "img")+"/",
-        selected = this.selected = {}, els=  this.els = els, vect = this.vect.bind(this),icon = this.icon;
+        selected = this.selected = {}, els=  this.els = options.els||{}, vect = this.vect.bind(this),icon = this.icon;
         this.bind([
             "moveup",
             "movedown",
@@ -53,7 +53,9 @@ var ElementsPanel = (function() {
             "elementDelete",
             "notElement",
             "hideTextField",
-            "changeName"
+            "changeName",
+            "focus",
+            "unfocus"
         ]);
         
         var 
@@ -68,11 +70,13 @@ var ElementsPanel = (function() {
                         window.fireEvent("element.delete");
                 }},"delete element")
         ).inject(panel),
+        fb = this.focusBar = this.div("focus-bar", {styles:{top:-25}}),
         elements = this.elements = this.div("area-content").inject(panel)
         ;
+        this.levels = [];
         /*----------------------- parse elements ----------------------*/
         
-        elements.adopt(this.parse(paper));
+        //elements.adopt(this.parse(paper));
         
         /* text field */
         this.textField = new Element("input",{"type":"text", "id":"editText",
@@ -102,6 +106,8 @@ var ElementsPanel = (function() {
         });
         
         window.addEvents({
+            "paper.focus": this.bound.focus,
+            "paper.unfocus":this.bound.unfocus,
             "element.create": this.bound.elementInsert,
             "element.deselect": this.bound.elementDeselect,
             "element.delete": this.bound.elementDelete,
@@ -112,17 +118,33 @@ var ElementsPanel = (function() {
      *parses the apaper object into the elements panel 
      */
     parse : function(paper){
-        var a = [];
-        paper.forEach(function(el) {
+        var a = [], that = this;
+        paper && paper.forEach(function(el) {
             var obj;
             el.noparse = el.noparse || false;
             if(!el.noparse){
-                obj = elementCreate(el);
-                this.els[el.id] = obj;
+                obj = that.elementCreate(el);
+                that.els[el.id] = obj;
                 a.splice(0,0,obj.element);
             }
         });
       return a;  
+    },
+    focus: function(p){
+        console.log(p);
+        this.paper = p;
+        delete this.els;
+        this.els = {};
+        this.elements.getChildren().destroy();
+        this.elements.adopt(this.parse(p));
+    },
+    unfocus: function(p){
+        console.log(p);
+        this.paper = p;
+        delete this.els;
+        this.els = {};
+        this.elements.getChildren().destroy();
+        this.elements.adopt(this.parse(p));
     },
     /**
      *clears selection which meight occure when double clicking 

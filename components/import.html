@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<!-- blueprint CSS framework -->
+	<link rel="stylesheet" type="text/css" href="css/screen.css" media="screen, projection" />
+	<link rel="stylesheet" type="text/css" href="css/print.css" media="print" />
+	<!--[if lt IE 8]>
+	<link rel="stylesheet" type="text/css" href="css/ie.css" media="screen, projection" />
+	<![endif]-->
+     <link rel='stylesheet' type='text/css' href="css/components.css" />
+  <link rel='stylesheet' type='text/css' href="css/slidingLabel.css" />
+  <link rel='stylesheet' type='text/css' href="css/TabPanel.css" />
+  
+  <link rel='stylesheet' type='text/css' href="css/editorCanvas.css" />
+  <link rel='stylesheet' type='text/css' href="css/MenuPanel.css" />
+  <link rel='stylesheet' type='text/css' href="css/propretiesPanel.css" />
+  <link rel='stylesheet' type='text/css' href="css/ElementsPanel.css"  />
+  <link rel='stylesheet' type='text/css' href="css/TimePanel.css"  />
+
+  <script type="text/javascript" src="../core/mootools-core-full-compat.js"></script>
+  <script type="text/javascript" src="../core/mootools-more-1.4.0.1.js"></script>
+  <script type="text/javascript" src="../core/raphael.js"></script>
+  <script type="text/javascript" src="js/raphael.util.js"></script>
+  <script type="text/javascript" src="js/raphael.pathManager.js"></script>
+  <script type="text/javascript" src="../external/raphael.free_transform.js"></script>
+    <script type="text/javascript" src="../external/raphael.export.js"></script>
+  <script type="text/javascript" src="../external/Class.XML2Js.js"></script>
+  <script type="text/javascript" src="../external/js_beautify.js"></script>
+  <script type="text/javascript" src="js/PropMixin.js"></script>
+  <script type="text/javascript" src="js/ElementsMixin.js"></script>
+  <script type="text/javascript" src="js/ScrollBar.js"></script>
+  <script type="text/javascript" src="js/Panel.js"></script>
+  <script type="text/javascript" src="js/TabPanel.js"></script>
+  <script type="text/javascript" src="js/MenuPanel.js"></script>
+  
+  <script type="text/javascript" src="js/CodePanel.js"></script>
+  <script type="text/javascript" src="js/ColorPicker.js"></script>
+  <script type="text/javascript" src="js/CanvasPanel.js"></script>
+  <script type="text/javascript" src="js/PropertiesPanel.js"></script>
+  <script type="text/javascript" src="js/ToolPanel.js"></script>
+  <style>
+  	
+  	body > h2 {
+  		
+  		margin:10px 20px ;
+  	}
+  </style>
+</head>
+ 
+<body>
+
+	<h2>Import Panel</h2>
+<div class="component active">
+	<div id="tools" class="tools"></div>
+	<div id="draw" class="canvas"></div>
+	<div id="side" ></div>	
+	<script>
+//		window.addEvent("domready", function () {
+/*global $,$$,console,Class,Element,typeOf,window,R, Raphael, TabPanel,PropretiesPanel,ToolPanel, ElementsPanel*/
+
+var
+	canvas = canvas = new TabPanel("draw", {
+		x:130,
+		width:900,
+		height:380,
+		tabs:{
+			canvas:new CanvasPanel()
+			}
+	}),
+	r = canvas.get("canvas").panel.R,
+	toolPanel = new TabPanel("tools", {
+		x:90,
+		width:40,
+		height:380,
+		tabs:{
+			"Tools": new ToolPanel({imgSrc:"../img", empty:true})
+		}
+	}),sidebar = new TabPanel("side", {
+		x:1030,
+		width:200,
+		height:380,
+		tabs:{
+			"Tools": new MenuPanel(r,{src:"../",imgSrc:"../img"})
+		}
+	});
+	var bool=false,i,j,jj,x,el,att,elc = 1,ntimes=4, bb, els=["path", "path"];
+	for(var k=0;k<elc;k++){
+		i = k%(els.length);
+		console.log("test init",el);
+		bb = {
+			x:((Math.random()*600)+50).round(),
+			y:((Math.random()*140)+50).round(),
+			w:((Math.random()*100)+70).round(),
+			h:((Math.random()*100)+50).round()
+		};
+		switch(els[i]){
+		case "path":
+			el = r.pathManager();
+			el.insertSegment(bb.x,bb.y);
+			el.insertSegment(bb.x,bb.y+bb.h);
+			el.insertSegment(bb.x+bb.w,bb.y+bb.h);
+			el.insertSegment(bb.x+bb.w,bb.y);
+			el.unplug();
+			break;
+		case "rect":
+			el = r.rect(bb.x,bb.y,bb.w, bb.h);
+		}
+		toolPanel.get("Tools").panel.elementCreate(el.attr("fill","#84e"));
+	}
+	window.fireEvent("tool.state", ["select"]);
+	//select last
+	//window.fireEvent("element.select", [el]);
+	//dblclick at 10 100
+	//window.fireEvent("canvas.dblclick", [{x:10, y:100}]);
+	//mousedown at on last element
+	//window.fireEvent("canvas.mousedown", [{x:bb.x+10, y:bb.y+10}] );
+	//dblclick at on last element
+	//window.fireEvent("canvas.dblclick", [{x:bb.x+10, y:bb.y+10}] );
+	//window.fireEvent("canvas.mousedown", [{x:bb.x+10, y:bb.y+10}] );
+	//window.fireEvent("canvas.unfocus");
+	
+	//window.fireEvent("canvas.mousedown", [{x:bb.x+10, y:bb.y+10}] );
+	
+//		});
+	</script>
+</div>
+	</body>
+</html>

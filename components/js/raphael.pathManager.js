@@ -65,6 +65,7 @@ Raphael.fn.pathManager = function(patharray, options, callback) {
         
         toggleClose = function(seg) {
             var i,ii,segs = path.segments, pa = path.patharray,end,mCount;
+            
             if(seg.prev === null){
                 end = seg;
                 while(end.next!==null){ end = end.next;}
@@ -87,11 +88,12 @@ Raphael.fn.pathManager = function(patharray, options, callback) {
                 
                 end.remove();
             }
-             
+            //console.log(pa);
             path.redraw();
         },
         down= function (x,y,e){
             var seg = this.parentSet;
+            //console.log([seg]);
             if(e.altKey){
                 if(/prev|next/.test(this.control)){
                     seg.symmetry = false;
@@ -131,7 +133,7 @@ Raphael.fn.pathManager = function(patharray, options, callback) {
             } 
             this.dx = this.dy = 0;
             seg.drawing = false;
-
+            window.fireEvent("panel.update",[{path:seg.path.patharray}]);
         },
         segDbclick = function (e){
             var seg = this.parentSet;
@@ -164,7 +166,7 @@ Raphael.fn.pathManager = function(patharray, options, callback) {
                 return;
             }
             //Inputed 2 values set  one attribute
-            if(set){
+            if(typeof set !== 'undefined'){
                 switch(att) {
                     case "index":
                         seg.index = set;
@@ -379,9 +381,8 @@ Raphael.fn.pathManager = function(patharray, options, callback) {
        prev = seg.prev, next = seg.next,
        pa = seg.path.patharray, segs = seg.path.segments;
        
-       
        if(segs.length===0){return;}
-       if(next===null && prev===null){
+       if(next===null && prev===null){ //lonely subpath
            seg.remove();
            pa.pop();
            segs.pop();
@@ -508,25 +509,27 @@ Raphael.fn.pathManager = function(patharray, options, callback) {
           p = pa[i];
           x = p[1]; y = p[2];
           if(p[0]==="M"){
-            lastM = segs.lastM = i;
+            lastM = segs.lastM = i;//mark last start point
             segs.push(segment(["M", x, y], i,{"symmetry":false}));
           } else {
                 seg = segs.last();
                 seg.attr({"nx":x, "ny":y});
                 seg.updateHandels();
                 
-                if(i+1==ii || (i+1!=ii && pa[i+1][0]=="M" && p[i][5]==p[lastM][1] && p[i][6]==p[lastM][2])){
-                    
+                x = p[5]; y = p[6]; //the point this segment is at
+                if(x===p[lastM][1] && y===p[lastM][2] && (!pa[i+1] || pa[i+1][0]=="M" )){
+                    //if this segment aligns with last M an the next segment is eith the end or an M
                     segs.push(segment(["Z"], i, {"prev":seg, "next":segs[lastM]}));
                     segs[lastM].attr({"px":p[3],"py":p[4]});
                 } else {
-                    x = p[5]; y = p[6];
                     segs.push(segment(["C",x,y,p[3],p[4],x,y], i, {"prev":seg, "symmetry":false}));
                 }
           }
           
         }
-         
+        
+        //console.log(pa);
+        //console.log(segs);
         return path;
     },
     parsePath = function (set)  {
@@ -578,7 +581,7 @@ Raphael.fn.pathManager = function(patharray, options, callback) {
     if(patharray) {parse(patharray);}
     path.drawing = true;
     if(path.node.set) {path.node.set("fill-rule","evenodd");}
-    
+    //console.log("path",path.segments);
     
 var selected = true;
 
@@ -596,13 +599,12 @@ path.unplug = function(){
         
         path.drawing = false;
         
-        delete path.segments;
-        delete path.guide;   
+        //delete path.segments;
+        //delete path.guide;   
     }
 };
 path.plug = function(){
-    var pa = path.patharray || path.attr(path),
-    trans = path.transform();
+    var pa = path.patharray || path.attr(path);
     
     path.guide = r.path().attr(guideattr);
     path.guide.noparse = true;
@@ -616,9 +618,8 @@ path.plug = function(){
     
     path.transform("");
     
-    pa = Raphael.transformPath(pa,trans);
     parse(pa);
-    };
+};
 path.hide = function(oldFunc){
     return function (){
             path.unplug();

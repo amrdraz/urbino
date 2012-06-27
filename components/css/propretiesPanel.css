@@ -24,21 +24,23 @@
 	text-align:right;
 	color:#666666;
 }
-.prop-panel .group.dimension, .prop-panel .group.clip {
+.prop-panel .group.transform, .prop-panel .group.dimension, .prop-panel .group.bbox, .prop-panel .group.clip {
 	height:60px;
 }
 
 .prop-panel .group.fillstroke, .prop-panel .group.text{
 	height:200px;
 }
-.prop-panel .group.transform, .prop-panel .group.arrow-end, .prop-panel .group.anchor{
+.prop-panel .group.arrow-end, .prop-panel .group.anchor{
 	height:100px
 }
 
 .prop-panel input[type=number] {
     width:35px;
+    height:15px;
 	white-space:nowrap;
 }
+
 .prop-panel  label{
 	text-align:right;
     color:#ddd;
@@ -56,7 +58,6 @@
 	height:15px;
 	width:110px;
 	white-space: nowrap;
-	overflow: normal;
 }
 
 
@@ -97,6 +98,11 @@ div.clear{
 	left:20px;
 }
 
+.prop-panel .proprety.icon .icon {
+	position:absolute;
+	right:20px;
+	top:0;
+}
 
 .prop-panel  .key-frame{
 	position:absolute;

@@ -1,3 +1,60 @@
+.canvas-panel .focus-bar {
+	position:absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:25px;
+	background:#111;
+	background:rgba(12,12,12,0.9);
+	color:#eee;
+}
+.canvas-panel .focus-bar .level {
+	float:left;
+	position:relative;
+	padding: 5px 10px 0 10px;
+	height:20px;
+	min-width:70px;
+	background:#222;
+	white-space: nowrap;
+}
+.canvas-panel .focus-bar .level:hover {
+	background:#333;
+}
+.canvas-panel .focus-bar .level.selected {
+	background:#111;
+	color:#0055AA;
+}
+.canvas-panel .focus-bar .next {
+	float:left;
+	position:relative;
+	padding-right:10px;
+	color:#eee;
+	width:15px;
+	height:25px;
+}
+.canvas-panel .focus-bar .next.last {
+	background: transparent;
+}
+.canvas-panel svg {
+	
+}
+.canvas-panel .screen{
+	position:absolute;
+	opacity:0.3;
+	width:100%;
+	height:100%;
+	background:#eee;
+}
+
+.canvas-panel .text-area {
+    position:absolute;
+    white-space:nowrap;
+    border:#482 solid 1px;
+}
+
+.canvas-panel .paper-area{
+	overflow: hidden;
+}
 .tool-panel{
 	width:100%;
 	height:100%;

@@ -52,7 +52,7 @@ var PropertiesPanel = (function(){
         ry: {name:"ry", "class":"right row-2",type:"number", anim:true},                // (number)
         text: {name:"text", "class":"left row-4",type:"textarea"},               // (string) contents of the text element. Use '\n' for multiline text
         "text-anchor":{name:"text-anchor", "class":"left row-2",type:"select", options:["start","middle","end"]},        // (string) ["start", "middle", "end"], default is "middle"
-        "opacity":{name:"opacity", "class":"right row-2",type:"percent", max:100, anim:true},            // (number)
+        "opacity":{name:"opacity", "class":"right row-2",type:"percent", max:100, min:0, anim:true},            // (number)
         "fill":{name:"fill", label:"fill","class":"left row-1",type:"color", anim:true},                // (string) colour, gradient or image
         //"fill-opacity":{name:"fill-opacity", type:"percent"},        // (number)
         "stroke":{name:"stroke", label:"stroke","class":"left row-2",type:"color", anim:true},            // (string) stroke colour
@@ -62,7 +62,7 @@ var PropertiesPanel = (function(){
         //TODO "stroke-miterlimit",// (number)
         //"stroke-opacity":{name:"stroke-opacity", type:"percent"},    // (number)
         "stroke-width":{name:"stroke-width", "class":"right row-3",type:"number", min:1},       // (number) stroke width in pixels, default is '1'
-        path:{name:"path", "class":"left row-1",type:"text", anim:true},                // (string) SVG path string format
+        path:{name:"path", "class":"left row-1", icon:"pen", type:"icon", anim:true},                // (string) SVG path string format
         src:{name:"src", "class":"left row-1",type:"text"},                // (string) image URL, only works for @Element.image element
         font:{name:"font", "class":"left row-1",type:"text"},                // (string)
         "font-family":{label:"font",name:"font-family", "class":"left row-1",type:"select", options:fonts},        // (string)
@@ -72,13 +72,13 @@ var PropertiesPanel = (function(){
         "target":{name:"target", "class":"left row-1", type:"select",options:["_self","_blank","_top","_parent"]},            // (string) used with href
         "title":{name:"title", "class":"left row-3", type:"text"},            // (string) will create tooltip with a given text
         // "transform" (string) see @Element.transform
-            "translate-x":{name:"translate-x", "class":"transform left row-1", label:"x",type:"number", anim:true},
-            "translate-y":{name:"translate-y", "class":"transform right row-1", label:"y",type:"number", anim:true},
-            "origin-x":{name:"origin-x", "class":"transform left row-1", label:"origin-x",type:"number", anim:true},
-            "origin-y":{name:"origin-y", "class":"transform right row-1", label:"origin-y",type:"number", anim:true},
-            "rotate":{name:"rotate", "class":"transform left row-2", label:"Rotate",type:"number", sufix:"°", anim:true},
-            "scale-x":{name:"scale-x", "class":"transform right row-2", label:"Scale-x",type:"percent", anim:true},
-            "scale-y":{name:"scale-y", "class":"transform right row-3", label:"Scale-y",type:"percent", anim:true},
+            "tx":{name:"tx", "class":"transform left row-1", label:"x",type:"number", anim:true},
+            "ty":{name:"ty", "class":"transform left row-2", label:"y",type:"number", anim:true},
+            "ox":{name:"ox", "class":"transform left row-1", label:"Origin-x",type:"percent", value:50},
+            "oy":{name:"oy", "class":"transform right row-1", label:"Origin-y",type:"percent", value:50},
+            "rotate":{name:"rotate", "class":"transform left row-1", label:"Rotate",type:"number", sufix:"°", anim:true},
+            "sx":{name:"sx", "class":"transform right row-1", label:"Scale-x",type:"percent", anim:true},
+            "sy":{name:"sy", "class":"transform right row-2", label:"Scale-y",type:"percent",  anim:true},
        // "arrow-end":{name:"arrow-end"},     // (string) arrowhead on the end of the path. The format for string is '<type>[-<width>[-<length>]]'. Possible types: 'classic', 'block', 'open', 'oval', 'diamond', 'none', width: 'wide', 'narrow', 'midium', length: 'long', 'short', 'midium'.
             "arrow-type":{name:"arrow-type", "class":"left row-1", label:"type",type:"select", options:['none','classic', 'block', 'open', 'oval', 'diamond'] },
             "arrow-width":{name:"arrow-width", "class":"left row-2", label:"width",type:"select", options:['midium','wide', 'narrow'] },
@@ -88,10 +88,15 @@ var PropertiesPanel = (function(){
             "clip-y":{name:"clip-y", "class":"left row-2", label:"Clip-y",type:"number"},
             "clip-width":{name:"clip-width", "class":"right row-1", label:"Clip-w",type:"number"},
             "clip-height":{name:"clip-height", "class":"right row-2", label:"Clip-h",type:"number"},
-        "cursor":{name:"cursor", "class":"left row-1", type:"text"}           // (string) CSS type of the cursor
+        "cursor":{name:"cursor", "class":"left row-1", type:"text"},           // (string) CSS type of the cursor
+        'offset':{name:'offset', y:27, x:10, type:'app'},
+        bwidth: {name:"bwidth", "class":"right row-1", label:"width",type:"number", anim:true},                // (number)
+        bheight: {name:"bheight", "class":"right row-2",label:"height",type:"number", anim:true}
     },
     groups={
-        dimension:["x","y","translate-x","translate-y","cx","cy","height","width","cr","rx","ry"],
+        dimension:["x","y","height","width"],
+        bbox:["tx","ty",'offset',"bheight","bwidth"],
+        transform:["rotate","sx","sy"],
         corner:["r"],
         path:["path"],
         image:["src"],
@@ -99,10 +104,10 @@ var PropertiesPanel = (function(){
         "arrow-end":["arrow-type","arrow-width","arrow-length"],
         fillstroke:["opacity","fill","stroke","stroke-width","stroke-dasharray","stroke-linecap","stroke-linejoin"/*,"stroke-miterlimit"*/],
         text:["text-anchor","font-family","font-size","font-weight","text"],
-        transform:["origin-x","origin-y","rotate","scale-x","scale-y"],
-        clip:["clip-x","clip-y","clip-width","clip-height"],
-        anchor:["title","href","target"],
-        cursor:["cursor"]
+        
+        //clip:["clip-x","clip-y","clip-width","clip-height"],
+        //anchor:["title","href","target"],
+        //cursor:["cursor"]
     }
     ;
     
@@ -114,10 +119,7 @@ var PropertiesPanel = (function(){
     options:{
       extraProps:{}  
     },
-     /**
-     * the scurrently selected element
-     */
-    selected: [],
+    
     /**
      * function that returns the attributes of the global state
      * @return attrs (obj) Raphael attr object formate {attrName:attrValue,...}
@@ -127,7 +129,7 @@ var PropertiesPanel = (function(){
             var obj = {};
             Array.from(a).each(function(v){
                 obj[v] = this.attrs[v];
-            });
+            }, this);
             return obj;
         } else{
             return this.attrs;
@@ -151,43 +153,47 @@ var PropertiesPanel = (function(){
      * the global state is the state of the propreties pabnel's attributes when no element is selected
      */
     attrs:{
-        "translate":"T0 0R0S1 1",
-        "x":0,"y":0,"cx":0,"cy":0,"width":0,"height":0,"rx":0,"ry":0,"cr":0,"r":0,
-        "opacity":1,
-        "src":"","fill":"none",
-        "stroke":"#000",
-        "stroke-width":1,
-        "stroke-dasharray":"",
-        "stroke-linecap":"butt",
-        "stroke-linejoin":"bevel",
-        "stroke-miterlimit":1,
-        "text-anchor":"start",
-        "font-family":'Arial, Helvetica, sans-serif',
-        "font-size":18,"font-weight":400,"text":"",
-        "href":"", "target":"", "title":"","cursor":"default",
-        "arrow-end":"none-midium-midium"},
-    /**
+    //    "translate":"R0S1 1T0 0",
+    //    "x":0,"y":0,"cx":0,"cy":0,"width":0,"height":0,"rx":0,"ry":0,"cr":0,"r":0,
+    //    "opacity":1,
+    //    "src":"",
+    //    "fill":"none",
+    //    "stroke":"#000",
+    //    "stroke-width":1,
+    //    "stroke-dasharray":"",
+    //    "stroke-linecap":"butt",
+    //    "stroke-linejoin":"bevel",
+    //    "stroke-miterlimit":1,
+    //    "text-anchor":"start",
+    //    "font-family":'Arial, Helvetica, sans-serif',
+    //    "font-size":18,"font-weight":400,"text":"",
+    //    "cursor":"default",
+    //    "arrow-end":"none-midium-midium"
+    },
+   /**
      * predefine list of props for SVG elements
      */
     elementProps: {
-        common:["clip-x","clip-y","clip-width","clip-height","origin-x","origin-y","rotate","scale-x","scale-y","title","opacity","cursor","fill","fill-opacity","stroke","stroke-dasharray","stroke-linecap","stroke-linejoin",/*"stroke-miterlimit",*/"stroke-opacity","stroke-width"],
-        circle:["cx","cy","cr","origin-x","origin-y","rotate","scale-x","scale-y","clip-x","clip-y","clip-width","clip-height", "href", "target", "title"],
-        rect:["x","y","height","width","r","origin-x","origin-y","rotate","scale-x","scale-y","clip-x","clip-y","clip-width","clip-height", "href", "target", "title"],
-        ellipse:["cx","cy","rx","ry","origin-x","origin-y","rotate","scale-x","scale-y","clip-x","clip-y","clip-width","clip-height", "href", "target", "title"],
-        text:["x","y","text","text-anchor","font","font-family","font-size","font-weight","origin-x","origin-y","rotate","scale-x","scale-y","clip-x","clip-y","clip-width","clip-height", "href", "target", "title"],
-        image:["x","y","width","height","src","origin-x","origin-y","rotate","scale-x","scale-y","clip-x","clip-y","clip-width","clip-height", "href", "target", "title"],
-        path:["translate-x","translate-y","path","arrow-type","arrow-width","arrow-length","origin-x","origin-y","rotate","scale-x","scale-y","clip-x","clip-y","clip-width","clip-height", "href", "target", "title"],
+        common:["tx","ty","bwidth","bheight","offset","rotate","sx","sy","title","opacity","cursor","fill","fill-opacity","stroke","stroke-dasharray","stroke-linecap","stroke-linejoin",/*"stroke-miterlimit",*/"stroke-opacity","stroke-width"],
+        set:["tx","ty","bwidth","bheight","offset","rotate","sx","sy"],
+        circle:["cr","ox","oy","rotate","sx","sy"],
+        rect:["r"],
+        ellipse:["rx","ry"],
+        text:["text","text-anchor","font","font-family","font-size","font-weight"],
+        image:["src"],
+        path:["path","arrow-type","arrow-width","arrow-length"],
         canvas:["x","y","width","height"],
-        all:["clip-x","clip-y","clip-width","clip-height","translate-x","translate-y","origin-x","origin-y","rotate","scale-x","scale-y","x","y","cx","cy","width","height","rx","ry","cr","r","opacity","src","fill","stroke","stroke-width","stroke-dasharray","stroke-linecap","stroke-linejoin",/*"stroke-miterlimit",*/"text-anchor","font-family","font-size","font-weight","text", "href", "target", "title","cursor"]
+        all:["clip-x","clip-y","clip-width","clip-height","translate-x","translate-y","ox","oy","rotate","sx","sy","x","y","cx","cy","width","height","rx","ry","cr","r","opacity","src","fill","stroke","stroke-width","stroke-dasharray","stroke-linecap","stroke-linejoin",/*"stroke-miterlimit",*/"text-anchor","font-family","font-size","font-weight","text", "href", "target", "title","cursor"]
     },
     states:{
+        set:["bbox","transform"],
         canvas:["dimension","paper"],
-        circle:["dimension","fillstroke","transform","clip","anchor","cursor"],
-        rect:["dimension","corner","fillstroke","transform","clip","anchor","cursor"],
-        ellipse:["dimension","fillstroke","transform","clip","anchor","cursor"],
-        text:["dimension","fillstroke","text","transform","clip","anchor","cursor"],
-        image:["dimension","fillstroke","image","transform","clip","anchor","cursor"],
-        path:["dimension","path","arrow-end","fillstroke","transform","clip","anchor","cursor"]
+        circle:["bbox","transform","fillstroke"],
+        rect:["bbox","transform","corner","fillstroke"],
+        ellipse:["bbox","transform","fillstroke"],
+        text:["bbox","transform","fillstroke","text"],
+        image:["bbox","transform","image","fillstroke"],
+        path:["bbox","transform","path","fillstroke","arrow-end"]
     },
     /**
      * intitialize Propreties Panel that contains given propreties
@@ -203,8 +209,13 @@ var PropertiesPanel = (function(){
         if(options.extraProps) {
             properties.combine(options.extraProps);
         }
+        /**
+         * the scurrently selected element
+         */
+        this.selected= [];
         
         this.parent(options ||{});
+        //console.log(this.attrs);
         
         if(options.empty){return this;}
         
@@ -217,27 +228,23 @@ var PropertiesPanel = (function(){
             "updateEvent",
             "elementSelect",
             "elementDeselect",
-            "elementUpdate",
             "panelUpdate",
+            "setOffset",
             "insertKeyframe"
         ]);
         
         this.slidingLabel = new SlidingLabel({
                                 container:panel,
                                 onChange:function(val, input){
-                                        var attr = {}, name = input.get("name"),fact = input.retrieve("factor"), sel = this.selected;
-                                        if(input.getParent().hasClass("transform")){
-                                            //TODO handel free transform
-                                            return;
-                                        }
-                                        if(input.getParent().hasClass("clip")){
-                                            //TODO set clip
-                                            return;
-                                        }
-                                    
-                                        attr[input.get("name")] = val;
+                                        var attr = {}, name = input.get("name");
+                                        attr[name] = val;
                                         //console.log(val);
                                         window.fireEvent("element.update", [attr]);
+                                    }.bind(this),
+                                    onFinish: function(val,input){
+                                        this.selected.each(function(el){
+                                            window.fireEvent("element.update.end", [val, input.get("name"), el]);
+                                        });
                                     }.bind(this)
                                 });
        this.colorPicker = new ColorPicker({
@@ -248,8 +255,8 @@ var PropertiesPanel = (function(){
                     att = v.node.getParent("div").get("for");
                     attr[att]=color;
                     attr[att+"-opacity"]=o;
-                window.fireEvent("element.update", [attr]);
-            }
+                    window.fireEvent("element.update", [attr]);
+                }
             }.bind(this)
         });
         
@@ -281,16 +288,45 @@ var PropertiesPanel = (function(){
         panel.addEvents({
             "keyup:relay(input,textarea)": this.bound.updateEvent,
             "change:relay(input, select)": this.bound.updateEvent,
-            "mousedown:relay(.key-frame img)": this.bound.insertKeyframe
+            "mousedown:relay(.key-frame img)": this.bound.insertKeyframe,
+            "mouseup:relay(.offset-picker)":this.bound.setOffset
         });
         
         window.addEvents({
             "element.deselect": this.bound.elementDeselect,
             "element.delete": this.bound.elementDeselect,
             "element.select":this.bound.elementSelect,
-            "element.update": this.bound.elementUpdate,
             "panel.update": this.bound.panelUpdate,
         });
+   },
+   setState:function(s){
+        var props = this.properties,
+            elP = this.elementProps,
+            states = this.states,
+            gs = this.groups;
+      // console.log(s,states[s],gs);
+       Object.each(gs, function(g){
+           g.group.addClass("hide");
+       });
+       Object.each(states[s], function(g){
+           //console.log(gs, g, gs[g]);
+           gs[g].group.removeClass("hide");
+       });
+       
+       Object.each(props, function(p){
+           p.prop.addClass("hide");
+       });
+       
+       Object.each(props, function(p, key){
+           //console.log(elP, s, key);
+           if(s==="set" && ~elP[s].indexOf(key)){ //s is set but I don't wnat to show common
+                p.prop.removeClass("hide");
+           } else if(~elP.common.indexOf(key) || ~elP[s].indexOf(key)){
+               //console.log(key)
+               p.prop.removeClass("hide");
+           }
+       });
+       this.state = s;
    },
    /**
     * function that fires element.update event with the input'scurrent value on keyup or change
@@ -307,6 +343,9 @@ var PropertiesPanel = (function(){
             var arr = group.getChildren(".proprety").map(function(c){return c.getLast().get("value");});
             attr["arrow-end"] = arr.join("-");
         } else {
+            if(input.retrieve("factor")){
+                val = val/input.retrieve("factor");
+            }
             attr[att] = val;   
         }
         
@@ -314,22 +353,8 @@ var PropertiesPanel = (function(){
         window.fireEvent("element.update", [attr]);
         
     },
-    /**
-     * updates the current selected element(s) with the passed attribute
-     * @param attr (obj) a Raphael attr object ie {attributName:attributeValue}
-     * 
-     */
-    elementUpdate: function(attr, elm){
-        if(elm){
-            elm.attr(attr);
-        }else{
-            this.selected.each(function(el){el.attr(attr);});
-            //if(this.selected.length<1){
-                window.fireEvent("panel.update", [attr]);
-            //}
-        }
-    },
     panelUpdate: function(attr){
+        //console.log(attr);
         this.prop(attr);
         if(this.selected.length===0){
             this.setAttr(attr);
@@ -344,7 +369,13 @@ var PropertiesPanel = (function(){
         this.selected.push(el);
         this.setState(el.type);
         //console.log(el.attr());
+        
+        this.prop('offset', el.getOffset());
+        
         this.prop(el.attr());
+        this.prop(el.trans());
+        
+        //console.log(el.getOffset(), el.trans());
     },
     /**
      * deselects an element and updates reset this propreties panel back to the global state
@@ -382,26 +413,40 @@ var PropertiesPanel = (function(){
             var p = this.properties[prop];
             if(!p){ return;}
             
-            
             //console.log(prop,p, val);
             p = p.prop;
-            if(val){ //set prop to val
-                if(p.hasClass("number")){
+            if(typeOf(val)!=='null'){ //set prop to val
+                if(p.hasClass("number")||p.hasClass("percent")){
+                    //.log(val);
+                    if(p.hasClass("percent")){
+                        val = val*=p.getLast().getPrevious().retrieve("factor");
+                    }
                     p.getLast().getPrevious().set("value", val);
                     return;
-                }
+                } else
                 if(p.hasClass("color")){
+                    //console.log(p, val);
                     this.colorPicker.setColor(p.getLast().retrieve("vec"), val);
-                    return;
+                } else if(p.hasClass("icon")){
+                    return p.setTitle(val);
                 }
-                
-                p.getLast().set("value", val);
+                if(p.hasClass("offset")){
+                    p.retrieve("set").set(val);
+                    
+                   // console.log(this.prop('offset'));
+                } else {
+                    p.getLast().set("value", val);
+                }
             } else { //get prop value
-                if(p.hasClass("number")){
+                if(p.hasClass("number")||p.hasClass("percent")){
                     return p.getLast().getPrevious().get("value");
                 }
                 if(p.hasClass("color")){
                     return p.getLast().retrieve("vec").attr("fill");
+                }
+                if(p.hasClass("icon")){
+                    return p.getTitle();
+                    return;
                 }
                 return p.getLast().get("value");
             }
@@ -426,6 +471,26 @@ var PropertiesPanel = (function(){
         this.selected.each(function(el){
             window.fireEvent("keyframe.insert", {el:el, prop:attr, value:this.prop(attr), jump:eve.alt});
         },this);
+    },
+    setOffset : function(e) {
+        var val = e.target.getParent(".offset").getLast().get("value").toInt(), x, y;
+        switch(val){
+            case 0: x = 0;   y = 0; break;
+            case 1: x = 0.5; y = 0; break;
+            case 2: x = 1;   y = 0; break;
+            case 3: x = 0;   y = 0.5; break;
+            case 4: x = 0.5; y = 0.5; break;
+            case 5: x = 1;   y = 0.5; break;
+            case 6: x = 0;   y = 1; break;
+            case 7: x = 0.5; y = 1; break;
+            case 8: x = 1;   y = 1; break;
+        }
+        this.selected.each(function(el){
+           el.offX = x;
+           el.offY = y;
+           console.log(el.offX, el.offY, el.trans(['tx','ty']));
+           this.prop(el.trans(['tx','ty']));
+        }, this);
     }
 });
 
