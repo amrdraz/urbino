@@ -120,12 +120,13 @@ Raphael.el.trans =Raphael.st.trans = function(tr,val) {
         } else {
             switch(tr) {
             case 'trs':
-            console.log(m);
+           // console.log(m);
                 val = [
                     ['R', m.rotate, at.center.x, at.center.y],
                     ['S', m.scalex, m.scaley, at.center.x, at.center.y],
                     ['T', m.dx||0, m.dy||0]
                     ];
+                    console.log(m, val);
                 break;
             case 'tx':
                 val = (bb.x + el.offX*bb.width).round(1);//(at.x+at.translate.x).round()+offx;
@@ -182,7 +183,7 @@ Raphael.fn.getAnimValue = function(tr, anim){
 }
 
 Raphael.el.ftUpdate = function(attr, val){
-    var at = this.ft.attrs;
+    var el = this, at = el.ft.attrs, bb = el.getBBox();
     if(typeof attr === 'object' && !(attr instanceof Array)){
         Object.each(attr, function(v, key){
             el.ftUpdate(key, v);
@@ -192,10 +193,12 @@ Raphael.el.ftUpdate = function(attr, val){
     if(typeof val !== 'undefined'){
         switch(attr){
         case 'tx':
-            at.translate.x = val;
+            at.translate.x = (val-el.offX*bb.width)-at.x;        
+            //at.translate.y = (at.translate.y-el.offY*bb.height)-at.y;
             break;
         case 'ty':
-            at.translate.y = val;
+            //at.translate.x = (at.translate.x-el.offX*bb.width)-at.x;        
+            at.translate.y = (val-el.offY*bb.height)-at.y;
             break;
         case 'bwidth':
             //val -= at.size.x;
@@ -228,7 +231,7 @@ Raphael.el.ftUpdate = function(attr, val){
             break;
         }
         //console.log(attr, val);
-        this.ft.updateHandles();
+        el.ft.updateHandles();
     }
 } 
 /**
@@ -308,10 +311,11 @@ Raphael.fn.toJS = function(options){
 Array.implement("insertSort", function(n){
     var ar = this, i;
     if(ar.length===0) ar[0] = n;
-     for(i=ar.length;~i;i--){ //insert in order
+    for(i=ar.length;~i;i--){ //insert in order
         if(ar[i-1] && ar[i-1]===n) return true;
         if(ar[i-1]<n){
             ar.splice(i,0,n); return true;
         }
     }
+    ar.splice(0,0,n); return true;
 });

@@ -468,7 +468,7 @@ var CanvasPanel = new Class({
      * @param at (obj) attributes of bounding box while drawing
      */
     elementCreate : function(el, at){
-        var R = this.level.paper, gs, ft;
+        var R = this.level.paper, gs, ft, ta = this.textArea;
         //console.log("canvas element create",el.segments);
         
         el.offX = el.offX || 0.5;
@@ -502,9 +502,10 @@ var CanvasPanel = new Class({
                 'S', at.scale.x, at.scale.y, at.center.x, at.center.y,
                 'T', at.translate.x, at.translate.y
                 ] + ft.items[0].transformString);*/
-                var tr = ft.subject.trans();
-                //console.log(tr);
-                window.fireEvent("panel.update", [ft.subject.trans()]);
+                var tr = ft.subject.trans(['tx','ty','sx','sy','rotate', 'bwidth', 'bheight']);
+                //console.log(ft.subject.trans('trs'));
+                window.fireEvent("panel.update", [tr]);
+                //window.fireEvent("panel.element.update", [tr, ft.subject]);
             }.bind(this));
             
         el.ft = ft;

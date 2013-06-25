@@ -707,7 +707,12 @@ Raphael.fn.freeTransform = function(subject, options, callback) {
 					] + ft.items[i].transformString);
 
 				asyncCallback([ 'apply' ]);
-
+				
+               /* if(isNaN(el.matrix.f) && isNaN(el.matrix.e)){
+                    el.trans("...T0 0");
+                    console.log(el.getBBox());
+                }*/ 
+                
 				ft.updateHandles();
 			}
 		});

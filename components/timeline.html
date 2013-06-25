@@ -21,7 +21,7 @@
   <script type="text/javascript" src="../core/mootools-more-1.4.0.1.js"></script>
   <script type="text/javascript" src="../core/raphael.js"></script>
   <script type="text/javascript" src="js/raphael.util.js"></script>
-  <script type="text/javascript" src="../external/raphael.free_transform.js"></script>
+  <script type="text/javascript" src="js/raphael.free_transform.js"></script>
   <script type="text/javascript" src="js/raphael.pathManager.js"></script>
   <script type="text/javascript" src="js/SlidingLabel.js"></script>
   <script type="text/javascript" src="js/ColorPicker.js"></script>
@@ -107,13 +107,13 @@
 	
 	//auto generate
 	
-	var bool=false,i,j,jj,x,step=1000,el,att,elc = 1,ntimes=3, bb,
+	var bool=false,i,j,jj,x,step=1000,el,att,elc = 1,ntimes=1, bb,
 	els=["rect", "text"],
-	attr=["sx"];
+	attr=["tx", "ty"];
 	for(var k=0;k<elc;k++){
 		i = k%(els.length);
 		bb = {
-			x:((Math.random()*50)+50).round(),
+			x:((Math.random()*50)+0).round(),
 			y:((Math.random()*40)+50).round(),
 			w:((Math.random()*50)+70).round(),
 			h:((Math.random()*10)+50).round()
@@ -147,12 +147,19 @@
 				x = i*step+250
 				bool = !bool;
 				att = {};
-				att[attr[j]] = ((i*0.3));
+				switch(attr[j]){
+				case "sx":case"sy":
+					att[attr[j]] = ((i*0.3+0.1));
+					break;
+				case "tx":case"ty":case"rotate":
+					att[attr[j]] = ((i*100+10));
+					break;
+				}
+				
 				//console.log(att);
-				//rot att[attr[j]] = ((i*100));
 				//att==="path"?el.attr("path")+" L"+(bb.x+(i*10))+" "+(bb.y+(i*10))
 				window.fireEvent("element.update", [att]);
-				window.fireEvent("keyframe.insert", {el:el, prop:attr[j], ms:x, jump:true});
+				window.fireEvent("keyframe.insert", {el:el, prop:attr[j], ms:x, jump:bool});
 			}
 		}
 	}

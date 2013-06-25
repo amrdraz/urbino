@@ -355,6 +355,7 @@ var PropertiesPanel = (function(){
     },
     panelUpdate: function(attr){
         //console.log(attr);
+        
         this.prop(attr);
         if(this.selected.length===0){
             this.setAttr(attr);

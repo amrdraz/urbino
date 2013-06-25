@@ -7,7 +7,7 @@ $data = '<!DOCTYPE HTML>
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 	<title>Urbino</title>
   
-	<script type="text/javascript" src="http://github.com/DmitryBaranovskiy/raphael/raw/master/raphael-min.js"></script>
+	<script type="text/javascript" src="core/raphael-min.js"></script>
   	<script type="text/javascript">
   		window.onload = (function(){
 		var holder = document.getElementById("holder");

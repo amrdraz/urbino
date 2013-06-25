@@ -72,7 +72,7 @@ var TimePanel = (function(){
             "y":{name:"oy", "class":"transform prop-label", label:"Origin-y",type:"number", anim:true},
             "rotate":{name:"rotate", "class":"transform prop-label", label:"Rotate",type:"number", sufix:"°", anim:true},
             "sx":{name:"sx", "class":"transform prop-label", label:"Scale-x",type:"percent", anim:true},
-            "sy":{name:"sy", "class":"transform prop-label", label:"Scale=y",type:"percent", anim:true},
+            "sy":{name:"sy", "class":"transform prop-label", label:"Scale-y",type:"percent", anim:true},
        // "arrow-end":{name:"arrow-end"},     // (string) arrowhead on the end of the path. The format for string is '<type>[-<width>[-<length>]]'. Possible types: 'classic', 'block', 'open', 'oval', 'diamond', 'none', width: 'wide', 'narrow', 'midium', length: 'long', 'short', 'midium'.
             "arrow-type":{name:"arrow-type", "class":"", label:"type",type:"select", options:['none','classic', 'block', 'open', 'oval', 'diamond'] },
             "arrow-width":{name:"arrow-width", "class":"", label:"width",type:"select", options:['midium','wide', 'narrow'] },
@@ -593,7 +593,9 @@ var TimePanel = (function(){
             return;
         }
         Object.each(attrs, function(val, prop){
-           this.prop(el,prop,val);
+            if(el.animating.contains(prop)){
+                this.prop(el,prop,val);
+            }
         }, this);
         if(this.selected[id]){
             window.fireEvent("panel.update", attrs);
@@ -602,7 +604,7 @@ var TimePanel = (function(){
     prop:function(el, prop,val){
          //if(!el.trans(prop)) return;
             var p = this.els[el.id].eProps[prop];
-            //console.log(this, this.els,el.id,this.els[el.id].eProps, prop, p);
+            console.log(el, prop, val);
             if(p.hasClass("color")){
                 if(val!=="-"){
                     this.colorPicker.setColor(p.getLast().retrieve("vec"), val);
@@ -640,11 +642,11 @@ var TimePanel = (function(){
             prop="transform";
             val = el.trans("trs");
         }
-        if(ms<=p[0].del) {
+        if(ms<=p[0].ms) {
             console.log("timerack update start",el, prop, val, ms);
             p[0].anim[100][prop] = val;
             return;
-        } else if(p[p.length-1].ms<ms){
+        } else if(p[p.length-1].ms<=ms){
             console.log("timerack update",el, prop, val, ms);
             p[p.length-1].anim[100][prop] = val;
            
@@ -659,7 +661,7 @@ var TimePanel = (function(){
                window.fireEvent("keyframe.insert", {el:el, prop:pr});
                return true;
             }
-            if(a.ms<=ms &&  ms<=p[i+1].del){ // [------]..|..[-----]
+            if(a.ms<=ms &&  p[i+1] && ms<=p[i+1].del){ // [------]..|..[-----]
                 console.log("timerack update mid",el, prop, val, ms);
                p[i].anim[100][prop] = val;
                return true;
@@ -894,7 +896,7 @@ var TimePanel = (function(){
         clearTimeout(this.timer);
         this.playButton.attr("path",this.icon.play);
         Object.each(this.animating, function(el){
-            !(el.type==="path" && el.drawing) && el.ft.showHandles();
+            this.selected[el.id] && !(el.type==="path" && el.drawing) && el.ft.showHandles();
             //console.log(el.aimating.contains("path"));
             if(el.type==="path" && el.drawing) {el.plug();}
             window.fireEvent("panel.element.update",[el.trans(el.animating),el]);
@@ -918,7 +920,7 @@ var TimePanel = (function(){
         };
         //hide elements properties and guid tools
         Object.each(this.animating, function(el){
-            el.ft.hideHandles();
+            el.ft && el.ft.hideHandles();
             if(el.type=="path" && el.drawing) {el.hideManager();}
             window.fireEvent("panel.element.update",['clear',el]);
         }, this);
@@ -1009,81 +1011,66 @@ var TimePanel = (function(){
                 }
                 !mss[a.ms].contains(p) && mss[a.ms].push(p);
                 msa[a.ms][p] = a;
-                
-                //console.log("del",perc2, k, a.del);
-                if(!anims[p][i-1]) {return;} //nothing before 0 or first
+                //console.log(a.ms, msr);
+                if(a.jump){return}  //nothing before jump 
                 
                 msr.insertSort(a.del);
                 if(!mss[a.del]) {
                     mss[a.del] = [];
                     msa[a.del] = {};
                 }
-                console.log(a.jump);
                 msa[a.del][p] = anims[p][i-1];
                 !mss[a.del].contains(p) && mss[a.del].push(p);
-                console.log(msa[a.del]);
+                //console.log(msa[a.del]);
             }, this);
         }, this);
         
-        //console.log(msr);
+        //console.log("combin trans after mapping", msr, msa, mss);
         //join them by map from mss
         //fill in the parts that transition
         msr.each(function(ms, mi){
-            var props = mss[ms], isJump=false,del = msr[mi-1]||ms;
+            var props = mss[ms], isJump=false,del = msr[mi-1];
             
             //get del and if jump
-            
-            var prev = msr[mi-1],preprev;
-            /*if(Object.every(msa[mi], function(a){return a.jump;})){ //all are jump, if first all are jump so no need to check for prev
-                del = ms;
+            //console.log("combin trans checking for jump at",ms, "in", msa, msa[ms]);
+            if(Object.every(msa[ms], function(a){return a.jump;})){ //all are jump, if first all are jump so no need to check for prev
                 isJump = true; 
-            } else {
-                preprev = msr[mi-2];
-                if(preprev && prev.some(function(a){
-                                return a.jump && preprev.every(function(pa){
-                                    return pa.ms<a.del;
-                                });
-                        })){
-                    del = ms;
-                    isJump = true; 
-                }
-            }*/
+                del = ms;
+            }
             
-            var tra = this.animCreate({prop:"transform",val:[["R",0],["S",1,1],["T",0,0]], del:del,ms:ms, jump:isJump})
-            console.log( del,tra, ms);
+            //console.log("combin trans init trans anim at",ms, "del", del, "jump", isJump);
+            var tra = this.animCreate({prop:"transform",val:[["R",0],["S",1,1],["T",0,0]], del:del, ms:ms, jump:isJump})
+            //console.log( del,tra, ms);
             trans.each(function(p){
                 //console.log(props, msa[ms], p);
-                if(props.contains(p)) {
+                if(props.contains(p)) { //case equality
                    this.mergeTrans(tra,msa[ms][p],p);
                    return;
                 }
                 //seek it from anims by by ms
                 var panims =  anims[p];
-                if(panims.getLast().ms<=ms){
-                    this.mergeTrans(tra,panims.getLast(),p);
-                    return;
+                if(panims[0].ms>ms){
+                    this.mergeTrans(tra,panims[0],p);
+                    //tra.del
+                }
+                if(panims.getLast().ms < ms){ // .............. |
+                     this.mergeTrans(tra,panims.getLast(),p);
+                     return;
                 }
                 panims.some(function(a,i){
                       // console.log("timerack update jump befor",el, prop, val, ms);
-                    if(a.jump && a.ms>ms){//  | x....
-                         this.mergeTrans(tra,p[i-1]?panims[i-1]:a,p); //i-1 is the case where its the first key
-                        return true;
-                    }
-                    if(ms===a.ms) {
-                        this.mergeTrans(tra,a,p);
-                        return true;
-                    }
-                    if(a.del<ms && a.ms>ms){        //  [-------|----]
-                     //   console.log("timerack update mid trans",el, prop, val, ms);
-                       el.attr("transform", panims[i-1].anim[100]["transform"]);
-                       el.status(a,(ms-a.del)/(a.ms-a.del));
-                       this.mergeTrans(tra,el.attr("transform"),p);
-                       msa[ms][p].push(a);
-                       return true;
-                    }
-                    if(a.ms<ms &&  (!p[i+1] || ms<p[i+1].del)){ // [------]  | ....
-                     //   console.log("timerack update mid",el, prop, val, ms);
-                       this.mergeTrans(tra,panims[i-1],p);
+                    //console.log(i, p, "a.ms", a.ms, "ms",ms, ms<a.ms,ms<a.del);
+                    if(a.ms>ms){ //  | .... or [-----|--]
+                        if(ms<a.del){ //  | ....
+                             this.mergeTrans(tra,panims[i-1]?panims[i-1]:a,p);
+                        } else { //  [-----|--]
+                            el.attr("transform", panims[i-1].anim[100]["transform"]);
+                            el.status(a,(ms-a.del)/(a.ms-a.del));
+                            tra.jump = false;
+                            tra.del = msr[mi-1];
+                            this.mergeTrans(tra,el.attr("transform"),p);
+                            msa[ms][p] = a;
+                        }
                        return true;
                     }
                     return false;
@@ -1091,7 +1078,7 @@ var TimePanel = (function(){
             }, this);
             trs.push(tra);
         }, this);
-        console.log("combin trans",msr, mss, msa, tanims, trs);
+        //console.log("combin trans",msr, mss, msa, tanims, trs);
         //return;
         el.anims.transform = trs;
     },
@@ -1259,7 +1246,7 @@ var TimePanel = (function(){
             //console.log(o.prop);
             o.prop = "transform"
             o.val = o.el.trans("trs");
-            //console.log(o.val);
+            console.log(o.val);
         }
         attr[o.prop] = o.val;
         if (o.jump){
@@ -1332,6 +1319,7 @@ var TimePanel = (function(){
             !this.animating.contains(el) && this.animating.push(el);
             //keep track of properties being animated for that element
             el.animating.push(prop);
+            console.log(el.animating);
             //console.log("keyframeInsert",a);
             this.lastMs = this.lastMs.max(a.ms);
             this.combineAnim(el);
@@ -1493,10 +1481,10 @@ var TimePanel = (function(){
         el.destroy();
         if(anims.length===0){
             $$(elm.tProps[prop],elm.eProps[prop].getParent()).addClass('empty');
-            el.animating.erase(prop);
+            elm.el.animating.erase(prop);
             if(Object.every(elm.tProps,function(p){return p.hasClass('empty');})){
                 $$(elm.element,elm.timeline).addClass("empty");
-                this.animating.erase(el);
+                this.animating.erase(elm.el);
                 delete elm.el.anim;
                 return;
             }
