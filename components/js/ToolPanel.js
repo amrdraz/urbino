@@ -85,7 +85,7 @@ initialize : function(options){
     });
     
     /**
-     * creates the tool panel and adds the 
+     * creates the tool panel buttons
      */
     p.set("html",''+
         '<div toolType="select" title="select element" class="tool">select</div>'+
@@ -97,6 +97,7 @@ initialize : function(options){
         '<div toolType="path" title="draw path" class="tool">path</div>'
     );
     
+    //init color pickers
     var ps = this.properties = {},
         props = {
         "fill":{name:"fill", value:fs.fill,x:5,y:250,width:30,type:"color"},

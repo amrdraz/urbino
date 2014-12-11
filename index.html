@@ -70,8 +70,8 @@
 	canvas = new TabPanel("canvas", {
 		x:40,
 		y:0,
-		width:1620,
-		height:1580,
+		width:600,
+		height:480,
 		initSelect:"Canvas",
 		tabs:{
 			"Canvas":c,
@@ -80,10 +80,10 @@
 		}
 	}),
 	side = new TabPanel("side", {
-		x:1600,
+		x:640,
 		y:0,
 		width:300,
-		height:780,
+		height:600,
 		initSelect:"Propreties",
 		tabs:{
 			"Propreties": (new PropertiesPanel({imgSrc:"img"})),
@@ -93,7 +93,7 @@
 	}),
 	timeline = new TabPanel("timeline", {
 		x:0,
-		y:1580,
+		y:600,
 		width:1020,
 		height:220,
 		tabs:{
